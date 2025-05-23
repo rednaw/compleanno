@@ -1,6 +1,7 @@
 <script>
 import { onMount, onDestroy } from 'svelte';
 import { Game } from './game-client.js';
+import { browser } from '$app/environment';
 
 let game;
 let guesses = [];
@@ -55,7 +56,9 @@ function restart() {
 }
 
 onMount(() => {
-  document.body.classList.add('wordle-page');
+  if (browser) {
+    document.body.classList.add('wordle-page');
+  }
   loadGame();
   window.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -66,7 +69,9 @@ onMount(() => {
 });
 
 onDestroy(() => {
-  document.body.classList.remove('wordle-page');
+  if (browser) {
+    document.body.classList.remove('wordle-page');
+  }
 });
 
 $: won = answers.at(-1) === 'xxxxx';
