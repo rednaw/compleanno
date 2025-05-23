@@ -13,7 +13,8 @@ const config = {
       strict: true
     }),
     paths: {
-      base: dev || preview ? "" : "/compleanno"
+      base: dev || preview ? "" : "/compleanno",
+      assets: dev || preview ? "" : "/compleanno"
     }
   }
 };
