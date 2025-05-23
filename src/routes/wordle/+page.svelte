@@ -1,5 +1,5 @@
 <script>
-import { onMount } from 'svelte';
+import { onMount, onDestroy } from 'svelte';
 import { Game } from './game-client.js';
 
 let game;
@@ -55,6 +55,7 @@ function restart() {
 }
 
 onMount(() => {
+  document.body.classList.add('wordle-page');
   loadGame();
   window.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -62,6 +63,10 @@ onMount(() => {
     else if (e.key === 'Backspace') handleKey('backspace');
     else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toLowerCase());
   });
+});
+
+onDestroy(() => {
+  document.body.classList.remove('wordle-page');
 });
 
 $: won = answers.at(-1) === 'xxxxx';
@@ -75,7 +80,7 @@ $: answer = answers.length >= 6 ? game.answer : null;
 </svelte:head>
 
 <style>
-:global(body) {
+:global(body.wordle-page) {
   min-height: 100vh;
   margin: 0;
   display: flex;
@@ -208,7 +213,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
-  <h1>Indovina la parola</h1>
+  <h1>Dove si trova?</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
       <div class="row {row === answers.length && !gameOver ? 'current' : ''} {badGuess && row === answers.length ? 'bad-guess' : ''}">
