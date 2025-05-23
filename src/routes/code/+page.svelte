@@ -31,6 +31,18 @@
     }
   }
 
+  function handleKey(e) {
+    if (success) return;
+    
+    if (e.key === 'Enter') {
+      handleEnter();
+    } else if (e.key === 'Backspace') {
+      handleBackspace();
+    } else if (/^[0-9]$/.test(e.key)) {
+      handleDigit(e.key);
+    }
+  }
+
   $effect(() => {
     if (success && browser) {
       const timer = setTimeout(() => {
@@ -43,12 +55,14 @@
   onMount(() => {
     if (browser) {
       document.body.classList.add('code-page');
+      window.addEventListener('keydown', handleKey);
     }
   });
 
   onDestroy(() => {
     if (browser) {
       document.body.classList.remove('code-page');
+      window.removeEventListener('keydown', handleKey);
     }
   });
 </script>
