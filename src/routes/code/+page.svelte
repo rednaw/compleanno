@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
 
   const CORRECT_CODE = '1234';
   let code = $state('');
@@ -31,7 +32,7 @@
   }
 
   $effect(() => {
-    if (success) {
+    if (success && browser) {
       const timer = setTimeout(() => {
         window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
       }, 1000);
@@ -40,11 +41,15 @@
   });
 
   onMount(() => {
-    document.body.classList.add('code-page');
+    if (browser) {
+      document.body.classList.add('code-page');
+    }
   });
 
   onDestroy(() => {
-    document.body.classList.remove('code-page');
+    if (browser) {
+      document.body.classList.remove('code-page');
+    }
   });
 </script>
 
