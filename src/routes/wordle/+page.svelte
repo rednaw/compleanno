@@ -230,11 +230,11 @@ button:disabled {
   {#if gameOver}
     <div class="result">
       {#if won}
-        <p>🎉 You won! 🎉</p>
+        <p>🎉 Hai vinto, vai a guardare velocemente! 🎉</p>
       {:else}
-        <p>Game over, try again!</p>
+        <p>Game over, riprova!</p>
       {/if}
-      <button on:click={restart}>Play again</button>
+      <button on:click={restart}>Riprova</button>
     </div>
   {:else}
     <div class="keyboard">
