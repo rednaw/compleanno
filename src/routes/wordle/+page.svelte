@@ -232,7 +232,7 @@ button:disabled {
       {#if won}
         <p>🎉 You won! 🎉</p>
       {:else}
-        <p>Game over".</p>
+        <p>Game over, try again!</p>
       {/if}
       <button on:click={restart}>Play again</button>
     </div>
