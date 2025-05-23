@@ -3,13 +3,22 @@
 </script>
 
 <main>
-  <a href="{base}/wordle">Wordle</a>
+  <nav>
+    <a href="{base}/wordle">Wordle</a>
+    <a href="{base}/code">Enter Code</a>
+  </nav>
 </main>
 
 <style>
   main {
     text-align: center;
     padding: 2rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
   }
 
   a {
