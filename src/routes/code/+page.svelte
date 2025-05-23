@@ -45,10 +45,7 @@
 
   $effect(() => {
     if (success && browser) {
-      const timer = setTimeout(() => {
-        window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
-      }, 1000);
-      return () => clearTimeout(timer);
+      window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
     }
   });
 
