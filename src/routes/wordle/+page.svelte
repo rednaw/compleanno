@@ -12,7 +12,7 @@ let badGuess = false;
 let gameOver = false;
 
 function loadGame() {
-  const saved = localStorage.getItem('sverdle');
+  const saved = localStorage.getItem('wordle');
   game = new Game(saved);
   guesses = [...game.guesses];
   answers = [...game.answers];
@@ -23,7 +23,7 @@ function loadGame() {
 }
 
 function saveGame() {
-  localStorage.setItem('sverdle', game.toString());
+  localStorage.setItem('wordle', game.toString());
 }
 
 function handleKey(key) {
@@ -49,7 +49,7 @@ function handleKey(key) {
 }
 
 function restart() {
-  localStorage.removeItem('sverdle');
+  localStorage.removeItem('wordle');
   loadGame();
   badGuess = false;
 }
@@ -70,7 +70,7 @@ $: answer = answers.length >= 6 ? game.answer : null;
 </script>
 
 <svelte:head>
-  <title>Sverdle</title>
+  <title>Wordle</title>
   <meta name="description" content="A Wordle clone written in SvelteKit" />
 </svelte:head>
 
@@ -81,7 +81,7 @@ $: answer = answers.length >= 6 ? game.answer : null;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('/src/lib/images/balloons.png') no-repeat center center fixed;
+  background: url('/questionmark.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -176,7 +176,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
-  <h1>Sverdle</h1>
+  <h1>Indovina la parola</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
       <div class="row {row === answers.length && !gameOver ? 'current' : ''} {badGuess && row === answers.length ? 'bad-guess' : ''}">

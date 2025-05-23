@@ -11,7 +11,7 @@ export class Game {
       this.guesses = guesses ? guesses.split(' ') : [];
       this.answers = answers ? answers.split(' ') : [];
     } else {
-      this.index = 0; //Math.floor(Math.random() * words.length);
+      this.index = 435; // caffe // Math.floor(Math.random() * words.length);
       this.guesses = ['', '', '', '', '', ''];
       this.answers = ([]);
     }
