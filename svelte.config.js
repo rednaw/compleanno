@@ -14,8 +14,6 @@ const config = {
     }),
     paths: {
       base: dev || preview ? "" : "/compleanno",
-      assets: dev || preview ? "" : "https://rednaw.github.io/compleanno",
-      relative: false
     }
   }
 };
