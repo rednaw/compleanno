@@ -173,6 +173,38 @@ button:disabled {
   font-size: 1.2em;
   text-align: center;
 }
+
+@media (max-width: 500px) {
+  .main-container {
+    max-width: 98vw;
+    padding: 1em 0.2em 0.5em 0.2em;
+  }
+  .game {
+    width: 100%;
+  }
+  .row {
+    width: 100%;
+    justify-content: center;
+  }
+  .letter {
+    width: 2.2em;
+    height: 2.2em;
+    font-size: 1.1em;
+  }
+  .keyboard {
+    width: 100%;
+    max-width: 100vw;
+  }
+  .kb-row {
+    width: 100%;
+    justify-content: center;
+  }
+  button {
+    padding: 0.3em 0.5em;
+    font-size: 0.95em;
+    min-width: 2.2em;
+  }
+}
 </style>
 
 <main class="main-container">
