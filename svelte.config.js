@@ -6,6 +6,7 @@ const preview = !!process.env.VITE_PREVIEW;
 const config = {
   kit: {
     adapter: adapter({
+      trailingSlash: "always",
       pages: "build",
       assets: "build",
       fallback: null,
