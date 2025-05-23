@@ -57,20 +57,19 @@ function restart() {
 
 onMount(() => {
   if (browser) {
-    document.body.classList.add('wordle-page');
+    window.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'Enter') handleKey('enter');
+      else if (e.key === 'Backspace') handleKey('backspace');
+      else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toLowerCase());
+    });
   }
   loadGame();
-  window.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'Enter') handleKey('enter');
-    else if (e.key === 'Backspace') handleKey('backspace');
-    else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toLowerCase());
-  });
 });
 
 onDestroy(() => {
   if (browser) {
-    document.body.classList.remove('wordle-page');
+    window.removeEventListener('keydown', handleKey);
   }
 });
 
@@ -100,9 +99,9 @@ $: answer = answers.length >= 6 ? game.answer : null;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 1em;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.1);
   padding: 2em 2em 1em 2em;
   max-width: 420px;
   width: 100%;
@@ -123,28 +122,34 @@ $: answer = answers.length >= 6 ? game.answer : null;
 .letter {
   width: 2em;
   height: 2em;
-  border: 1px solid #ccc;
+  border: 2px solid #fd7f20;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5em;
-  background: #fff;
+  background: white;
   text-transform: uppercase;
+  color: #010100;
+  font-weight: 600;
+  border-radius: 0.5em;
 }
 .exact {
-  background: #6aaa64;
-  color: #fff;
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
 }
 .close {
-  background: #c9b458;
-  color: #fff;
+  background: #ffc107;
+  color: white;
+  border-color: #ffc107;
 }
 .missing {
-  background: #787c7e;
-  color: #fff;
+  background: #90a4ae;
+  color: white;
+  border-color: #90a4ae;
 }
 .current {
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #fc2e20;
 }
 .bad-guess {
   animation: shake 0.2s 2;
@@ -169,10 +174,17 @@ $: answer = answers.length >= 6 ? game.answer : null;
 button {
   padding: 0.5em 1em;
   font-size: 1em;
-  border: 1px solid #ccc;
-  background: #eee;
+  border: 2px solid #fd7f20;
+  background: white;
+  color: #010100;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0.5em;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+button:hover {
+  background: #fdb750;
+  border-color: #fc2e20;
 }
 button:disabled {
   opacity: 0.5;
@@ -182,6 +194,7 @@ button:disabled {
   margin-top: 1em;
   font-size: 1.2em;
   text-align: center;
+  color: #2c3e50;
 }
 
 @media (max-width: 500px) {

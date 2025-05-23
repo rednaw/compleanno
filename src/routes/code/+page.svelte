@@ -54,14 +54,12 @@
 
   onMount(() => {
     if (browser) {
-      document.body.classList.add('code-page');
       window.addEventListener('keydown', handleKey);
     }
   });
 
   onDestroy(() => {
     if (browser) {
-      document.body.classList.remove('code-page');
       window.removeEventListener('keydown', handleKey);
     }
   });
@@ -73,24 +71,14 @@
 </svelte:head>
 
 <style>
-  :global(body.code-page) {
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1a1a1a;
-    color: white;
-  }
-
   .main-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 1em;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.1);
     padding: 2em;
     max-width: 320px;
     width: 100%;
@@ -103,6 +91,7 @@
     margin: 1em 0;
     min-height: 1.5em;
     font-family: monospace;
+    color: #010100;
   }
 
   .keypad {
@@ -116,30 +105,33 @@
   button {
     padding: 1em;
     font-size: 1.5em;
-    border: none;
-    background: #333;
-    color: white;
+    border: 2px solid #fd7f20;
+    background: white;
+    color: #010100;
     cursor: pointer;
     border-radius: 0.5em;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    font-weight: 500;
   }
 
   button:hover {
-    background: #444;
+    background: #fdb750;
+    border-color: #fc2e20;
   }
 
   button:active {
-    background: #555;
+    background: #fc2e20;
+    color: white;
   }
 
   .error {
-    color: #ff4444;
+    color: #fc2e20;
     margin: 1em 0;
     min-height: 1.5em;
   }
 
   .success {
-    color: #44ff44;
+    color: #fd7f20;
     margin: 1em 0;
     min-height: 1.5em;
   }
