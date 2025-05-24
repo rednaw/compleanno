@@ -7,6 +7,7 @@
   let code = $state('');
   let error = $state(false);
   let success = $state(false);
+  let fadeOut = $state(false);
 
   function handleDigit(digit) {
     if (code.length < 4) {
@@ -45,13 +46,10 @@
 
   $effect(() => {
     if (success && browser) {
-      const mainContainer = document.querySelector('.main-container');
-      if (mainContainer) {
-        mainContainer.classList.add('fade-out');
-        setTimeout(() => {
-          window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
-        }, 1000);
-      }
+      fadeOut = true;
+      setTimeout(() => {
+        window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
+      }, 1000);
     }
   });
 
@@ -75,50 +73,12 @@
 
 <style>
   @keyframes fadeOut {
-    from {
-      opacity: 1;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-  }
-
-  @keyframes successFlash {
-    0% {
-      background: rgba(255, 255, 255, 0.9);
-      transform: scale(1);
-    }
-    20% {
-      background: rgba(253, 127, 32, 0.2);
-      transform: scale(1.05);
-    }
-    40% {
-      background: rgba(255, 255, 255, 0.9);
-      transform: scale(1);
-    }
-    60% {
-      background: rgba(253, 127, 32, 0.2);
-      transform: scale(1.05);
-    }
-    80% {
-      background: rgba(255, 255, 255, 0.9);
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(0.8);
-    }
-  }
-
-  .success-animation {
-    animation: successFlash 1.5s forwards;
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   .fade-out {
     animation: fadeOut 1s forwards;
-    -webkit-animation: fadeOut 1s forwards; /* For iOS */
   }
 
   .main-container {
@@ -126,15 +86,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white);
     border-radius: 1em;
     box-shadow: 0 4px 32px rgba(0,0,0,0.1);
     padding: 2em;
     max-width: 320px;
     width: 100%;
     margin: 2em auto;
-    transition: all 0.3s ease;
-    -webkit-transform: translateZ(0); /* Force GPU acceleration on iOS */
   }
 
   .code-display {
@@ -142,8 +100,8 @@
     letter-spacing: 0.5em;
     margin: 1em 0;
     min-height: 1.5em;
-    font-family: monospace;
-    color: #010100;
+    font-family: var(--font-mono);
+    color: var(--color-text);
   }
 
   .keypad {
@@ -157,9 +115,9 @@
   button {
     padding: 1em;
     font-size: 1.5em;
-    border: 2px solid #fd7f20;
-    background: white;
-    color: #010100;
+    border: 2px solid var(--color-border);
+    background: var(--color-white);
+    color: var(--color-text);
     cursor: pointer;
     border-radius: 0.5em;
     transition: all 0.2s;
@@ -167,29 +125,29 @@
   }
 
   button:hover {
-    background: #fdb750;
-    border-color: #fc2e20;
+    background: var(--color-hover-bg);
+    border-color: var(--color-hover-border);
   }
 
   button:active {
-    background: #fc2e20;
-    color: white;
+    background: var(--color-theme-1);
+    color: var(--color-white);
   }
 
   .error {
-    color: #fc2e20;
+    color: var(--color-theme-1);
     margin: 1em 0;
     min-height: 1.5em;
   }
 
   .success {
-    color: #fd7f20;
+    color: var(--color-theme-2);
     margin: 1em 0;
     min-height: 1.5em;
   }
 </style>
 
-<main class="main-container">
+<main class="main-container" class:fade-out={success}>
   <h1>Enter Code</h1>
   <div class="code-display">
     {code.padEnd(4, '•')}
