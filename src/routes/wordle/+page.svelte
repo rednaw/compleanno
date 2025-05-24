@@ -83,6 +83,16 @@ $: answer = answers.length >= 6 ? game.answer : null;
 </svelte:head>
 
 <style>
+.back-button {
+  position: absolute;
+  top: 1em;
+  left: 1em;
+  font-size: 2em;
+  color: var(--color-theme-1);
+  text-decoration: none;
+  font-weight: bold;
+}
+
 .main-container {
   display: flex;
   flex-direction: column;
@@ -220,6 +230,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
+  <a href="/" class="back-button">←</a>
   <h1>Dove si trova?</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
