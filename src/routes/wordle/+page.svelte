@@ -85,13 +85,14 @@ $: answer = answers.length >= 6 ? game.answer : null;
 
 <style>
 .back-button {
-  position: absolute;
+  position: fixed;
   top: 1em;
   left: 1em;
   font-size: 2em;
   color: var(--color-theme-1);
   text-decoration: none;
   font-weight: bold;
+  z-index: 100;
 }
 
 .main-container {
@@ -231,7 +232,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
-  <a href={base} class="back-button">←</a>
+  <a href="{base}/" class="back-button">←</a>
   <h1>Dove si trova?</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
