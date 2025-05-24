@@ -38,9 +38,6 @@ function handleKey(key) {
       const valid = game.enter(currentGuess.split(''));
       if (!valid) {
         badGuess = true;
-        if (browser && navigator.vibrate) {
-          navigator.vibrate(200);
-        }
         return;
       }
       saveGame();
