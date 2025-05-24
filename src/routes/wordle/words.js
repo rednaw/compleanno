@@ -1012,6 +1012,7 @@ export const words = [
   'tornò',
   'torre',
   'torri',
+  'torta',
   'torto',
   'tosto',
   'toute',
