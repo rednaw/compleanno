@@ -79,21 +79,10 @@ $: answer = answers.length >= 6 ? game.answer : null;
 </script>
 
 <svelte:head>
-  <title>Wordle</title>
-  <meta name="description" content="A Wordle clone written in SvelteKit" />
+  <title>Dove si trova?</title>
 </svelte:head>
 
 <style>
-:global(body.wordle-page) {
-  min-height: 100vh;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: url('/questionmark.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
-
 .main-container {
   display: flex;
   flex-direction: column;
@@ -253,9 +242,7 @@ button:disabled {
   {#if gameOver}
     <div class="result">
       {#if won}
-        <p>🎉 Hai vinto, vai a guardare velocemente! 🎉</p>
-      {:else}
-        <p>Game over, riprova!</p>
+        <h1>🎉</h1>
       {/if}
       <button on:click={restart}>Riprova</button>
     </div>
