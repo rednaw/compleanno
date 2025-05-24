@@ -49,7 +49,7 @@
       fadeOut = true;
       setTimeout(() => {
         window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
-      }, 1000);
+      }, 2000);
     }
   });
 
@@ -72,13 +72,32 @@
 </svelte:head>
 
 <style>
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+
+  .shake {
+    animation: shake 0.2s 2;
+  }
+
   @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from { 
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+    to { 
+      opacity: 0;
+      transform: rotate(5deg) scale(0.8);
+    }
   }
 
   .fade-out {
-    animation: fadeOut 1s forwards;
+    animation: fadeOut 2s forwards;
+    transform-origin: center center;
   }
 
   .main-container {
@@ -134,30 +153,13 @@
     color: var(--color-white);
   }
 
-  .error {
-    color: var(--color-theme-1);
-    margin: 1em 0;
-    min-height: 1.5em;
-  }
-
-  .success {
-    color: var(--color-theme-2);
-    margin: 1em 0;
-    min-height: 1.5em;
-  }
 </style>
 
-<main class="main-container" class:fade-out={success}>
+<main class="main-container" class:fade-out={success} class:shake={error}>
   <h1>Enter Code</h1>
   <div class="code-display">
     {code.padEnd(4, '•')}
   </div>
-  {#if error}
-    <div class="error">Wrong code!</div>
-  {/if}
-  {#if success}
-    <div class="success">Correct! Redirecting...</div>
-  {/if}
   <div class="keypad">
     {#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as digit}
       <button onclick={() => handleDigit(digit)}>{digit}</button>
