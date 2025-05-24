@@ -45,7 +45,13 @@
 
   $effect(() => {
     if (success && browser) {
-      window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
+      const mainContainer = document.querySelector('.main-container');
+      if (mainContainer) {
+        mainContainer.classList.add('fade-out');
+        setTimeout(() => {
+          window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
+        }, 1000);
+      }
     }
   });
 
@@ -68,6 +74,53 @@
 </svelte:head>
 
 <style>
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes successFlash {
+    0% {
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1);
+    }
+    20% {
+      background: rgba(253, 127, 32, 0.2);
+      transform: scale(1.05);
+    }
+    40% {
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1);
+    }
+    60% {
+      background: rgba(253, 127, 32, 0.2);
+      transform: scale(1.05);
+    }
+    80% {
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+
+  .success-animation {
+    animation: successFlash 1.5s forwards;
+  }
+
+  .fade-out {
+    animation: fadeOut 1s forwards;
+    -webkit-animation: fadeOut 1s forwards; /* For iOS */
+  }
+
   .main-container {
     display: flex;
     flex-direction: column;
@@ -80,6 +133,8 @@
     max-width: 320px;
     width: 100%;
     margin: 2em auto;
+    transition: all 0.3s ease;
+    -webkit-transform: translateZ(0); /* Force GPU acceleration on iOS */
   }
 
   .code-display {
