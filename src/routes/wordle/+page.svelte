@@ -122,14 +122,14 @@ $: answer = answers.length >= 6 ? game.answer : null;
 .letter {
   width: 2em;
   height: 2em;
-  border: 2px solid #fd7f20;
+  border: 2px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5em;
-  background: white;
+  background: var(--color-white);
   text-transform: uppercase;
-  color: #010100;
+  color: var(--color-text);
   font-weight: 600;
   border-radius: 0.5em;
 }
@@ -149,7 +149,7 @@ $: answer = answers.length >= 6 ? game.answer : null;
   border-color: #90a4ae;
 }
 .current {
-  border-bottom: 2px solid #fc2e20;
+  border-bottom: 2px solid var(--color-border-active);
 }
 .bad-guess {
   animation: shake 0.2s 2;
@@ -174,17 +174,17 @@ $: answer = answers.length >= 6 ? game.answer : null;
 button {
   padding: 0.5em 1em;
   font-size: 1em;
-  border: 2px solid #fd7f20;
-  background: white;
-  color: #010100;
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
   cursor: pointer;
   border-radius: 0.5em;
   transition: all 0.2s;
   font-weight: 500;
 }
 button:hover {
-  background: #fdb750;
-  border-color: #fc2e20;
+  background: var(--color-hover-bg);
+  border-color: var(--color-hover-border);
 }
 button:disabled {
   opacity: 0.5;

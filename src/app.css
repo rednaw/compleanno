@@ -1,16 +1,37 @@
 @import '@fontsource/fira-mono';
 
 :root {
+	/* Base colors */
+	--color-royal-blue: #0e61cb;
+	--color-chili-pepper: #ff3d33;
+	--color-lilac: #ddd5f4;
+	--color-olive: #33320f;
+	--color-white: #ffffff;
+
+	/* Theme colors */
+	--color-bg-0: var(--color-royal-blue);
+	--color-bg-1: var(--color-chili-pepper);
+	--color-bg-2: var(--color-lilac);
+	--color-theme-1: var(--color-chili-pepper);
+	--color-theme-2: var(--color-royal-blue);
+	--color-text: var(--color-olive);
+
+	/* Game colors */
+	--color-border: var(--color-lilac);
+	--color-border-active: var(--color-royal-blue);
+	--color-hover-bg: var(--color-lilac);
+	--color-hover-border: var(--color-royal-blue);
+	--color-exact: #4caf50;
+	--color-close: #ffc107;
+	--color-missing: #90a4ae;
+
+	/* Fonts */
 	--font-body:
 		Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 		'Open Sans', 'Helvetica Neue', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: #fdb750;
-	--color-bg-1: #fc2e20;
-	--color-bg-2: #fd7f20;
-	--color-theme-1: #fc2e20;
-	--color-theme-2: #fd7f20;
-	--color-text: #010100;
+
+	/* Layout */
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
