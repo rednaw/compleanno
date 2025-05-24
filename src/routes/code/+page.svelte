@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
+  import { base } from '$app/paths';
 
   const CORRECT_CODE = '1234';
   let code = $state('');
@@ -165,7 +166,7 @@
 </style>
 
 <main class="main-container" class:fade-out={success} class:shake={error}>
-  <a href="/" class="back-button">←</a>
+  <a href={base} class="back-button">←</a>
   <div class="code-display">
     {code.padEnd(4, '•')}
   </div>
