@@ -20,17 +20,17 @@
 <style>
   main {
     text-align: center;
-    min-height: 100vh;
+    min-height: 105vh;
     display: flex;
     background: var(--color-background);
   }
 
   .content {
     width: 100%;
-    padding: 8rem 2rem 4rem 2rem;
+    padding: 8rem 2rem 2rem 2rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    margin-top: auto;
   }
 
   .games-grid {
@@ -44,6 +44,7 @@
 
   .code-section {
     margin-top: 2rem;
+    margin-bottom: 6rem;
   }
 
   .game-button, .code-button {
