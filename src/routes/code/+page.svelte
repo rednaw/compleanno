@@ -50,7 +50,7 @@
       fadeOut = true;
       setTimeout(() => {
         window.location.href = 'https://www.sherlocked.nl/nl/experiences/the-alchemist';
-      }, 2000);
+      }, 5000);
     }
   });
 
@@ -85,18 +85,46 @@
   }
 
   @keyframes fadeOut {
-    from { 
+    0% { 
       opacity: 1;
       transform: rotate(0deg) scale(1);
+      background: var(--color-white);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
     }
-    to { 
+    5% {
+      opacity: 1;
+      transform: rotate(0deg) scale(1.2);
+      background: #ffffff;
+      box-shadow: 0 0 100px #ffffff, 0 0 150px #ffffff, 0 0 200px #ffffff, 0 0 250px #ffffff;
+    }
+    10% {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+      background: var(--color-white);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+    }
+    15% {
+      opacity: 1;
+      transform: rotate(0deg) scale(1.2);
+      background: #ffffff;
+      box-shadow: 0 0 100px #ffffff, 0 0 150px #ffffff, 0 0 200px #ffffff, 0 0 250px #ffffff;
+    }
+    20% {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+      background: var(--color-white);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+    }
+    100% { 
       opacity: 0;
       transform: rotate(5deg) scale(0.8);
+      background: var(--color-white);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
     }
   }
 
   .fade-out {
-    animation: fadeOut 2s forwards;
+    animation: fadeOut 6s forwards;
     transform-origin: center center;
   }
 
