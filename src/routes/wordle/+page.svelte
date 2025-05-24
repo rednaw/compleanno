@@ -2,6 +2,7 @@
 import { onMount, onDestroy } from 'svelte';
 import { Game } from './game-client.js';
 import { browser } from '$app/environment';
+import { base } from '$app/paths';
 
 let game;
 let guesses = [];
@@ -230,7 +231,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
-  <a href="/" class="back-button">←</a>
+  <a href={base} class="back-button">←</a>
   <h1>Dove si trova?</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
