@@ -24,7 +24,7 @@
 
   function handleEnter() {
     if (code.length === 4) {
-      if (code === CORRECT_CODE) {
+      if (code.toLowerCase() === CORRECT_CODE.toLowerCase()) {
         success = true;
       } else {
         error = true;
@@ -101,6 +101,7 @@
   }
 
   .main-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -154,19 +155,20 @@
   }
 
   .back-button {
-    position: absolute;
+    position: fixed;
     top: 1em;
     left: 1em;
     font-size: 2em;
     color: var(--color-theme-1);
     text-decoration: none;
     font-weight: bold;
+    z-index: 100;
   }
 
 </style>
 
+<a href={base} class="back-button">←</a>
 <main class="main-container" class:fade-out={success} class:shake={error}>
-  <a href={base} class="back-button">←</a>
   <div class="code-display">
     {code.padEnd(4, '•')}
   </div>
