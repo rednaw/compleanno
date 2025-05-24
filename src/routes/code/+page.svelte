@@ -152,9 +152,20 @@
     color: var(--color-white);
   }
 
+  .back-button {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    font-size: 2em;
+    color: var(--color-theme-1);
+    text-decoration: none;
+    font-weight: bold;
+  }
+
 </style>
 
 <main class="main-container" class:fade-out={success} class:shake={error}>
+  <a href="/" class="back-button">←</a>
   <div class="code-display">
     {code.padEnd(4, '•')}
   </div>
