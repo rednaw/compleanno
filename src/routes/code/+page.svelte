@@ -68,7 +68,6 @@
 
 <svelte:head>
   <title>Enter Code</title>
-  <meta name="description" content="Enter the code to proceed" />
 </svelte:head>
 
 <style>
@@ -156,7 +155,6 @@
 </style>
 
 <main class="main-container" class:fade-out={success} class:shake={error}>
-  <h1>Enter Code</h1>
   <div class="code-display">
     {code.padEnd(4, '•')}
   </div>

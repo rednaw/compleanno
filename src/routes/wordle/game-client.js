@@ -6,16 +6,15 @@ export class Game {
    */
   constructor(serialized = undefined) {
     if (serialized) {
-      const [index, guesses, answers] = serialized.split('-');
-      this.index = +index;
+      const [answer, guesses, answers] = serialized.split('-');
+      this.answer = answer;
       this.guesses = guesses ? guesses.split(' ') : [];
       this.answers = answers ? answers.split(' ') : [];
     } else {
-      this.index = 435; // caffe // Math.floor(Math.random() * words.length);
+      this.answer = 'caffe';
       this.guesses = ['', '', '', '', '', ''];
-      this.answers = ([]);
+      this.answers = [];
     }
-    this.answer = words[this.index];
   }
 
   /**
@@ -54,6 +53,6 @@ export class Game {
    * Serialize game state so it can be set in localStorage
    */
   toString() {
-    return `${this.index}-${this.guesses.join(' ')}-${this.answers.join(' ')}`;
+    return `${this.answer}-${this.guesses.join(' ')}-${this.answers.join(' ')}`;
   }
 } 
