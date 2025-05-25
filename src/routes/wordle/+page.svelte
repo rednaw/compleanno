@@ -86,7 +86,7 @@ $: answer = answers.length >= 6 ? game.answer : null;
 <style>
 .back-button {
   position: fixed;
-  top: 1em;
+  top: 0em;
   left: 1em;
   font-size: 3em;
   color: var(--color-theme-1);
