@@ -4,7 +4,7 @@
   import { browser } from '$app/environment';
   import { base } from '$app/paths';
 
-  const CORRECT_CODE = '1234';
+  const CORRECT_CODE = '3920';
   let code = $state('');
   let error = $state(false);
   let success = $state(false);
