@@ -23,7 +23,7 @@
     position: fixed;
     top: 1em;
     left: 1em;
-    font-size: 2em;
+    font-size: 3em;
     color: var(--color-theme-1);
     text-decoration: none;
     font-weight: bold;
