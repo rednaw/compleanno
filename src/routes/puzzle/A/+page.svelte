@@ -3,7 +3,7 @@
 </script>
 
 <div class="puzzle-container">
-  <img src="{base}/A.png?v=2" alt="Puzzle A" class="puzzle-image" />
+  <img src="{base}/A.png" alt="Puzzle A" class="puzzle-image" />
 </div>
 
 <style>
