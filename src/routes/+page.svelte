@@ -6,9 +6,9 @@
   <div class="content">
     <div class="games-grid">
       <a href="{base}/wordle" class="game-button">?</a>
-      <button class="game-button">?</button>
-      <button class="game-button">?</button>
-      <button class="game-button">?</button>
+      <a href="{base}/puzzle/A" class="game-button">?</a>
+      <a href="{base}/puzzle/B" class="game-button">?</a>
+      <a href="{base}/puzzle/C" class="game-button">?</a>
     </div>
     <div class="arrow">↓</div>
     <div class="code-section">
