@@ -198,6 +198,12 @@ button:disabled {
   color: #2c3e50;
 }
 
+.result h1 {
+  font-size: 6rem;
+  margin: 0;
+  line-height: 1;
+}
+
 @media (max-width: 500px) {
   .main-container {
     max-width: 98vw;
@@ -255,7 +261,7 @@ button:disabled {
   {#if gameOver}
     <div class="result">
       {#if won}
-        <h1>🎉</h1>
+        <h1>☕</h1>
       {/if}
       <button on:click={restart}>Riprova</button>
     </div>
