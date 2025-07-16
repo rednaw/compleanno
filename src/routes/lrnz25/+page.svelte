@@ -145,7 +145,7 @@
   .song-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0.7em 1em;
     border-radius: 0.5em;
     margin-bottom: 0.4em;
@@ -176,7 +176,7 @@
   }
   .song-number {
     font-weight: bold;
-    margin-right: 1em;
+    margin-right: 0.5em;
   }
   .song-status {
     font-size: 1em;
