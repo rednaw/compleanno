@@ -136,14 +136,17 @@
     color: var(--color-theme-1);
   }
   .song-list {
-    max-width: 400px;
-    margin-bottom: 1em;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .song-row {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0.7em 1em;
