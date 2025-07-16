@@ -195,7 +195,7 @@
 
 </style>
 
-<a href="{base}/" class="back-button">←</a>
+<a href="{base}/maria25/" class="back-button">←</a>
 <main class="main-container" class:fade-out={success} class:shake={error}>
   <div class="code-display">
     {code.padEnd(4, '•')}

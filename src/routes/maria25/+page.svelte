@@ -5,14 +5,14 @@
 <main>
   <div class="content">
     <div class="games-grid">
-      <a href="{base}/wordle" class="game-button">?</a>
-      <a href="{base}/puzzle/A" class="game-button">?</a>
-      <a href="{base}/puzzle/B" class="game-button">?</a>
-      <a href="{base}/puzzle/C" class="game-button">?</a>
+      <a href="{base}/maria25/wordle" class="game-button">?</a>
+      <a href="{base}/maria25/puzzle/A" class="game-button">?</a>
+      <a href="{base}/maria25/puzzle/B" class="game-button">?</a>
+      <a href="{base}/maria25/puzzle/C" class="game-button">?</a>
     </div>
     <div class="arrow">↓</div>
     <div class="code-section">
-      <a href="{base}/code" class="code-button">?</a>
+      <a href="{base}/maria25/code" class="code-button">?</a>
     </div>
   </div>
 </main>
