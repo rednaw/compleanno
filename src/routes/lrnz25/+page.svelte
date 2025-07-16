@@ -1,5 +1,6 @@
 <script>
   import { songs } from './songs.js';
+  import { base } from '$app/paths';
   const fragmentDurations = [5, 10, 15];
   const fragmentLabels = ['5s', '10s', '15s'];
 
@@ -17,7 +18,7 @@
   let playing = false;
 
   function getFragmentFile(song, fragIdx) {
-    return `/lrnz25/song${song.number}_${fragmentDurations[fragIdx]}.mp3`;
+    return `${base}/lrnz25/song${song.number}_${fragmentDurations[fragIdx]}.mp3`;
   }
 
   function playFragment(idx = songStates[currentSongIdx].fragmentIdx) {
