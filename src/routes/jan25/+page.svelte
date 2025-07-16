@@ -274,7 +274,7 @@
         setTimeout(() => {
           transitionOut = true;
           setTimeout(() => {
-            window.location.href = joinBase('/game2');
+            window.location.href = joinBase('/jan25/game2');
           }, 2000);
         }, 500);
       }
