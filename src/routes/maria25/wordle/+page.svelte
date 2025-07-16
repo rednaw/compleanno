@@ -238,7 +238,7 @@ button:disabled {
 </style>
 
 <main class="main-container">
-  <a href="{base}/" class="back-button">←</a>
+  <a href="{base}/maria25/" class="back-button">←</a>
   <h1>Dove si trova?</h1>
   <div class="game">
     {#each Array.from({ length: 6 }) as _, row}
