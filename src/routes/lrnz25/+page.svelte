@@ -1,270 +1,116 @@
 <script>
-  import { songs } from './songs.js';
   import { base } from '$app/paths';
-  const fragmentDurations = [5, 10, 15];
-  const fragmentLabels = ['5s', '10s', '15s'];
-
-  // State for each song
-  let songStates = songs.map(() => ({
-    fragmentIdx: 0,
-    guess: '',
-    feedback: '',
-    showAnswer: false,
-    status: 'not-started' // 'not-started', 'in-progress', 'correct', 'failed'
-  }));
-
-  let currentSongIdx = 0;
-  let audio;
-  let playing = false;
-
-  function getFragmentFile(song, fragIdx) {
-    return `${base}/lrnz25/song${song.number}_${fragmentDurations[fragIdx]}.mp3`;
-  }
-
-  function playFragment(idx = songStates[currentSongIdx].fragmentIdx) {
-    audio.src = getFragmentFile(songs[currentSongIdx], idx);
-    audio.currentTime = 0;
-    audio.play();
-    playing = true;
-    setTimeout(() => {
-      audio.pause();
-      playing = false;
-    }, fragmentDurations[idx] * 1000);
-  }
-
-  function checkGuess() {
-    const state = songStates[currentSongIdx];
-    const correct = songs[currentSongIdx].answer.trim().toLowerCase();
-    const user = state.guess.trim().toLowerCase();
-    state.status = 'in-progress';
-    if (user === correct) {
-      state.feedback = '✅ Goed!';
-      state.status = 'correct';
-      setTimeout(() => gotoNext(), 1200);
-    } else {
-      if (state.fragmentIdx < 2) {
-        state.feedback = '❌ Probeer het met een langer fragment!';
-        state.fragmentIdx++;
-        state.guess = '';
-      } else {
-        state.feedback = '❌ Helaas! Het juiste antwoord was: ' + songs[currentSongIdx].answer;
-        state.showAnswer = true;
-        state.status = 'failed';
-        setTimeout(() => gotoNext(), 2200);
-      }
-    }
-  }
-
-  function gotoNext() {
-    if (currentSongIdx < songs.length - 1) {
-      currentSongIdx++;
-    }
-  }
-  function gotoPrev() {
-    if (currentSongIdx > 0) {
-      currentSongIdx--;
-    }
-  }
-  function selectSong(idx) {
-    currentSongIdx = idx;
-  }
-
-  $: allDone = songStates.every(s => s.status === 'correct' || s.status === 'failed');
+  import { onMount } from 'svelte';
+  let connectionsDone = false;
+  onMount(() => {
+    try { connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; } catch {}
+  });
 </script>
 
 <main>
-  <h1>Raad het liedje!</h1>
-  <div class="song-list">
-    {#each songs as song, i}
-      <button type="button"
-        class="song-row {currentSongIdx === i ? 'active' : ''} {songStates[i].status}"
-        aria-current={currentSongIdx === i ? 'true' : undefined}
-        on:click={() => selectSong(i)}>
-        <span class="song-number">{i + 1}.</span>
-        <span class="song-status">
-          {#if songStates[i].status === 'correct'}✅ Goed!
-          {:else if songStates[i].status === 'failed'}❌ Fout
-          {:else if songStates[i].status === 'in-progress'}⏳ Bezig
-          {:else}⬜ Niet gestart
-          {/if}
-        </span>
-      </button>
-    {/each}
-  </div>
-  <!-- Removed nav-btns -->
-  {#if allDone}
-    <div class="done">🎉 Je hebt alle liedjes gehad!</div>
-  {/if}
-  {#if !allDone}
-    <div class="current-song-block">
-      <div class="fragment-controls">
-        {#each fragmentLabels as label, idx}
-          <button on:click={() => playFragment(idx)} disabled={playing} class:active={songStates[currentSongIdx].fragmentIdx === idx}>
-            ▶️ {label}
-          </button>
-        {/each}
-      </div>
-      <audio bind:this={audio} src={getFragmentFile(songs[currentSongIdx], songStates[currentSongIdx].fragmentIdx)}></audio>
-      <form on:submit|preventDefault={checkGuess} class="guess-form">
-        <input type="text" bind:value={songStates[currentSongIdx].guess} placeholder="Typ je antwoord..." autocomplete="off" />
-        <button type="submit" disabled={playing || !songStates[currentSongIdx].guess.trim()}>Check</button>
-      </form>
-      {#if songStates[currentSongIdx].feedback && !songStates[currentSongIdx].showAnswer}
-        <div class="feedback">{songStates[currentSongIdx].feedback}</div>
-      {/if}
-      {#if songStates[currentSongIdx].showAnswer}
-        <div class="answer">{songStates[currentSongIdx].feedback}</div>
-      {/if}
+  <div class="content">
+    <div class="games-grid">
+      <a href="{base}/lrnz25/music" class="game-button">?</a>
+      <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
+      <a href="{base}/lrnz25/picture" class="game-button">?</a>
+      <a href="{base}/lrnz25/guess" class="game-button">?</a>
     </div>
-  {/if}
+    <div class="arrow">↓</div>
+    <div class="code-section">
+      <a href="{base}/lrnz25/code" class="code-button">?</a>
+    </div>
+  </div>
 </main>
 
 <style>
   main {
+    text-align: center;
+    min-height: 105vh;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
     background: var(--color-background);
-    padding: 2em;
-    box-sizing: border-box;
   }
-  h1 {
-    margin-bottom: 1em;
-    font-size: 2em;
-    color: var(--color-theme-1);
-  }
-  .song-list {
+
+  .content {
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
-    text-align: center;
+    padding: 8rem 2rem 2rem 2rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    margin-top: auto;
   }
-  .song-row {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.7em 1em;
-    border-radius: 0.5em;
-    margin-bottom: 0.4em;
-    background: var(--color-white);
-    cursor: pointer;
-    border: 2px solid var(--color-border);
-    transition: border 0.2s, background 0.2s;
-    font-size: 1.1em;
-  }
-  .song-row.active {
-    border: 2px solid var(--color-theme-1);
-    background: var(--color-hover-bg);
-  }
-  .song-row.correct {
-    background: #a5d6a7;
-    border-color: #388e3c;
-    color: #1b5e20;
-  }
-  .song-row.failed {
-    background: #ffcdd2;
-    border-color: #d32f2f;
-    color: #b71c1c;
-  }
-  .song-row.in-progress {
-    background: #fff9c4;
-    border-color: #fbc02d;
-    color: #795548;
-  }
-  .song-number {
-    font-weight: bold;
-    margin-right: 0.5em;
-  }
-  .song-status {
-    font-size: 1em;
-  }
-  .current-song-block {
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
     max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .code-section {
+    margin-top: 2rem;
+    margin-bottom: 6rem;
+  }
+
+  .game-button, .code-button {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 2rem;
+    padding: 2rem;
     background: var(--color-white);
-    border-radius: 0.5em;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    padding: 1.5em 1em 1em 1em;
-    margin-bottom: 1em;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
-    align-self: center;
-  }
-  .fragment-controls {
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    aspect-ratio: 1;
     display: flex;
-    gap: 0.5em;
-    margin-bottom: 1em;
+    align-items: center;
     justify-content: center;
   }
-  .fragment-controls button {
-    font-size: 1.1em;
-    padding: 0.5em 1.2em;
-    border-radius: 0.5em;
-    border: none;
-    background: var(--color-theme-1);
-    color: var(--color-white);
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
+
+  .code-button {
+    font-size: 3rem;
+    padding: 3rem;
+    max-width: 200px;
+    margin: 0 auto;
   }
-  .fragment-controls button.active {
-    background: var(--color-theme-2);
+
+  .game-button:hover, .code-button:hover {
+    background: var(--color-hover-bg);
+    border-color: var(--color-hover-border);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  .fragment-controls button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+
+  .game-button:active, .code-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  .guess-form {
-    display: flex;
-    gap: 0.5em;
-    margin-bottom: 1em;
-    justify-content: center;
-  }
-  input[type="text"] {
-    font-size: 1.1em;
-    padding: 0.5em 1em;
-    border-radius: 0.5em;
-    border: 1px solid var(--color-border);
-    min-width: 180px;
-  }
-  button[type="submit"] {
-    font-size: 1.1em;
-    padding: 0.5em 1.2em;
-    border-radius: 0.5em;
-    border: none;
-    background: var(--color-theme-2);
-    color: var(--color-white);
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  button[type="submit"]:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .feedback, .answer, .done {
-    margin: 1em 0;
-    font-size: 1.2em;
-    color: var(--color-theme-1);
-    text-align: center;
-  }
+
   @media (max-width: 500px) {
-    .song-list,
-    .current-song-block {
-      width: 100%;
-      max-width: 100vw;
+    .content {
+      padding: 6rem 1rem 2rem 1rem;
+    }
+    
+    .games-grid {
+      gap: 0.75rem;
+    }
+
+    .game-button {
+      padding: 1.5rem;
+      font-size: 1.75rem;
+    }
+
+    .code-button {
+      padding: 2rem;
+      font-size: 2.5rem;
     }
   }
-  @media (min-width: 600px) {
-    .song-list,
-    .current-song-block {
-      max-width: 400px;
-    }
+
+  .arrow {
+    font-size: 6rem;
+    color: var(--color-text);
+    margin: 1rem 0;
   }
-</style> 
+</style>
