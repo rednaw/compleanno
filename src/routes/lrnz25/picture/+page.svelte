@@ -1,4 +1,8 @@
-<a href="/lrnz25/" class="back-button">←</a>
+<script>
+  import { base } from '$app/paths';
+</script>
+
+<a href="{base}/lrnz25/" class="back-button">←</a>
 <div class="puzzle-container">
   <div class="placeholder">Picture</div>
 </div>
