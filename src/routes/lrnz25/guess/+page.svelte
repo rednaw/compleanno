@@ -1,5 +1,6 @@
 <script>
   import { base } from '$app/paths';
+  import { onMount } from 'svelte';
 
   const correctAnswer = 'extinction rebellion';
   const helpImages = [
@@ -11,6 +12,22 @@
   let submitted = false;
   let isCorrect = false;
   let helpClicks = 0;
+  let showRotateMessage = false;
+  let isPortrait = false;
+
+  // Check device orientation and screen size
+  function checkOrientation() {
+    const isMobile = window.innerWidth <= 768;
+    const isPortraitMode = window.innerHeight > window.innerWidth;
+    
+    if (isMobile && !isPortraitMode) {
+      showRotateMessage = true;
+      isPortrait = false;
+    } else {
+      showRotateMessage = false;
+      isPortrait = true;
+    }
+  }
 
   // Check if game was already completed
   try {
@@ -81,11 +98,31 @@
       placeholder.innerHTML = '?';
     });
   }
+
+  // Load and check orientation on mount
+  onMount(() => {
+    // Check orientation on mount
+    checkOrientation();
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  });
 </script>
 
 <a href="{base}/lrnz25/" class="back-button">←</a>
 
-<main class="container">
+{#if showRotateMessage}
+  <div class="rotate-message">
+    <div class="rotate-icon">📱↕️</div>
+  </div>
+{:else}
+  <main class="container">
   <div class="images-section">
     <div class="images-container">
       <div class="image-wrapper">
@@ -134,8 +171,29 @@
     </div>
   </div>
 </main>
+{/if}
 
 <style>
+  .rotate-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--color-background);
+  }
+
+  .rotate-icon {
+    font-size: 8rem;
+    animation: rotate 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  @keyframes rotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(15deg) scale(1.1); }
+  }
+
   .back-button {
     position: fixed;
     top: 0;
