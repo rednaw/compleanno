@@ -90,14 +90,13 @@
         <button type="submit" disabled={!guess.trim()} class="submit-btn">
           Submit
         </button>
+        {#if submitted && isCorrect}
+          <div class="result-section">
+            <p class="result-text">🎉 3</p>
+          </div>
+        {/if}
       </form>
     </div>
-
-    {#if submitted && isCorrect}
-      <div class="result-section">
-        <p class="result-text">🎉 3</p>
-      </div>
-    {/if}
   </main>
 {/if}
 
@@ -161,7 +160,7 @@
 
   .input-section {
     margin-top: 2rem;
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
     width: 100%;
     max-width: 600px;
     position: relative;
@@ -173,6 +172,7 @@
     gap: 1rem;
     justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .guess-input {
@@ -215,18 +215,19 @@
   }
 
   .result-section {
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
     text-align: center;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 0.5rem;
     border: 2px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 1rem 1.2rem;
+    padding: 0.8rem 1rem;
     width: fit-content;
     min-width: 120px;
-    z-index: 100;
+    height: 3.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
   .result-text {
