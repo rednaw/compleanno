@@ -61,6 +61,11 @@
       sessionStorage.removeItem('lrnz25_guess_done');
       sessionStorage.removeItem('lrnz25_code_done');
       
+      // Clear individual music song states
+      for (let i = 0; i < 4; i++) {
+        sessionStorage.removeItem(`lrnz25_music_song_${i}`);
+      }
+      
       // Reset local state
       connectionsDone = false;
       guessDone = false;
