@@ -3,8 +3,8 @@
 
   const correctAnswer = 'extinction rebellion';
   const helpImages = [
-    { src: '/lrnz25/pumpjack.webp', alt: 'Pumpjack' },
-    { src: '/lrnz25/politie.png', alt: 'Politie' }
+    { src: `${base}/lrnz25/pumpjack.webp`, alt: 'Pumpjack' },
+    { src: `${base}/lrnz25/politie.png`, alt: 'Politie' }
   ];
   
   let guess = '';
@@ -89,10 +89,10 @@
   <div class="images-section">
     <div class="images-container">
       <div class="image-wrapper">
-        <img src="/lrnz25/dodo.jpg" alt="Dodo" class="game-image" />
+        <img src="{base}/lrnz25/dodo.jpg" alt="Dodo" class="game-image" />
       </div>
       <div class="image-wrapper">
-        <img src="/lrnz25/che.webp" alt="Che Guevara" class="game-image" />
+        <img src="{base}/lrnz25/che.webp" alt="Che Guevara" class="game-image" />
       </div>
     </div>
     
