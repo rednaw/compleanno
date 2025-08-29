@@ -7,8 +7,12 @@
 
   // Check device orientation and screen size
   function checkOrientation() {
-    const isMobile = window.innerWidth <= 768;
-    const isPortrait = window.innerHeight > window.innerWidth;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    // Simple width-based detection with a higher threshold
+    const isMobile = width <= 900;
+    const isPortrait = height > width;
     
     if (isMobile && isPortrait) {
       showRotateMessage = true;
