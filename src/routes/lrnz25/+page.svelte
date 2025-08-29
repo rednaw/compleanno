@@ -87,9 +87,9 @@
       <div class="arrow">↓</div>
       <div class="code-section">
         {#if allPuzzlesCompleted}
-          <div class="final-image-container">
+          <a href="{base}/lrnz25/code" class="final-image-container">
             <img src="{base}/lrnz25/final.png" alt="Final reward" class="final-image" />
-          </div>
+          </a>
         {:else}
           <a href="{base}/lrnz25/code" class="code-button">?</a>
         {/if}
@@ -179,6 +179,8 @@
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
+    text-decoration: none;
+    transition: all 0.2s ease;
   }
 
   .final-image {
@@ -188,6 +190,13 @@
     border-radius: 0.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 2px solid var(--color-border);
+    transition: all 0.2s ease;
+  }
+
+  .final-image-container:hover .final-image {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-hover-border);
   }
 
   .game-button:hover, .code-button:hover {
