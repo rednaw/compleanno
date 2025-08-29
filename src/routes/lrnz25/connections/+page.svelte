@@ -4,7 +4,7 @@
 
   const GROUPS = [
     { name: 'Gite a champoluc troncate a metà', color: '#f7d070', words: ['Mezza', 'Mari', 'Belve', 'Zerb'] },
-    { name: 'Matematica quantum', color: '#50b0e3', words: ['Leap', 'Cat', 'State', 'Information'] },
+    { name: 'Quantum_____', color: '#50b0e3', words: ['Leap', 'Cat', 'State', 'Information'] },
     { name: 'Viaggi fatti con noi', color: '#a78bfa', words: ['Abuc', 'Anic', 'Aivilob', 'Racsagadam'] },
     { name: 'Nomi propri di animali', color: '#94d3a2', words: ['Voorhuis', 'Zwartie', 'Pizza', 'Spijker'] }
   ];
