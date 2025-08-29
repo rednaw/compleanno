@@ -4,12 +4,44 @@
   
   let connectionsDone = false;
   let guessDone = false;
+  let showRotateMessage = false;
+  let isPortrait = false;
+
+  // Check device orientation
+  function checkOrientation() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    // Simply check if device is in landscape mode
+    const isLandscapeMode = width > height;
+    
+    // Show rotate message only if in landscape mode (encourage portrait for home page)
+    if (isLandscapeMode) {
+      showRotateMessage = true;
+      isPortrait = false;
+    } else {
+      showRotateMessage = false;
+      isPortrait = true;
+    }
+  }
 
   onMount(() => {
     try { 
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
       guessDone = sessionStorage.getItem('lrnz25_guess_done') === '1';
     } catch {}
+    
+    // Check orientation on mount
+    checkOrientation();
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
   });
 
   function clearGlobalState() {
@@ -29,23 +61,49 @@
   }
 </script>
 
-<main>
-  <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
-  <div class="content">
-    <div class="games-grid">
-      <a href="{base}/lrnz25/music" class="game-button">?</a>
-      <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
-      <a href="{base}/lrnz25/picture" class="game-button">?</a>
-      <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
-    </div>
-    <div class="arrow">↓</div>
-    <div class="code-section">
-      <a href="{base}/lrnz25/code" class="code-button">?</a>
-    </div>
+{#if showRotateMessage}
+  <div class="rotate-message">
+    <div class="rotate-icon">📱↕️</div>
   </div>
-</main>
+{:else}
+  <main>
+    <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
+    <div class="content">
+      <div class="games-grid">
+        <a href="{base}/lrnz25/music" class="game-button">?</a>
+        <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
+        <a href="{base}/lrnz25/picture" class="game-button">?</a>
+        <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="code-section">
+        <a href="{base}/lrnz25/code" class="code-button">?</a>
+      </div>
+    </div>
+  </main>
+{/if}
 
 <style>
+  .rotate-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--color-background);
+  }
+
+  .rotate-icon {
+    font-size: 8rem;
+    animation: rotate 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  @keyframes rotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(15deg) scale(1.1); }
+  }
+
   main {
     text-align: center;
     min-height: 105vh;
