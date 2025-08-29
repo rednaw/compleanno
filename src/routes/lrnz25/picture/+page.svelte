@@ -5,16 +5,16 @@
   let showRotateMessage = false;
   let isLandscape = false;
 
-  // Check device orientation and screen size
+  // Check device orientation
   function checkOrientation() {
     const width = window.innerWidth;
     const height = window.innerHeight;
     
-    // Simple width-based detection with a higher threshold
-    const isMobile = width <= 900;
+    // Simply check if device is in portrait mode
     const isPortrait = height > width;
     
-    if (isMobile && isPortrait) {
+    // Show rotate message only if in portrait mode (encourage landscape for this puzzle)
+    if (isPortrait) {
       showRotateMessage = true;
       isLandscape = false;
     } else {

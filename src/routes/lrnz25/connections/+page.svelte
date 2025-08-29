@@ -28,12 +28,16 @@
     ).sort(() => Math.random() - 0.5); // Shuffle
   }
 
-  // Check device orientation and screen size
+  // Check device orientation
   function checkOrientation() {
-    const isMobile = window.innerWidth <= 768;
-    const isPortrait = window.innerHeight > window.innerWidth;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     
-    if (isMobile && isPortrait) {
+    // Simply check if device is in portrait mode
+    const isPortrait = height > width;
+    
+    // Show rotate message only if in portrait mode (encourage landscape for this puzzle)
+    if (isPortrait) {
       showRotateMessage = true;
       isLandscape = false;
     } else {
