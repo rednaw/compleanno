@@ -11,6 +11,9 @@
     const isMobile = window.innerWidth <= 768;
     const isLandscape = window.innerWidth > window.innerHeight;
     
+    // iOS Safari specific handling
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
     if (isMobile && isLandscape) {
       showRotateMessage = true;
       isPortrait = false;
@@ -19,7 +22,17 @@
       isPortrait = true;
     }
     
-
+    // Debug logging for iOS
+    if (isIOS) {
+      console.log('iOS detected:', { 
+        isMobile, 
+        isLandscape, 
+        showRotateMessage, 
+        innerWidth: window.innerWidth, 
+        innerHeight: window.innerHeight,
+        userAgent: navigator.userAgent 
+      });
+    }
   }
 
   onMount(() => {
@@ -34,9 +47,21 @@
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', checkOrientation);
     
+    // iOS Safari specific: also listen for window focus and visibility changes
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      window.addEventListener('focus', checkOrientation);
+      document.addEventListener('visibilitychange', checkOrientation);
+    }
+    
     return () => {
       window.removeEventListener('resize', checkOrientation);
       window.removeEventListener('orientationchange', checkOrientation);
+      
+      // Clean up iOS-specific listeners
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        window.removeEventListener('focus', checkOrientation);
+        document.removeEventListener('visibilitychange', checkOrientation);
+      }
     };
   });
 </script>
