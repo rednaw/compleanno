@@ -3,76 +3,16 @@
   import { onMount } from 'svelte';
   
   let connectionsDone = false;
-  let showRotateMessage = false;
-  let isPortrait = false;
-
-  // Check device orientation and screen size
-  function checkOrientation() {
-    const isMobile = window.innerWidth <= 768;
-    const isLandscape = window.innerWidth > window.innerHeight;
-    
-    // iOS Safari specific handling
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
-    if (isMobile && isLandscape) {
-      showRotateMessage = true;
-      isPortrait = false;
-    } else {
-      showRotateMessage = false;
-      isPortrait = true;
-    }
-    
-    // Debug logging for iOS
-    if (isIOS) {
-      console.log('iOS detected:', { 
-        isMobile, 
-        isLandscape, 
-        showRotateMessage, 
-        innerWidth: window.innerWidth, 
-        innerHeight: window.innerHeight,
-        userAgent: navigator.userAgent 
-      });
-    }
-  }
 
   onMount(() => {
     try { 
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
     } catch {}
-    
-    // Check orientation on mount
-    checkOrientation();
-    
-    // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-    
-    // iOS Safari specific: also listen for window focus and visibility changes
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      window.addEventListener('focus', checkOrientation);
-      document.addEventListener('visibilitychange', checkOrientation);
-    }
-    
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-      
-      // Clean up iOS-specific listeners
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        window.removeEventListener('focus', checkOrientation);
-        document.removeEventListener('visibilitychange', checkOrientation);
-      }
-    };
   });
 </script>
 
-{#if showRotateMessage}
-  <div class="rotate-message" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--color-background);">
-    <div class="rotate-icon" style="font-size: 8rem; animation: rotate 3s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));">📱↔️</div>
-  </div>
-{:else}
-  <main>
-    <div class="content">
+<main>
+  <div class="content">
     <div class="games-grid">
       <a href="{base}/lrnz25/music" class="game-button">?</a>
       <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
@@ -172,20 +112,9 @@
     }
   }
 
-        .arrow {
+  .arrow {
     font-size: 6rem;
     color: var(--color-text);
     margin: 1rem 0;
   }
-
-
-
-
-
-  @keyframes rotate {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
 </style>
-{/if}
