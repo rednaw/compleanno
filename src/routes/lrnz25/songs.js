@@ -1,7 +1,6 @@
 export const songs = [
-  { answer: "Fade to Black", number: 1 },
-  // { answer: "Another Song", number: 2 },
-  // { answer: "Third Song", number: 3 },
-  // { answer: "Fourth Song", number: 4 },
-  // { answer: "Fifth Song", number: 5 },
+  { answer: "R U Mine?", number: 1 },
+  { answer: "I-E-A-I-A-I-O", number: 2 },
+  { answer: "Camel Dancefloor", number: 3 },
+  { answer: "Holy Roller", number: 4 },
 ]; 
