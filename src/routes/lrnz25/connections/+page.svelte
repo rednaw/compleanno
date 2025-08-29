@@ -6,7 +6,7 @@
     { name: 'Gite a champoluc troncate a metà', color: '#f7d070', words: ['Mezza', 'Mari', 'Belve', 'Zerb'] },
     { name: 'Matematica quantum', color: '#50b0e3', words: ['Leap', 'Cat', 'State', 'Information'] },
     { name: 'Viaggi fatti con noi', color: '#a78bfa', words: ['Abuc', 'Anic', 'Aivilob', 'Racsagadam'] },
-    { name: 'Nomi propri di animali', color: '#94d3a2', words: ['Voorhuis', 'Swartie', 'Pizza', 'Spijker'] }
+    { name: 'Nomi propri di animali', color: '#94d3a2', words: ['Voorhuis', 'Zwartie', 'Pizza', 'Spijker'] }
   ];
 
   let tiles = [];
@@ -120,7 +120,6 @@
         console.error('Error saving state:', e);
       }
       
-      message = group.name;
       selected.clear();
       selected = new Set(selected);
       
@@ -162,49 +161,72 @@
       <div class="rotate-icon">📱↔️</div>
     </div>
   {:else}
-  <main class="container">
-  {#if solvedGroups.length}
-    <div class="solved">
-      {#each solvedGroups as group}
-        <div class="solved-row" style="background: {group.color}; border-color: {group.color}">
-          <div class="solved-title">{group.name}</div>
-          <div class="solved-words">{group.words.join(', ')}</div>
+    <main class="container">
+    <div class="game-layout">
+      <div class="left-panel">
+        <div class="grid-wrap">
+          <div class="grid" class:shake>
+            {#each tiles as tile, i}
+              <button
+                type="button"
+                class="tile"
+                class:selected={selected.has(i)}
+                class:locked={tile.locked}
+                disabled={tile.locked || solvedGroups.length === 4}
+                on:click={() => toggleTile(i)}
+              >
+                {tile.label}
+              </button>
+            {/each}
+          </div>
+          
+          {#if selected.size === 4 && solvedGroups.length < 4}
+            <button 
+              type="button" 
+              class="check-dot" 
+              on:click={checkSelection}
+              aria-label="Controleer selectie"
+            >
+              ✔
+            </button>
+          {/if}
         </div>
-      {/each}
-    </div>
-  {/if}
+      </div>
 
-  <div class="grid-wrap">
-    <div class="grid" class:shake>
-      {#each tiles as tile, i}
-        <button
-          type="button"
-          class="tile"
-          class:selected={selected.has(i)}
-          class:locked={tile.locked}
-          disabled={tile.locked || solvedGroups.length === 4}
-          on:click={() => toggleTile(i)}
-        >
-          {tile.label}
-        </button>
-      {/each}
+      <div class="right-panel">
+        {#if solvedGroups.length}
+          <div class="solved">
+            {#each solvedGroups.slice(0, 2) as group}
+              <div class="solved-row" style="background: {group.color}; border-color: {group.color}">
+                <div class="solved-title">{group.name}</div>
+                <div class="solved-words">{group.words.join(', ')}</div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if message && solvedGroups.length < 4}
+          <div class="message">{message}</div>
+        {/if}
+      </div>
     </div>
-    
-    {#if selected.size === 4 && solvedGroups.length < 4}
-      <button 
-        type="button" 
-        class="check-dot" 
-        on:click={checkSelection}
-        aria-label="Controleer selectie"
-      >
-        ✔
-      </button>
+
+    {#if solvedGroups.length > 2}
+      <div class="bottom-panel">
+        <div class="solved">
+          {#each solvedGroups.slice(2) as group}
+            <div class="solved-row" style="background: {group.color}; border-color: {group.color}">
+              <div class="solved-title">{group.name}</div>
+              <div class="solved-words">{group.words.join(', ')}</div>
+            </div>
+          {/each}
+        </div>
+        
+        {#if message && solvedGroups.length === 4}
+          <div class="win-message">🎉 5</div>
+        {/if}
+      </div>
     {/if}
-  </div>
-
-  {#if message}
-    <div class="message">{message}</div>
-  {/if}
   </main>
 {/if}
 
@@ -250,13 +272,46 @@
     box-sizing: border-box;
   }
 
+  .game-layout {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  .left-panel {
+    flex-shrink: 0;
+  }
+
+  .right-panel {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+  }
+
+  .bottom-panel {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .bottom-panel .solved {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
   .solved {
     width: 100%;
     max-width: 520px;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 0.6rem;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .solved-row {
@@ -282,8 +337,7 @@
     position: relative;
     width: 100%;
     max-width: 520px;
-    margin: 0 auto;
-    padding-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .grid {
@@ -341,16 +395,32 @@
   }
 
   .message {
-    margin-top: 0.8rem;
+    margin-top: 0.5rem;
     color: var(--color-text);
     font-weight: 700;
     font-size: 1.2rem;
     text-align: center;
-    padding: 0.8rem 1rem;
+    padding: 0.5rem;
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 0.6rem;
+    border-radius: 0.5rem;
     border: 2px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .win-message {
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: center;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    border: 2px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    width: fit-content;
+    min-width: 120px;
   }
 
   .shake {
@@ -363,9 +433,86 @@
     40%, 80% { transform: translateX(8px); }
   }
 
+  @media (max-width: 768px) {
+    .game-layout {
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+    
+    .right-panel {
+      min-width: auto;
+      max-width: none;
+    }
+    
+    .solved {
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .bottom-panel {
+      margin-top: 0.5rem;
+    }
+  }
+
   @media (max-width: 500px) {
-    .grid-wrap { max-width: 98vw; }
-    .grid { gap: 0.4rem; }
-    .tile { padding: 0.8rem 0.4rem; font-size: 0.95rem; }
+    .game-layout {
+      gap: 0.3rem;
+    }
+    
+    .grid-wrap { 
+      max-width: 60vw; 
+    }
+    
+    .grid { 
+      gap: 0.3rem; 
+    }
+    
+    .tile { 
+      padding: 0.5rem 0.3rem; 
+      font-size: 0.75rem; 
+      border-radius: 0.4rem;
+    }
+    
+    .right-panel {
+      min-width: 35vw;
+    }
+    
+    .bottom-panel {
+      margin-top: 0.5rem;
+    }
+    
+    .bottom-panel .solved {
+      gap: 0.5rem;
+    }
+    
+    .solved {
+      gap: 0.3rem;
+    }
+    
+    .solved-row {
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.4rem;
+    }
+    
+    .solved-title {
+      font-size: 0.8rem;
+    }
+    
+    .solved-words {
+      font-size: 0.7rem;
+    }
+    
+    .message {
+      font-size: 0.9rem;
+      padding: 0.5rem 0.7rem;
+      margin-top: 0.5rem;
+    }
+    
+    .check-dot {
+      width: 32px;
+      height: 32px;
+      font-size: 1.2rem;
+      bottom: -1rem;
+    }
   }
 </style>
