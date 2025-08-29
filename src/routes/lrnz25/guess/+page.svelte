@@ -210,7 +210,7 @@
   }
 
   .input-section {
-    margin-top: auto;
+    margin-top: 1rem;
     padding-bottom: 2rem;
     width: 100%;
     max-width: 600px;
