@@ -3,10 +3,12 @@
   import { onMount } from 'svelte';
   
   let connectionsDone = false;
+  let guessDone = false;
 
   onMount(() => {
     try { 
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
+      guessDone = sessionStorage.getItem('lrnz25_guess_done') === '1';
     } catch {}
   });
 
@@ -22,6 +24,7 @@
       
       // Reset local state
       connectionsDone = false;
+      guessDone = false;
     } catch {}
   }
 </script>
@@ -33,7 +36,7 @@
       <a href="{base}/lrnz25/music" class="game-button">?</a>
       <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
       <a href="{base}/lrnz25/picture" class="game-button">?</a>
-      <a href="{base}/lrnz25/guess" class="game-button">?</a>
+      <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
     </div>
     <div class="arrow">↓</div>
     <div class="code-section">
