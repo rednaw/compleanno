@@ -5,8 +5,12 @@
   let connectionsDone = false;
   let guessDone = false;
   let pictureDone = false;
+  let musicDone = false;
   let showRotateMessage = false;
   let isPortrait = false;
+
+  // Check if all puzzles are completed
+  $: allPuzzlesCompleted = connectionsDone && guessDone && pictureDone && musicDone;
 
   // Check device orientation
   function checkOrientation() {
@@ -31,6 +35,7 @@
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
       guessDone = sessionStorage.getItem('lrnz25_guess_done') === '1';
       pictureDone = sessionStorage.getItem('lrnz25_picture_done') === '1';
+      musicDone = sessionStorage.getItem('lrnz25_music_done') === '1';
     } catch {}
     
     // Check orientation on mount
@@ -60,6 +65,7 @@
       connectionsDone = false;
       guessDone = false;
       pictureDone = false;
+      musicDone = false;
     } catch {}
   }
 </script>
@@ -73,14 +79,20 @@
     <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
     <div class="content">
       <div class="games-grid">
-        <a href="{base}/lrnz25/music" class="game-button">?</a>
+        <a href="{base}/lrnz25/music" class="game-button" data-key="music">{musicDone ? '2' : '?'}</a>
         <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
         <a href="{base}/lrnz25/picture" class="game-button" data-key="picture">{pictureDone ? '3' : '?'}</a>
         <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
       </div>
       <div class="arrow">↓</div>
       <div class="code-section">
-        <a href="{base}/lrnz25/code" class="code-button">?</a>
+        {#if allPuzzlesCompleted}
+          <div class="final-image-container">
+            <img src="{base}/lrnz25/final.png" alt="Final reward" class="final-image" />
+          </div>
+        {:else}
+          <a href="{base}/lrnz25/code" class="code-button">?</a>
+        {/if}
       </div>
     </div>
   </main>
@@ -158,6 +170,24 @@
     padding: 3rem;
     max-width: 200px;
     margin: 0 auto;
+  }
+
+  .final-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .final-image {
+    width: 100%;
+    height: auto;
+    max-width: 400px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--color-border);
   }
 
   .game-button:hover, .code-button:hover {

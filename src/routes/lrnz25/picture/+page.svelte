@@ -87,13 +87,14 @@
           class="guess-input"
           autocomplete="off"
         />
-        <button type="submit" disabled={!guess.trim()} class="submit-btn">
-          Submit
-        </button>
         {#if submitted && isCorrect}
           <div class="result-section">
             <p class="result-text">🎉 3</p>
           </div>
+        {:else}
+          <button type="submit" disabled={!guess.trim()} class="submit-btn">
+            Submit
+          </button>
         {/if}
       </form>
     </div>
