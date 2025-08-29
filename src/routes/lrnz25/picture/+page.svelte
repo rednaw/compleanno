@@ -138,7 +138,7 @@
     align-items: center;
     min-height: 100vh;
     background: var(--color-background);
-    padding: 4rem 1rem 2rem 1rem;
+    padding: 2rem 1rem 1rem 1rem;
     box-sizing: border-box;
     justify-content: center;
   }
@@ -159,8 +159,8 @@
   }
 
   .input-section {
-    margin-top: 2rem;
-    padding-bottom: 2rem;
+    margin-top: 1rem;
+    padding-bottom: 1rem;
     width: 100%;
     max-width: 600px;
     position: relative;
@@ -176,11 +176,11 @@
   }
 
   .guess-input {
-    font-size: 1.2rem;
-    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    padding: 0.6rem 0.8rem;
     border: 2px solid var(--color-border);
     border-radius: 0.5rem;
-    min-width: 250px;
+    min-width: 200px;
     background: var(--color-white);
     color: var(--color-text);
   }
@@ -192,8 +192,8 @@
   }
 
   .submit-btn {
-    font-size: 1.2rem;
-    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    padding: 0.6rem 1.2rem;
     border: none;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -220,10 +220,10 @@
     border-radius: 0.5rem;
     border: 2px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 0.8rem 1rem;
+    padding: 0.6rem 0.8rem;
     width: fit-content;
-    min-width: 120px;
-    height: 3.6rem;
+    min-width: 100px;
+    height: 3.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,23 +240,48 @@
   /* Responsive design for small screens */
   @media (max-width: 768px) {
     .container {
-      padding: 3rem 0.5rem 1rem 0.5rem;
+      padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+    }
+    
+    .input-section {
+      margin-top: 0.5rem;
     }
     
     .puzzle-image {
-      max-width: 98vw;
-      max-height: 75vh;
+      max-width: 95vw;
+      max-height: 70vh;
     }
   }
 
   @media (max-width: 480px) {
     .container {
-      padding: 2rem 0.5rem 1rem 0.5rem;
+      padding: 1rem 0.5rem 0.5rem 0.5rem;
+    }
+    
+    .input-section {
+      margin-top: 0.5rem;
+    }
+    
+    .guess-input {
+      min-width: 150px;
+      font-size: 1rem;
+      padding: 0.5rem 0.6rem;
+    }
+    
+    .submit-btn {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+    }
+    
+    .result-section {
+      height: 2.8rem;
+      padding: 0.5rem 0.6rem;
+      min-width: 80px;
     }
     
     .puzzle-image {
       max-width: 100vw;
-      max-height: 80vh;
+      max-height: 75vh;
     }
   }
 </style>
