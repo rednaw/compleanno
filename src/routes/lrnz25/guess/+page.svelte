@@ -4,7 +4,7 @@
   const correctAnswer = 'extinction rebellion';
   const helpImages = [
     { src: `${base}/lrnz25/pumpjack.webp`, alt: 'Pumpjack' },
-    { src: `${base}/lrnz25/politie.png`, alt: 'Politie' }
+    { src: `${base}/lrnz25/politie.jpg`, alt: 'Politie' }
   ];
   
   let guess = '';
