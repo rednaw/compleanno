@@ -9,9 +9,25 @@
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
     } catch {}
   });
+
+  function clearGlobalState() {
+    try {
+      // Clear all lrnz25 game progress
+      sessionStorage.removeItem('lrnz25_connections_done');
+      sessionStorage.removeItem('lrnz25_connections_solved');
+      sessionStorage.removeItem('lrnz25_music_done');
+      sessionStorage.removeItem('lrnz25_picture_done');
+      sessionStorage.removeItem('lrnz25_guess_done');
+      sessionStorage.removeItem('lrnz25_code_done');
+      
+      // Reset local state
+      connectionsDone = false;
+    } catch {}
+  }
 </script>
 
 <main>
+  <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
   <div class="content">
     <div class="games-grid">
       <a href="{base}/lrnz25/music" class="game-button">?</a>
@@ -116,5 +132,29 @@
     font-size: 6rem;
     color: var(--color-text);
     margin: 1rem 0;
+  }
+
+  .clear-button {
+    position: fixed;
+    top: 0;
+    left: 1rem;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    z-index: 100;
+  }
+
+  .clear-button:hover {
+    background: rgba(220, 53, 69, 0.1);
+    transform: scale(1.1);
+  }
+
+  .clear-button:active {
+    transform: scale(0.95);
   }
 </style>

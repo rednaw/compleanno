@@ -268,15 +268,16 @@
     align-items: center;
     min-height: 100vh;
     background: var(--color-background);
-    padding: 1.5rem;
+    padding: 1rem;
+    padding-top: 3rem;
     box-sizing: border-box;
   }
 
   .game-layout {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     align-items: flex-start;
-    max-width: 1200px;
+    max-width: 1000px;
     width: 100%;
   }
 
@@ -286,17 +287,18 @@
 
   .right-panel {
     flex: 1;
-    min-width: 300px;
-    max-width: 400px;
+    min-width: 250px;
+    max-width: 350px;
+    margin-left: 1rem;
   }
 
   .bottom-panel {
     width: 100%;
-    max-width: 1200px;
-    margin-top: 0.5rem;
+    max-width: 1000px;
+    margin-top: 0.4rem;
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .bottom-panel .solved {
@@ -307,20 +309,20 @@
 
   .solved {
     width: 100%;
-    max-width: 520px;
+    max-width: 480px;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
   }
 
   .solved-row {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.6rem 0.8rem;
+    gap: 0.2rem;
+    padding: 0.5rem 0.7rem;
     border: 2px solid;
-    border-radius: 0.6rem;
+    border-radius: 0.5rem;
     color: #1b1b1b;
   }
 
@@ -336,22 +338,22 @@
   .grid-wrap {
     position: relative;
     width: 100%;
-    max-width: 520px;
-    padding-bottom: 0.5rem;
+    max-width: 480px;
+    padding-bottom: 0.4rem;
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
+    gap: 0.4rem;
     width: 100%;
   }
 
   .tile {
-    padding: 1rem 0.5rem;
+    padding: 0.8rem 0.4rem;
     background: var(--color-white);
     border: 2px solid var(--color-border);
-    border-radius: 0.6rem;
+    border-radius: 0.5rem;
     font-weight: 900;
     letter-spacing: 0.06em;
     cursor: pointer;
@@ -376,8 +378,8 @@
     left: 50%;
     transform: translateX(-50%);
     bottom: 0;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: 2px solid var(--color-theme-2);
     background: var(--color-theme-2);
@@ -410,17 +412,17 @@
   .win-message {
     color: var(--color-text);
     font-weight: 700;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     text-align: center;
-    padding: 0.8rem 1rem;
+    padding: 1.2rem 1.5rem;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 0.5rem;
     border: 2px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 0.5rem;
+    margin-top: -0.5rem;
     margin-left: 0.5rem;
     width: fit-content;
-    min-width: 120px;
+    min-width: 140px;
   }
 
   .shake {
@@ -456,63 +458,69 @@
 
   @media (max-width: 500px) {
     .game-layout {
-      gap: 0.3rem;
+      gap: 0.25rem;
     }
     
     .grid-wrap { 
-      max-width: 60vw; 
+      max-width: 55vw; 
     }
     
     .grid { 
-      gap: 0.3rem; 
+      gap: 0.25rem; 
     }
     
     .tile { 
-      padding: 0.5rem 0.3rem; 
-      font-size: 0.75rem; 
-      border-radius: 0.4rem;
+      padding: 0.4rem 0.25rem; 
+      font-size: 0.7rem; 
+      border-radius: 0.35rem;
     }
     
     .right-panel {
-      min-width: 35vw;
+      min-width: 32vw;
     }
     
     .bottom-panel {
-      margin-top: 0.5rem;
+      margin-top: 0.4rem;
     }
     
     .bottom-panel .solved {
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     
     .solved {
-      gap: 0.3rem;
+      gap: 0.25rem;
     }
     
     .solved-row {
-      padding: 0.4rem 0.6rem;
-      border-radius: 0.4rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 0.35rem;
     }
     
     .solved-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
     
     .solved-words {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
     }
     
     .message {
-      font-size: 0.9rem;
-      padding: 0.5rem 0.7rem;
-      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.6rem;
+      margin-top: 0.4rem;
+    }
+    
+    .win-message {
+      font-size: 1.8rem;
+      padding: 1rem 1.2rem;
+      min-width: 120px;
     }
     
     .check-dot {
-      width: 32px;
-      height: 32px;
-      font-size: 1.2rem;
-      bottom: -1rem;
+      width: 28px;
+      height: 28px;
+      font-size: 1rem;
+      bottom: -0.8rem;
     }
   }
 </style>
