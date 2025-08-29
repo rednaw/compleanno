@@ -4,6 +4,26 @@
 
   let showRotateMessage = false;
   let isLandscape = false;
+  let guess = '';
+  let submitted = false;
+  let isCorrect = false;
+
+  function submitGuess() {
+    if (!guess.trim()) return;
+    
+    const userGuess = guess.trim().toLowerCase();
+    if (userGuess === 'drie') {
+      isCorrect = true;
+      submitted = true;
+      // Save completion state to sessionStorage
+      try {
+        sessionStorage.setItem('lrnz25_picture_done', '1');
+      } catch {}
+    } else {
+      isCorrect = false;
+      guess = '';
+    }
+  }
 
   // Check device orientation
   function checkOrientation() {
@@ -25,6 +45,14 @@
 
   // Load and check orientation on mount
   onMount(() => {
+    // Check if game was already completed
+    try {
+      if (sessionStorage.getItem('lrnz25_picture_done') === '1') {
+        submitted = true;
+        isCorrect = true;
+      }
+    } catch {}
+    
     // Check orientation on mount
     checkOrientation();
     
@@ -50,6 +78,26 @@
     <div class="image-section">
       <img src="{base}/lrnz25/wiskunde.png" alt="Wiskunde Puzzle" class="puzzle-image" />
     </div>
+    
+    <div class="input-section">
+      <form on:submit|preventDefault={submitGuess} class="guess-form">
+        <input 
+          type="text" 
+          bind:value={guess} 
+          class="guess-input"
+          autocomplete="off"
+        />
+        <button type="submit" disabled={!guess.trim()} class="submit-btn">
+          Submit
+        </button>
+      </form>
+    </div>
+
+    {#if submitted && isCorrect}
+      <div class="result-section">
+        <p class="result-text">🎉 3</p>
+      </div>
+    {/if}
   </main>
 {/if}
 
@@ -108,7 +156,84 @@
     max-width: 95vw;
     max-height: 70vh;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0.1);
+  }
+
+  .input-section {
+    margin-top: 2rem;
+    padding-bottom: 4rem;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .guess-form {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .guess-input {
+    font-size: 1.2rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    min-width: 250px;
+    background: var(--color-white);
+    color: var(--color-text);
+  }
+
+  .guess-input:focus {
+    outline: none;
+    border-color: var(--color-theme-1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .submit-btn {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-white);
+    background: var(--color-theme-2);
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--color-theme-1);
+    transform: translateY(-2px);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .result-section {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    border: 2px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.2rem;
+    width: fit-content;
+    min-width: 120px;
+    z-index: 100;
+  }
+
+  .result-text {
+    font-size: 2.2rem;
+    margin: 0;
+    font-weight: bold;
+    color: var(--color-text);
   }
 
   /* Responsive design for small screens */

@@ -16,6 +16,7 @@
   let shake = false;
   let showRotateMessage = false;
   let isLandscape = false;
+  let showWinMessage = false;
 
   // Initialize tiles from groups
   function initTiles() {
@@ -61,6 +62,11 @@
             );
           }
         });
+      }
+      
+      // Check if puzzle was already completed
+      if (sessionStorage.getItem('lrnz25_connections_done') === '1') {
+        showWinMessage = true;
       }
     } catch (e) {
       console.error('Error loading saved state:', e);
@@ -130,6 +136,7 @@
       // Check win condition
       if (solvedGroups.length === 4) {
         message = 'Gefeliciteerd! Alle groepen gevonden.';
+        showWinMessage = true;
         try {
           sessionStorage.setItem('lrnz25_connections_done', '1');
         } catch {}
@@ -226,7 +233,7 @@
           {/each}
         </div>
         
-        {#if message && solvedGroups.length === 4}
+        {#if showWinMessage}
           <div class="win-message">🎉 5</div>
         {/if}
       </div>

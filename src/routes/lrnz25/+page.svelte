@@ -4,6 +4,7 @@
   
   let connectionsDone = false;
   let guessDone = false;
+  let pictureDone = false;
   let showRotateMessage = false;
   let isPortrait = false;
 
@@ -29,6 +30,7 @@
     try { 
       connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
       guessDone = sessionStorage.getItem('lrnz25_guess_done') === '1';
+      pictureDone = sessionStorage.getItem('lrnz25_picture_done') === '1';
     } catch {}
     
     // Check orientation on mount
@@ -57,6 +59,7 @@
       // Reset local state
       connectionsDone = false;
       guessDone = false;
+      pictureDone = false;
     } catch {}
   }
 </script>
@@ -72,7 +75,7 @@
       <div class="games-grid">
         <a href="{base}/lrnz25/music" class="game-button">?</a>
         <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
-        <a href="{base}/lrnz25/picture" class="game-button">?</a>
+        <a href="{base}/lrnz25/picture" class="game-button" data-key="picture">{pictureDone ? '3' : '?'}</a>
         <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
       </div>
       <div class="arrow">↓</div>
