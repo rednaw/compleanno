@@ -88,6 +88,16 @@
       state.guess = '';
     }
     
+    // Save individual song state
+    try {
+      sessionStorage.setItem(`lrnz25_music_song_${idx}`, JSON.stringify({
+        status: state.status,
+        feedback: state.feedback,
+        fragmentLevel: state.fragmentLevel,
+        attempts: state.attempts
+      }));
+    } catch {}
+    
     // Force immediate UI update
     songStates = [...songStates];
     
@@ -109,13 +119,24 @@
   // Check if puzzle was already completed on mount
   onMount(() => {
     try {
+      // Load individual song states
+      songStates.forEach((state, index) => {
+        const savedState = sessionStorage.getItem(`lrnz25_music_song_${index}`);
+        if (savedState) {
+          const parsed = JSON.parse(savedState);
+          state.status = parsed.status;
+          state.feedback = parsed.feedback;
+          state.fragmentLevel = parsed.fragmentLevel;
+          state.attempts = parsed.attempts;
+        }
+      });
+      
+      // Check if all songs are completed
       if (sessionStorage.getItem('lrnz25_music_done') === '1') {
         allSongsCompleted = true;
-        // Mark all songs as completed
-        songStates.forEach(state => {
-          state.status = 'correct';
-          state.feedback = 'correct';
-        });
+      } else {
+        // Check if all songs are now completed based on loaded states
+        checkAllSongsCompleted();
       }
     } catch {}
     
