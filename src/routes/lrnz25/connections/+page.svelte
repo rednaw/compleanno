@@ -14,6 +14,8 @@
   let solvedGroups = [];
   let message = '';
   let shake = false;
+  let showRotateMessage = false;
+  let isLandscape = false;
 
   // Initialize tiles from groups
   function initTiles() {
@@ -24,6 +26,20 @@
         locked: false 
       }))
     ).sort(() => Math.random() - 0.5); // Shuffle
+  }
+
+  // Check device orientation and screen size
+  function checkOrientation() {
+    const isMobile = window.innerWidth <= 768;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    
+    if (isMobile && isPortrait) {
+      showRotateMessage = true;
+      isLandscape = false;
+    } else {
+      showRotateMessage = false;
+      isLandscape = true;
+    }
   }
 
   // Load saved progress
@@ -45,6 +61,18 @@
     } catch (e) {
       console.error('Error loading saved state:', e);
     }
+    
+    // Check orientation on mount
+    checkOrientation();
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
   });
 
   // Initialize on first load
@@ -129,7 +157,12 @@
 
 <a href="{base}/lrnz25/" class="back-button">←</a>
 
-<main class="container">
+  {#if showRotateMessage}
+    <div class="rotate-message">
+      <div class="rotate-icon">📱↔️</div>
+    </div>
+  {:else}
+  <main class="container">
   {#if solvedGroups.length}
     <div class="solved">
       {#each solvedGroups as group}
@@ -172,9 +205,30 @@
   {#if message}
     <div class="message">{message}</div>
   {/if}
-</main>
+  </main>
+{/if}
 
 <style>
+  .rotate-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--color-background);
+  }
+
+  .rotate-icon {
+    font-size: 8rem;
+    animation: rotate 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  @keyframes rotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(15deg) scale(1.1); }
+  }
+
   .back-button {
     position: fixed;
     top: 0;
