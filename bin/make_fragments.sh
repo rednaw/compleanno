@@ -27,7 +27,7 @@ fi
 
 BASENAME="$DEST_DIR/song${SONG_NUMBER}_"
 
-for DURATION in 5 10 15; do
+for DURATION in 1 2 5 20; do
   ffmpeg -y -i "$MP3_FILE" -ss 0 -t $DURATION -acodec copy "${BASENAME}${DURATION}.mp3"
 done
 
