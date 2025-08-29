@@ -1,65 +1,356 @@
 <script>
   import { base } from '$app/paths';
 
-  const correctAnswer = 'rome';
+  const correctAnswer = 'extinction rebellion';
+  const helpImages = [
+    { src: '/lrnz25/pumpjack.webp', alt: 'Pumpjack' },
+    { src: '/lrnz25/politie.png', alt: 'Politie' }
+  ];
+  
   let guess = '';
-  let attempts = 0;
-  let success = false;
-  let error = false;
+  let submitted = false;
+  let isCorrect = false;
+  let helpClicks = 0;
+
+  // Check if game was already completed
+  try {
+    if (sessionStorage.getItem('lrnz25_guess_done') === '1') {
+      submitted = true;
+      isCorrect = true;
+    }
+  } catch {}
 
   function submitGuess() {
-    if (success) return;
-    const user = guess.trim().toLowerCase();
-    if (!user) return;
-    attempts += 1;
-    if (user === correctAnswer) {
-      success = true;
-      error = false;
+    if (!guess.trim()) return;
+    
+    const userGuess = guess.trim().toLowerCase();
+    if (userGuess === correctAnswer) {
+      isCorrect = true;
+      submitted = true;
+      // Save completion state to sessionStorage
+      try {
+        sessionStorage.setItem('lrnz25_guess_done', '1');
+      } catch {}
     } else {
-      error = true;
+      isCorrect = false;
+      guess = '';
+      shakeScreen();
     }
   }
-  function resetError() { if (error) error = false; }
+
+  function shakeScreen() {
+    const main = document.querySelector('main');
+    const body = document.body;
+    
+    let shakeCount = 0;
+    const shakeInterval = setInterval(() => {
+      if (shakeCount >= 8) {
+        clearInterval(shakeInterval);
+        main.style.transform = '';
+        body.style.transform = '';
+        return;
+      }
+      
+      const offset = shakeCount % 2 === 0 ? -8 : 8;
+      const rotation = shakeCount % 2 === 0 ? -0.3 : 0.3;
+      main.style.transform = `translateX(${offset}px) rotate(${rotation}deg)`;
+      body.style.transform = `translateX(${offset}px) rotate(${rotation}deg)`;
+      shakeCount++;
+    }, 60);
+  }
+
+  function showHelpImage() {
+    if (helpClicks >= helpImages.length) return;
+    
+    const placeholders = document.querySelectorAll('.placeholder-image');
+    const image = helpImages[helpClicks];
+    
+    // Replace placeholder with image using inline styles that work
+    placeholders[helpClicks].innerHTML = `<img src="${image.src}" alt="${image.alt}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem;" />`;
+    helpClicks++;
+  }
+
+  function resetGame() {
+    guess = '';
+    submitted = false;
+    isCorrect = false;
+    helpClicks = 0;
+    
+    const placeholders = document.querySelectorAll('.placeholder-image');
+    placeholders.forEach(placeholder => {
+      placeholder.innerHTML = '?';
+    });
+  }
 </script>
 
 <a href="{base}/lrnz25/" class="back-button">←</a>
-<main class="main-container" class:shake={error}>
-  <h1>Guess the Place</h1>
-  <div class="hints">
-    <p>Hint 1: Capital city in Europe.</p>
-    {#if attempts >= 1}
-      <p>Hint 2: Famous for ancient ruins.</p>
+
+<main class="container">
+  <div class="images-section">
+    <div class="images-container">
+      <div class="image-wrapper">
+        <img src="/lrnz25/dodo.jpg" alt="Dodo" class="game-image" />
+      </div>
+      <div class="image-wrapper">
+        <img src="/lrnz25/che.webp" alt="Che Guevara" class="game-image" />
+      </div>
+    </div>
+    
+    <div class="images-container">
+      <div class="image-wrapper">
+        <div class="placeholder-image">?</div>
+      </div>
+      <div class="image-wrapper">
+        <div class="placeholder-image">?</div>
+      </div>
+    </div>
+
+    {#if submitted && isCorrect}
+      <div class="result-section">
+        <p class="result-text">🎉 7</p>
+      </div>
     {/if}
-    {#if attempts >= 2}
-      <p>Hint 3: The Colosseum is here.</p>
-    {/if}
+
+    <div class="input-section">
+      {#if !submitted}
+        <form on:submit|preventDefault={submitGuess} class="guess-form">
+          <input 
+            type="text" 
+            bind:value={guess} 
+            placeholder="" 
+            class="guess-input"
+            autocomplete="off"
+          />
+          <div class="buttons-container">
+            <button type="submit" disabled={!guess.trim()} class="submit-btn">
+              Submit
+            </button>
+            <button type="button" class="help-btn" on:click={showHelpImage}>
+              Help
+            </button>
+          </div>
+        </form>
+      {/if}
+    </div>
   </div>
-  {#if success}
-    <div class="result success">✅ Correct! The answer is ROME.</div>
-  {:else}
-    <form class="guess-form" on:submit|preventDefault={submitGuess}>
-      <input type="text" bind:value={guess} on:input={resetError} placeholder="Type your guess..." autocomplete="off" />
-      <button type="submit" disabled={!guess.trim()}>Check</button>
-    </form>
-    {#if error}
-      <div class="result error">❌ Try again.</div>
-    {/if}
-  {/if}
 </main>
 
 <style>
-  .back-button { position: fixed; top: 0em; left: 1em; font-size: 3em; color: var(--color-theme-1); text-decoration: none; font-weight: bold; z-index: 100; }
-  .main-container { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; background: var(--color-background); padding: 2em; box-sizing: border-box; }
-  h1 { margin: 0 0 1rem 0; color: var(--color-theme-1); }
-  .hints { background: var(--color-white); border: 2px solid var(--color-border); border-radius: 0.75rem; padding: 1rem; max-width: 480px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  .guess-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
-  input[type="text"] { font-size: 1.1em; padding: 0.6em 1em; border-radius: 0.5em; border: 1px solid var(--color-border); min-width: 200px; }
-  button[type="submit"] { font-size: 1.1em; padding: 0.6em 1.2em; border-radius: 0.5em; border: none; background: var(--color-theme-2); color: var(--color-white); font-weight: bold; cursor: pointer; transition: background 0.2s; }
-  button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
-  .result { margin-top: 0.75rem; font-weight: 600; }
-  .result.success { color: #2e7d32; }
-  .result.error { color: #d32f2f; }
-  .shake { animation: shake 0.2s 2; }
-  @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+  .back-button {
+    position: fixed;
+    top: 0;
+    left: 1rem;
+    font-size: 3rem;
+    color: var(--color-theme-1);
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 100;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background: var(--color-background);
+    padding: 4rem 1rem 2rem 1rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+
+  .images-section {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 2rem;
+  }
+
+  .images-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .image-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .game-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 3px solid var(--color-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+
+
+  .placeholder-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 0.5rem;
+    border: 3px dashed var(--color-border);
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--color-border);
+    font-weight: bold;
+  }
+
+  .input-section {
+    margin-top: auto;
+    padding-bottom: 2rem;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .guess-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .guess-input {
+    font-size: 1.2rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    min-width: 250px;
+    background: var(--color-white);
+    color: var(--color-text);
+  }
+
+  .guess-input:focus {
+    outline: none;
+    border-color: var(--color-theme-1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .buttons-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .submit-btn, .help-btn {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-white);
+  }
+
+  .submit-btn {
+    background: var(--color-theme-2);
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--color-theme-1);
+    transform: translateY(-2px);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .help-btn {
+    background: var(--color-theme-1);
+  }
+
+  .help-btn:hover {
+    background: var(--color-theme-2);
+    transform: translateY(-2px);
+  }
+
+  .result-section {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    border: 2px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.2rem 1.5rem;
+    width: fit-content;
+    min-width: 140px;
+    margin: 0 auto;
+    margin-top: 3rem;
+  }
+
+  .result-text {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 600px) {
+    .container {
+      padding: 3rem 1rem 1rem 1rem;
+    }
+
+    .images-section {
+      padding-top: 1rem;
+    }
+    
+    .images-container {
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .game-image {
+      width: 150px;
+      height: 150px;
+    }
+    
+
+    
+    .placeholder-image {
+      width: 150px;
+      height: 150px;
+      font-size: 2.5rem;
+    }
+    
+    .placeholder-image {
+      font-size: 2.5rem;
+    }
+
+    .guess-form {
+      flex-direction: row;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .guess-input {
+      min-width: 200px;
+      font-size: 1.1rem;
+      padding: 0.7rem 0.9rem;
+    }
+
+    .submit-btn, .help-btn {
+      font-size: 1.1rem;
+      padding: 0.7rem 1.3rem;
+    }
+  }
 </style>
 
