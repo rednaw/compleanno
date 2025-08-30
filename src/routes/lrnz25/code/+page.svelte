@@ -46,6 +46,10 @@
     // Phase 2: Zoom effect and show final image
     setTimeout(() => {
       showFinalImage = true;
+      // Save completion state to localStorage
+      try {
+        localStorage.setItem('lrnz25_code_done', '1');
+      } catch {}
     }, 1500);
   }
 
@@ -57,7 +61,17 @@
   }
 
   onMount(() => {
-    if (browser) window.addEventListener('keydown', handleKey);
+    if (browser) {
+      window.addEventListener('keydown', handleKey);
+      
+      // Check if puzzle was already completed
+      try {
+        if (localStorage.getItem('lrnz25_code_done') === '1') {
+          success = true;
+          showFinalImage = true;
+        }
+      } catch {}
+    }
   });
   onDestroy(() => {
     if (browser) window.removeEventListener('keydown', handleKey);
@@ -92,7 +106,7 @@
   button { padding: 1em; font-size: 1.5em; border: 2px solid var(--color-border); background: var(--color-white); color: var(--color-text); cursor: pointer; border-radius: 0.5em; transition: all 0.2s; font-weight: 500; }
   button:hover { background: var(--color-hover-bg); border-color: var(--color-hover-border); }
   button:active { background: var(--color-theme-1); color: var(--color-white); }
-  .back-button { position: fixed; top: 0em; left: 1em; font-size: 3em; color: var(--color-theme-1); text-decoration: none; font-weight: bold; z-index: 100; }
+  .back-button { position: fixed; top: 0em; left: 1em; font-size: 3em; color: var(--color-theme-1); text-decoration: none; font-weight: bold; z-index: 1001; }
 
   .main-container.transition-phase-start {
     transform: scale(1.1) rotate(5deg);
