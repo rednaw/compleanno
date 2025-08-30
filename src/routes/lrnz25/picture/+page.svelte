@@ -15,9 +15,9 @@
     if (userGuess === 'drie') {
       isCorrect = true;
       submitted = true;
-      // Save completion state to sessionStorage
+      // Save completion state to localStorage
       try {
-        sessionStorage.setItem('lrnz25_picture_done', '1');
+        localStorage.setItem('lrnz25_picture_done', '1');
       } catch {}
     } else {
       isCorrect = false;
@@ -47,7 +47,7 @@
   onMount(() => {
     // Check if game was already completed
     try {
-      if (sessionStorage.getItem('lrnz25_picture_done') === '1') {
+      if (localStorage.getItem('lrnz25_picture_done') === '1') {
         submitted = true;
         isCorrect = true;
       }

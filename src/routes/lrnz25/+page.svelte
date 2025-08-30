@@ -6,10 +6,11 @@
   let guessDone = false;
   let pictureDone = false;
   let musicDone = false;
+  let codeDone = false;
   let showRotateMessage = false;
   let isPortrait = false;
 
-  // Check if all puzzles are completed
+  // Check if all main puzzles are completed (excluding code puzzle)
   $: allPuzzlesCompleted = connectionsDone && guessDone && pictureDone && musicDone;
 
   // Check device orientation
@@ -32,10 +33,13 @@
 
   onMount(() => {
     try { 
-      connectionsDone = sessionStorage.getItem('lrnz25_connections_done') === '1'; 
-      guessDone = sessionStorage.getItem('lrnz25_guess_done') === '1';
-      pictureDone = sessionStorage.getItem('lrnz25_picture_done') === '1';
-      musicDone = sessionStorage.getItem('lrnz25_music_done') === '1';
+      connectionsDone = localStorage.getItem('lrnz25_connections_done') === '1'; 
+      guessDone = localStorage.getItem('lrnz25_guess_done') === '1';
+      pictureDone = localStorage.getItem('lrnz25_picture_done') === '1';
+      musicDone = localStorage.getItem('lrnz25_music_done') === '1';
+      codeDone = localStorage.getItem('lrnz25_code_done') === '1';
+      
+
     } catch {}
     
     // Check orientation on mount
@@ -54,16 +58,16 @@
   function clearGlobalState() {
     try {
       // Clear all lrnz25 game progress
-      sessionStorage.removeItem('lrnz25_connections_done');
-      sessionStorage.removeItem('lrnz25_connections_solved');
-      sessionStorage.removeItem('lrnz25_music_done');
-      sessionStorage.removeItem('lrnz25_picture_done');
-      sessionStorage.removeItem('lrnz25_guess_done');
-      sessionStorage.removeItem('lrnz25_code_done');
+      localStorage.removeItem('lrnz25_connections_done');
+      localStorage.removeItem('lrnz25_connections_solved');
+      localStorage.removeItem('lrnz25_music_done');
+      localStorage.removeItem('lrnz25_picture_done');
+      localStorage.removeItem('lrnz25_guess_done');
+      localStorage.removeItem('lrnz25_code_done');
       
       // Clear individual music song states
       for (let i = 0; i < 4; i++) {
-        sessionStorage.removeItem(`lrnz25_music_song_${i}`);
+        localStorage.removeItem(`lrnz25_music_song_${i}`);
       }
       
       // Reset local state
@@ -71,6 +75,7 @@
       guessDone = false;
       pictureDone = false;
       musicDone = false;
+      codeDone = false;
     } catch {}
   }
 </script>

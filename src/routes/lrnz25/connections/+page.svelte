@@ -50,7 +50,7 @@
   // Load saved progress
   onMount(() => {
     try {
-      const saved = sessionStorage.getItem('lrnz25_connections_solved');
+      const saved = localStorage.getItem('lrnz25_connections_solved');
       if (saved) {
         solvedGroups = JSON.parse(saved);
         // Lock solved tiles
@@ -65,7 +65,7 @@
       }
       
       // Check if puzzle was already completed
-      if (sessionStorage.getItem('lrnz25_connections_done') === '1') {
+      if (localStorage.getItem('lrnz25_connections_done') === '1') {
         showWinMessage = true;
       }
     } catch (e) {
@@ -125,7 +125,7 @@
       
       // Save progress
       try {
-        sessionStorage.setItem('lrnz25_connections_solved', JSON.stringify(solvedGroups));
+        localStorage.setItem('lrnz25_connections_solved', JSON.stringify(solvedGroups));
       } catch (e) {
         console.error('Error saving state:', e);
       }
@@ -138,7 +138,7 @@
         message = 'Gefeliciteerd! Alle groepen gevonden.';
         showWinMessage = true;
         try {
-          sessionStorage.setItem('lrnz25_connections_done', '1');
+          localStorage.setItem('lrnz25_connections_done', '1');
         } catch {}
       }
     } else {

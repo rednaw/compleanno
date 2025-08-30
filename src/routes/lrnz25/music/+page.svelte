@@ -90,7 +90,7 @@
     
     // Save individual song state
     try {
-      sessionStorage.setItem(`lrnz25_music_song_${idx}`, JSON.stringify({
+      localStorage.setItem(`lrnz25_music_song_${idx}`, JSON.stringify({
         status: state.status,
         feedback: state.feedback,
         fragmentLevel: state.fragmentLevel,
@@ -108,10 +108,10 @@
   function checkAllSongsCompleted() {
     allSongsCompleted = songStates.every(state => state.status === 'correct');
     
-    // Save completion state to sessionStorage
+    // Save completion state to localStorage
     if (allSongsCompleted) {
       try {
-        sessionStorage.setItem('lrnz25_music_done', '1');
+        localStorage.setItem('lrnz25_music_done', '1');
       } catch {}
     }
   }
@@ -121,7 +121,7 @@
     try {
       // Load individual song states
       songStates.forEach((state, index) => {
-        const savedState = sessionStorage.getItem(`lrnz25_music_song_${index}`);
+        const savedState = localStorage.getItem(`lrnz25_music_song_${index}`);
         if (savedState) {
           const parsed = JSON.parse(savedState);
           state.status = parsed.status;
@@ -132,7 +132,7 @@
       });
       
       // Check if all songs are completed
-      if (sessionStorage.getItem('lrnz25_music_done') === '1') {
+      if (localStorage.getItem('lrnz25_music_done') === '1') {
         allSongsCompleted = true;
       } else {
         // Check if all songs are now completed based on loaded states
