@@ -33,13 +33,7 @@
     }
   }
 
-  // Check if game was already completed
-  try {
-    if (localStorage.getItem('lrnz25_guess_done') === '1') {
-      submitted = true;
-      isCorrect = true;
-    }
-  } catch {}
+
 
   function submitGuess() {
     if (!guess.trim()) return;
@@ -89,6 +83,11 @@
     // Replace placeholder with image using inline styles that work
     placeholders[helpClicks].innerHTML = `<img src="${image.src}" alt="${image.alt}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem;" />`;
     helpClicks++;
+    
+    // Save help button state to localStorage
+    try {
+      localStorage.setItem('lrnz25_guess_help_clicks', helpClicks.toString());
+    } catch {}
   }
 
   function resetGame() {
@@ -96,6 +95,11 @@
     submitted = false;
     isCorrect = false;
     helpClicks = 0;
+    
+    // Clear help button state from localStorage
+    try {
+      localStorage.removeItem('lrnz25_guess_help_clicks');
+    } catch {}
     
     const placeholders = document.querySelectorAll('.placeholder-image');
     placeholders.forEach(placeholder => {
@@ -105,6 +109,32 @@
 
   // Load and check orientation on mount
   onMount(() => {
+    // Check if game was already completed
+    try {
+      if (localStorage.getItem('lrnz25_guess_done') === '1') {
+        submitted = true;
+        isCorrect = true;
+      }
+      
+      // Load help button state
+      const savedHelpClicks = localStorage.getItem('lrnz25_guess_help_clicks');
+      if (savedHelpClicks) {
+        helpClicks = parseInt(savedHelpClicks);
+        
+        // Show the help images that were already revealed
+        // Use setTimeout to ensure DOM is fully rendered
+        setTimeout(() => {
+          const placeholders = document.querySelectorAll('.placeholder-image');
+          for (let i = 0; i < helpClicks && i < helpImages.length; i++) {
+            if (placeholders[i]) {
+              const image = helpImages[i];
+              placeholders[i].innerHTML = `<img src="${image.src}" alt="${image.alt}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem;" />`;
+            }
+          }
+        }, 100);
+      }
+    } catch {}
+    
     // Check orientation on mount
     checkOrientation();
     
