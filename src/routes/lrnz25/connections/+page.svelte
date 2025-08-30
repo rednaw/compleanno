@@ -1,6 +1,9 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
+  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import BackButton from '../components/BackButton.svelte';
+  import RotateMessage from '../components/RotateMessage.svelte';
 
   const GROUPS = [
     { name: 'Gite a champoluc troncate a metà', color: '#f7d070', words: ['Mezza', 'Mari', 'Belve', 'Zerb'] },
@@ -29,23 +32,7 @@
     ).sort(() => Math.random() - 0.5); // Shuffle
   }
 
-  // Check device orientation
-  function checkOrientation() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Simply check if device is in portrait mode
-    const isPortrait = height > width;
-    
-    // Show rotate message only if in portrait mode (encourage landscape for this puzzle)
-    if (isPortrait) {
-      showRotateMessage = true;
-      isLandscape = false;
-    } else {
-      showRotateMessage = false;
-      isLandscape = true;
-    }
-  }
+
 
   // Load saved progress
   onMount(() => {
@@ -65,7 +52,7 @@
       }
       
       // Check if puzzle was already completed
-      if (localStorage.getItem('lrnz25_connections_done') === '1') {
+      if (loadPuzzleState('lrnz25_connections_done')) {
         showWinMessage = true;
       }
     } catch (e) {
@@ -73,16 +60,18 @@
     }
     
     // Check orientation on mount
-    checkOrientation();
+    const updateOrientation = () => {
+      const isLandscapeMode = checkOrientation(false); // Encourage landscape for connections puzzle
+      showRotateMessage = !isLandscapeMode;
+      isLandscape = isLandscapeMode;
+    };
+    
+    updateOrientation();
     
     // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    const cleanup = setupOrientationListeners(updateOrientation);
     
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
+    return cleanup;
   });
 
   // Initialize on first load
@@ -137,9 +126,7 @@
       if (solvedGroups.length === 4) {
         message = 'Gefeliciteerd! Alle groepen gevonden.';
         showWinMessage = true;
-        try {
-          localStorage.setItem('lrnz25_connections_done', '1');
-        } catch {}
+        savePuzzleState('lrnz25_connections_done', '1');
       }
     } else {
       // Count words from same group
@@ -165,14 +152,12 @@
   }
 </script>
 
-<a href="{base}/lrnz25/" class="back-button">←</a>
+<BackButton />
 
-  {#if showRotateMessage}
-    <div class="rotate-message">
-      <div class="rotate-icon">📱↔️</div>
-    </div>
-  {:else}
-    <main class="container">
+<RotateMessage show={showRotateMessage} encouragePortrait={false} />
+
+{#if !showRotateMessage}
+  <main class="container">
     <div class="game-layout">
       <div class="left-panel">
         <div class="grid-wrap">
@@ -242,36 +227,7 @@
 {/if}
 
 <style>
-  .rotate-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--color-background);
-  }
 
-  .rotate-icon {
-    font-size: 8rem;
-    animation: rotate 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  }
-
-  @keyframes rotate {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
-
-  .back-button {
-    position: fixed;
-    top: 0;
-    left: 1rem;
-    font-size: 3rem;
-    color: var(--color-theme-1);
-    text-decoration: none;
-    font-weight: bold;
-    z-index: 100;
-  }
 
   .container {
     display: flex;

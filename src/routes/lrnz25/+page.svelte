@@ -1,6 +1,8 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
+  import { checkOrientation, setupOrientationListeners, loadPuzzleState, clearPuzzleState } from './utils.js';
+  import RotateMessage from './components/RotateMessage.svelte';
   
   let connectionsDone = false;
   let guessDone = false;
@@ -13,65 +15,49 @@
   // Check if all main puzzles are completed (excluding code puzzle)
   $: allPuzzlesCompleted = connectionsDone && guessDone && pictureDone && musicDone;
 
-  // Check device orientation
-  function checkOrientation() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Simply check if device is in landscape mode
-    const isLandscapeMode = width > height;
-    
-    // Show rotate message only if in landscape mode (encourage portrait for home page)
-    if (isLandscapeMode) {
-      showRotateMessage = true;
-      isPortrait = false;
-    } else {
-      showRotateMessage = false;
-      isPortrait = true;
-    }
-  }
+
 
   onMount(() => {
     try { 
-      connectionsDone = localStorage.getItem('lrnz25_connections_done') === '1'; 
-      guessDone = localStorage.getItem('lrnz25_guess_done') === '1';
-      pictureDone = localStorage.getItem('lrnz25_picture_done') === '1';
-      musicDone = localStorage.getItem('lrnz25_music_done') === '1';
-      codeDone = localStorage.getItem('lrnz25_code_done') === '1';
-      
-
+      connectionsDone = loadPuzzleState('lrnz25_connections_done');
+      guessDone = loadPuzzleState('lrnz25_guess_done');
+      pictureDone = loadPuzzleState('lrnz25_picture_done');
+      musicDone = loadPuzzleState('lrnz25_music_done');
+      codeDone = loadPuzzleState('lrnz25_code_done');
     } catch {}
     
     // Check orientation on mount
-    checkOrientation();
+    const updateOrientation = () => {
+      const isPortraitMode = checkOrientation(true); // Encourage portrait for home page
+      showRotateMessage = !isPortraitMode;
+      isPortrait = isPortraitMode;
+    };
+    
+    updateOrientation();
     
     // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    const cleanup = setupOrientationListeners(updateOrientation);
     
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
+    return cleanup;
   });
 
   function clearGlobalState() {
     try {
       // Clear all lrnz25 game progress
-      localStorage.removeItem('lrnz25_connections_done');
-      localStorage.removeItem('lrnz25_connections_solved');
-      localStorage.removeItem('lrnz25_music_done');
-      localStorage.removeItem('lrnz25_picture_done');
-      localStorage.removeItem('lrnz25_guess_done');
-      localStorage.removeItem('lrnz25_code_done');
+      clearPuzzleState('lrnz25_connections_done');
+      clearPuzzleState('lrnz25_connections_solved');
+      clearPuzzleState('lrnz25_music_done');
+      clearPuzzleState('lrnz25_picture_done');
+      clearPuzzleState('lrnz25_guess_done');
+      clearPuzzleState('lrnz25_code_done');
       
       // Clear individual music song states
       for (let i = 0; i < 4; i++) {
-        localStorage.removeItem(`lrnz25_music_song_${i}`);
+        clearPuzzleState(`lrnz25_music_song_${i}`);
       }
       
       // Clear guess puzzle help button state
-      localStorage.removeItem('lrnz25_guess_help_clicks');
+      clearPuzzleState('lrnz25_guess_help_clicks');
       
       // Reset local state
       connectionsDone = false;
@@ -83,11 +69,9 @@
   }
 </script>
 
-{#if showRotateMessage}
-  <div class="rotate-message">
-    <div class="rotate-icon">📱↕️</div>
-  </div>
-{:else}
+<RotateMessage show={showRotateMessage} encouragePortrait={true} />
+
+{#if !showRotateMessage}
   <main>
     <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
     <div class="content">
@@ -112,25 +96,6 @@
 {/if}
 
 <style>
-  .rotate-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--color-background);
-  }
-
-  .rotate-icon {
-    font-size: 8rem;
-    animation: rotate 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  }
-
-  @keyframes rotate {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
 
   main {
     text-align: center;
