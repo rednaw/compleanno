@@ -2,6 +2,9 @@
   import { songs } from '../songs.js';
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
+  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import BackButton from '../components/BackButton.svelte';
+  import RotateMessage from '../components/RotateMessage.svelte';
 
   let showRotateMessage = false;
   let isPortrait = false;
@@ -23,23 +26,7 @@
     return `${base}/lrnz25/song${song.number}_${level}.mp3`; 
   }
 
-  // Check device orientation
-  function checkOrientation() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Simply check if device is in landscape mode
-    const isLandscapeMode = width > height;
-    
-    // Show rotate message only if in landscape mode (encourage portrait for music puzzle)
-    if (isLandscapeMode) {
-      showRotateMessage = true;
-      isPortrait = false;
-    } else {
-      showRotateMessage = false;
-      isPortrait = true;
-    }
-  }
+
 
   function playFragment(idx) {
     const state = songStates[idx];
@@ -110,9 +97,7 @@
     
     // Save completion state to localStorage
     if (allSongsCompleted) {
-      try {
-        localStorage.setItem('lrnz25_music_done', '1');
-      } catch {}
+      savePuzzleState('lrnz25_music_done', '1');
     }
   }
 
@@ -132,7 +117,7 @@
       });
       
       // Check if all songs are completed
-      if (localStorage.getItem('lrnz25_music_done') === '1') {
+      if (loadPuzzleState('lrnz25_music_done')) {
         allSongsCompleted = true;
       } else {
         // Check if all songs are now completed based on loaded states
@@ -141,26 +126,26 @@
     } catch {}
     
     // Check orientation on mount
-    checkOrientation();
+    const updateOrientation = () => {
+      const isPortraitMode = checkOrientation(true); // Encourage portrait for music puzzle
+      showRotateMessage = !isPortraitMode;
+      isPortrait = isPortraitMode;
+    };
+    
+    updateOrientation();
     
     // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    const cleanup = setupOrientationListeners(updateOrientation);
     
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
+    return cleanup;
   });
 </script>
 
-<a href="{base}/lrnz25/" class="back-button">←</a>
+<BackButton />
 
-{#if showRotateMessage}
-  <div class="rotate-message">
-    <div class="rotate-icon">📱↕️</div>
-  </div>
-{:else}
+<RotateMessage show={showRotateMessage} encouragePortrait={true} />
+
+{#if !showRotateMessage}
   <main>
     <div class="song-list">
           {#each songs as song, i}
@@ -196,27 +181,7 @@
 {/if}
 
 <style>
-  .back-button { position: fixed; top: 0; left: 1rem; font-size: 3rem; color: var(--color-theme-1); text-decoration: none; font-weight: bold; z-index: 100; }
-  
-  .rotate-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--color-background);
-  }
 
-  .rotate-icon {
-    font-size: 8rem;
-    animation: rotate 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  }
-
-  @keyframes rotate {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
   
   main { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; background: var(--color-background); padding: 1rem 0.5rem 1rem 0.5rem; box-sizing: border-box; margin-top: 4rem; }
   .song-list { width: 100%; max-width: 100%; margin-left: auto; margin-right: auto; box-sizing: border-box; text-align: center; display: flex; flex-direction: column; align-items: center; }

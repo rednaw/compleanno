@@ -2,6 +2,8 @@
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { base } from '$app/paths';
+  import { savePuzzleState, loadPuzzleState } from '../utils.js';
+  import BackButton from '../components/BackButton.svelte';
 
   const CORRECT_CODE = '7253';
   let code = '';
@@ -46,10 +48,8 @@
     // Phase 2: Zoom effect and show final image
     setTimeout(() => {
       showFinalImage = true;
-      // Save completion state to localStorage
-      try {
-        localStorage.setItem('lrnz25_code_done', '1');
-      } catch {}
+              // Save completion state to localStorage
+        savePuzzleState('lrnz25_code_done', '1');
     }, 1500);
   }
 
@@ -65,12 +65,10 @@
       window.addEventListener('keydown', handleKey);
       
       // Check if puzzle was already completed
-      try {
-        if (localStorage.getItem('lrnz25_code_done') === '1') {
-          success = true;
-          showFinalImage = true;
-        }
-      } catch {}
+      if (loadPuzzleState('lrnz25_code_done')) {
+        success = true;
+        showFinalImage = true;
+      }
     }
   });
   onDestroy(() => {
@@ -106,7 +104,6 @@
   button { padding: 1em; font-size: 1.5em; border: 2px solid var(--color-border); background: var(--color-white); color: var(--color-text); cursor: pointer; border-radius: 0.5em; transition: all 0.2s; font-weight: 500; }
   button:hover { background: var(--color-hover-bg); border-color: var(--color-hover-border); }
   button:active { background: var(--color-theme-1); color: var(--color-white); }
-  .back-button { position: fixed; top: 0em; left: 1em; font-size: 3em; color: var(--color-theme-1); text-decoration: none; font-weight: bold; z-index: 1001; }
 
   .main-container.transition-phase-start {
     transform: scale(1.1) rotate(5deg);
@@ -160,7 +157,7 @@
   }
 </style>
 
-<a href="{base}/lrnz25/" class="back-button">←</a>
+<BackButton highZIndex={true} />
 
 <main class="main-container {transitionPhase !== 'none' ? `transition-phase-${transitionPhase}` : ''}" class:shake={error} class:hidden={showFinalImage}>
   <div class="code-display">{code.padEnd(4, '•')}</div>

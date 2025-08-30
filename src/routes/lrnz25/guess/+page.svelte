@@ -1,6 +1,9 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
+  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import BackButton from '../components/BackButton.svelte';
+  import RotateMessage from '../components/RotateMessage.svelte';
 
   const correctAnswer = 'extinction rebellion';
   const helpImages = [
@@ -15,23 +18,7 @@
   let showRotateMessage = false;
   let isPortrait = false;
 
-  // Check device orientation
-  function checkOrientation() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Simply check if device is in portrait mode
-    const isPortraitMode = height > width;
-    
-    // Show rotate message only if in landscape mode (encourage portrait for this puzzle)
-    if (!isPortraitMode) {
-      showRotateMessage = true;
-      isPortrait = false;
-    } else {
-      showRotateMessage = false;
-      isPortrait = true;
-    }
-  }
+
 
 
 
@@ -43,9 +30,7 @@
       isCorrect = true;
       submitted = true;
       // Save completion state to localStorage
-      try {
-        localStorage.setItem('lrnz25_guess_done', '1');
-      } catch {}
+      savePuzzleState('lrnz25_guess_done', '1');
     } else {
       isCorrect = false;
       guess = '';
@@ -110,11 +95,10 @@
   // Load and check orientation on mount
   onMount(() => {
     // Check if game was already completed
-    try {
-      if (localStorage.getItem('lrnz25_guess_done') === '1') {
-        submitted = true;
-        isCorrect = true;
-      }
+    if (loadPuzzleState('lrnz25_guess_done')) {
+      submitted = true;
+      isCorrect = true;
+    }
       
       // Load help button state
       const savedHelpClicks = localStorage.getItem('lrnz25_guess_help_clicks');
@@ -133,29 +117,28 @@
           }
         }, 100);
       }
-    } catch {}
     
     // Check orientation on mount
-    checkOrientation();
+    const updateOrientation = () => {
+      const isPortraitMode = checkOrientation(true); // Encourage portrait for guess puzzle
+      showRotateMessage = !isPortraitMode;
+      isPortrait = isPortraitMode;
+    };
+    
+    updateOrientation();
     
     // Listen for orientation changes
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    const cleanup = setupOrientationListeners(updateOrientation);
     
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
+    return cleanup;
   });
 </script>
 
-<a href="{base}/lrnz25/" class="back-button">←</a>
+<BackButton />
 
-{#if showRotateMessage}
-  <div class="rotate-message">
-    <div class="rotate-icon">📱↕️</div>
-  </div>
-{:else}
+<RotateMessage show={showRotateMessage} encouragePortrait={true} />
+
+{#if !showRotateMessage}
   <main class="container">
   <div class="images-section">
     <div class="images-container">
@@ -208,36 +191,9 @@
 {/if}
 
 <style>
-  .rotate-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--color-background);
-  }
 
-  .rotate-icon {
-    font-size: 8rem;
-    animation: rotate 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  }
 
-  @keyframes rotate {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    75% { transform: rotate(15deg) scale(1.1); }
-  }
 
-  .back-button {
-    position: fixed;
-    top: 0;
-    left: 1rem;
-    font-size: 3rem;
-    color: var(--color-theme-1);
-    text-decoration: none;
-    font-weight: bold;
-    z-index: 100;
-  }
 
   .container {
     display: flex;
