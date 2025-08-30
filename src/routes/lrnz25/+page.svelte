@@ -70,6 +70,9 @@
         localStorage.removeItem(`lrnz25_music_song_${i}`);
       }
       
+      // Clear guess puzzle help button state
+      localStorage.removeItem('lrnz25_guess_help_clicks');
+      
       // Reset local state
       connectionsDone = false;
       guessDone = false;
