@@ -1,0 +1,18 @@
+{
+	"clips": [
+		{
+			"id": "royal-tenenbaums",
+			"title": "The Royal Tenenbaums",
+			"url": "https://www.youtube.com/watch?v=caMgokYWboU",
+			"start": "0:03",
+			"end": "0:05"
+		},
+		{
+			"id": "avengers-endgame",
+			"title": "Avengers: Endgame",
+			"url": "https://www.youtube.com/watch?v=vqWz0ZCpYBs",
+			"start": "1:15",
+			"end": "1:17"
+		}
+	]
+}
