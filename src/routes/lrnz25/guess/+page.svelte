@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
   import BackButton from '../components/BackButton.svelte';
-  import RotateMessage from '../components/RotateMessage.svelte';
+  import RotateMessage from '$lib/components/RotateMessage.svelte';
 
   const correctAnswer = 'extinction rebellion';
   const helpImages = [

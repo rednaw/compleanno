@@ -1,9 +1,9 @@
 <script>
-  import { base } from '$app/paths';
   import { onMount } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
   import BackButton from '../components/BackButton.svelte';
-  import RotateMessage from '../components/RotateMessage.svelte';
+  import RotateMessage from '$lib/components/RotateMessage.svelte';
 
   const GROUPS = [
     { name: 'Gite a champoluc troncate a metà', color: '#f7d070', words: ['Mezza', 'Mari', 'Belve', 'Zerb'] },
@@ -13,12 +13,11 @@
   ];
 
   let tiles = [];
-  let selected = new Set();
+  let selected = new SvelteSet();
   let solvedGroups = [];
   let message = '';
   let shake = false;
   let showRotateMessage = false;
-  let isLandscape = false;
   let showWinMessage = false;
 
   // Initialize tiles from groups
@@ -63,7 +62,6 @@
     const updateOrientation = () => {
       const isLandscapeMode = checkOrientation(false); // Encourage landscape for connections puzzle
       showRotateMessage = !isLandscapeMode;
-      isLandscape = isLandscapeMode;
     };
     
     updateOrientation();
@@ -87,7 +85,6 @@
     }
     
     message = '';
-    selected = new Set(selected);
   }
 
   function checkSelection() {
@@ -120,7 +117,6 @@
       }
       
       selected.clear();
-      selected = new Set(selected);
       
       // Check win condition
       if (solvedGroups.length === 4) {
@@ -162,7 +158,7 @@
       <div class="left-panel">
         <div class="grid-wrap">
           <div class="grid" class:shake>
-            {#each tiles as tile, i}
+            {#each tiles as tile, i (`${tile.groupIndex}-${tile.label}`)}
               <button
                 type="button"
                 class="tile"
@@ -192,7 +188,7 @@
       <div class="right-panel">
         {#if solvedGroups.length}
           <div class="solved">
-            {#each solvedGroups.slice(0, 2) as group}
+            {#each solvedGroups.slice(0, 2) as group (group.name)}
               <div class="solved-row" style="background: {group.color}; border-color: {group.color}">
                 <div class="solved-title">{group.name}</div>
                 <div class="solved-words">{group.words.join(', ')}</div>
@@ -210,7 +206,7 @@
     {#if solvedGroups.length > 2}
       <div class="bottom-panel">
         <div class="solved">
-          {#each solvedGroups.slice(2) as group}
+          {#each solvedGroups.slice(2) as group (group.name)}
             <div class="solved-row" style="background: {group.color}; border-color: {group.color}">
               <div class="solved-title">{group.name}</div>
               <div class="solved-words">{group.words.join(', ')}</div>

@@ -15,7 +15,7 @@
 			"onAutoForward": "notify"
 		}
 	},
-	"postCreateCommand": "npm ci",
+	"postCreateCommand": "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ffmpeg python3 curl ca-certificates && sudo curl -fsSL -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp && sudo chmod a+rx /usr/local/bin/yt-dlp && npm ci",
 	"customizations": {
 		"vscode": {
 			"extensions": [
