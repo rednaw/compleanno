@@ -5,7 +5,7 @@ Download YouTube trailers and cut [start, end) segments with ffmpeg.
 Requires on PATH: yt-dlp, ffmpeg
 
   python3 scripts/gcm26/extract.py
-  python3 scripts/gcm26/extract.py --manifest path/to/manifest.json --out-dir static/gcm26/clips
+  python3 scripts/gcm26/extract.py --manifest src/lib/gcm26/manifest.json --out-dir static/gcm26/clips
 """
 
 from __future__ import annotations
@@ -131,7 +131,7 @@ def extract_segment(
 
 def main() -> None:
 	root = Path(__file__).resolve().parents[2]
-	default_manifest = Path(__file__).resolve().parent / "manifest.json"
+	default_manifest = root / "src" / "lib" / "gcm26" / "manifest.json"
 	parser = argparse.ArgumentParser(description="Cut trailer clips from YouTube URLs.")
 	parser.add_argument(
 		"--manifest",

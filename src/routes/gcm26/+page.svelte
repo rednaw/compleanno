@@ -1,11 +1,27 @@
 <script>
 	import { base } from '$app/paths';
+	import { onMount } from 'svelte';
+	import RotateMessage from '$lib/components/RotateMessage.svelte';
+	import { checkOrientation, setupOrientationListeners } from '../lrnz25/utils.js';
+
+	let showRotateMessage = false;
+
+	onMount(() => {
+		const updateOrientation = () => {
+			showRotateMessage = !checkOrientation(true);
+		};
+		updateOrientation();
+		return setupOrientationListeners(updateOrientation);
+	});
 </script>
 
 <svelte:head>
 	<title>GCM 26</title>
 </svelte:head>
 
+<RotateMessage show={showRotateMessage} encouragePortrait={true} />
+
+{#if !showRotateMessage}
 <main>
 	<div class="content">
 		<div class="games-grid">
@@ -20,6 +36,7 @@
 		</div>
 	</div>
 </main>
+{/if}
 
 <style>
 	main {
