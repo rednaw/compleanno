@@ -1,16 +1,10 @@
 {
 	"name": "compleanno",
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
-	"remoteUser": "vscode",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+	"remoteUser": "node",
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"
 	],
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "23",
-			"nodeGypDependencies": true
-		}
-	},
 	"containerEnv": {
 		"DEVCONTAINER": "1"
 	},
