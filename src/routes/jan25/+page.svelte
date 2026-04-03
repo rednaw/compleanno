@@ -10,8 +10,6 @@
       ? (path.startsWith('/') ? base + path.slice(1) : base + path)
       : (path.startsWith('/') ? base + path : base + '/' + path);
   }
-  // For debugging
-  console.log('SvelteKit base path:', base);
 
   const gridSize = 9;
 
@@ -57,14 +55,6 @@
       const nx = x + dx * i;
       const ny = y + dy * i;
       grid[ny][nx] = word[i];
-    }
-  }
-
-  function removeWord(grid, word, x, y, dx, dy) {
-    for (let i = 0; i < word.length; i++) {
-      const nx = x + dx * i;
-      const ny = y + dy * i;
-      grid[ny][nx] = '';
     }
   }
 
@@ -301,9 +291,9 @@
     {#if grid.length}
       {#key foundCoords.size}
         <div class="grid {shake ? 'shake' : ''}">
-          {#each grid as row, y}
+          {#each grid as row, y (y)}
             <div class="row">
-              {#each row as letter, x}
+              {#each row as letter, x (`${y}-${x}`)}
                 <button
                   type="button"
                   class="cell"
@@ -320,7 +310,7 @@
         </div>
       {/key}
       <div class="word-list">
-        {#each displayedWords as word}
+        {#each displayedWords as word (word)}
           {@const i = words.indexOf(word)}
           <span class="word {foundWordsSet.has(word.toUpperCase()) ? 'found' : ''}">{foundWordsSet.has(word.toUpperCase()) ? word : maskedWords[i]}</span>
         {/each}

@@ -1,5 +1,5 @@
 <script>
-	import '../app.css';
+	import '../../app.css';
 </script>
 
 <svelte:head>
@@ -8,11 +8,11 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </svelte:head>
 
-<slot />
-
 <style>
 	:global(*) {
 		-webkit-tap-highlight-color: transparent;
 		touch-action: manipulation;
 	}
 </style>
+
+<slot />
