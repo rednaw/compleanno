@@ -20,7 +20,15 @@ fi
 
 mkdir -p "$DEST_DIR"
 
-yt-dlp -x --audio-format mp3 -o "$DEST_DIR/%(title)s [%(id)s].%(ext)s" "https://www.youtube.com/watch?v=$VIDEO_ID"
+# YouTube needs a JS runtime + EJS components for sig/n-challenge solving (see yt-dlp EJS wiki).
+# curl-installed yt-dlp + Node in the devcontainer: use --js-runtimes node and ejs:github.
+yt-dlp --no-playlist \
+	--js-runtimes node \
+	--remote-components ejs:github \
+	--extractor-args "youtube:player_client=web" \
+	-x --audio-format mp3 \
+	-o "$DEST_DIR/%(title)s [%(id)s].%(ext)s" \
+	"https://www.youtube.com/watch?v=$VIDEO_ID"
 
 MP3_FILE=$(find "$DEST_DIR" -type f -name "*\[$VIDEO_ID\].mp3" | head -n1)
 

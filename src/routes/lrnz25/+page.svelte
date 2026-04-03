@@ -2,7 +2,7 @@
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
   import { checkOrientation, setupOrientationListeners, loadPuzzleState, clearPuzzleState } from './utils.js';
-  import RotateMessage from './components/RotateMessage.svelte';
+  import RotateMessage from '$lib/components/RotateMessage.svelte';
   
   let connectionsDone = false;
   let guessDone = false;

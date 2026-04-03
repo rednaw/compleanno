@@ -69,6 +69,12 @@ def download_video(url: str, dest_dir: Path, force: bool) -> Path:
 		[
 			"yt-dlp",
 			"--no-playlist",
+			"--js-runtimes",
+			"node",
+			"--remote-components",
+			"ejs:github",
+			"--extractor-args",
+			"youtube:player_client=web",
 			"-f",
 			"bv*+ba/b",
 			"--merge-output-format",
