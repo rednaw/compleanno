@@ -1,12 +1,12 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 
 	/** @type {string} */
 	export let label = 'Puzzle';
 </script>
 
 <main class="stub">
-	<a class="back" href="{base}/gcm26/">←</a>
+	<a class="back" href={resolve('/gcm26')}>←</a>
 	<p class="msg">{label} — placeholder.</p>
 </main>
 

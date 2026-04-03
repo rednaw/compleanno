@@ -1,7 +1,7 @@
 <script>
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { films, filmTitleMatches } from '../films.js';
+	import { films, filmTitleMatches } from './films.js';
 	import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../../lrnz25/utils.js';
 	import BackButton from '../../lrnz25/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
@@ -21,7 +21,7 @@
 	let allCompleted = false;
 
 	function clipSrc(id) {
-		return `${base}/gcm26/clips/${id}.mp4`;
+		return `${base}/gcm26/${id}.mp4`;
 	}
 
 	function playClip(idx) {

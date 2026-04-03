@@ -1,16 +1,15 @@
 <script>
-  import { base } from '$app/paths';
+  import { resolve, asset } from '$app/paths';
   import { onMount } from 'svelte';
-  import { checkOrientation, setupOrientationListeners, loadPuzzleState, clearPuzzleState } from './utils.js';
+  import { checkOrientation, setupOrientationListeners, loadPuzzleState, clearPuzzleKeys } from './utils.js';
   import RotateMessage from '$lib/components/RotateMessage.svelte';
+  import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
   
   let connectionsDone = false;
   let guessDone = false;
   let pictureDone = false;
   let musicDone = false;
-  let codeDone = false;
   let showRotateMessage = false;
-  let isPortrait = false;
 
   // Check if all main puzzles are completed (excluding code puzzle)
   $: allPuzzlesCompleted = connectionsDone && guessDone && pictureDone && musicDone;
@@ -18,19 +17,17 @@
 
 
   onMount(() => {
-    try { 
+
       connectionsDone = loadPuzzleState('lrnz25_connections_done');
       guessDone = loadPuzzleState('lrnz25_guess_done');
       pictureDone = loadPuzzleState('lrnz25_picture_done');
       musicDone = loadPuzzleState('lrnz25_music_done');
-      codeDone = loadPuzzleState('lrnz25_code_done');
-    } catch {}
+
     
     // Check orientation on mount
     const updateOrientation = () => {
       const isPortraitMode = checkOrientation(true); // Encourage portrait for home page
       showRotateMessage = !isPortraitMode;
-      isPortrait = isPortraitMode;
     };
     
     updateOrientation();
@@ -42,30 +39,21 @@
   });
 
   function clearGlobalState() {
-    try {
-      // Clear all lrnz25 game progress
-      clearPuzzleState('lrnz25_connections_done');
-      clearPuzzleState('lrnz25_connections_solved');
-      clearPuzzleState('lrnz25_music_done');
-      clearPuzzleState('lrnz25_picture_done');
-      clearPuzzleState('lrnz25_guess_done');
-      clearPuzzleState('lrnz25_code_done');
-      
-      // Clear individual music song states
-      for (let i = 0; i < 4; i++) {
-        clearPuzzleState(`lrnz25_music_song_${i}`);
-      }
-      
-      // Clear guess puzzle help button state
-      clearPuzzleState('lrnz25_guess_help_clicks');
-      
-      // Reset local state
+      clearPuzzleKeys([
+        'lrnz25_connections_done',
+        'lrnz25_connections_solved',
+        'lrnz25_music_done',
+        'lrnz25_picture_done',
+        'lrnz25_guess_done',
+        'lrnz25_code_done',
+        'lrnz25_guess_help_clicks',
+        ...Array.from({ length: 4 }, (_, i) => `lrnz25_music_song_${i}`)
+      ]);
       connectionsDone = false;
       guessDone = false;
       pictureDone = false;
       musicDone = false;
-      codeDone = false;
-    } catch {}
+
   }
 </script>
 
@@ -73,22 +61,22 @@
 
 {#if !showRotateMessage}
   <main>
-    <button class="clear-button" on:click={clearGlobalState} title="Clear progress">🗑️</button>
+    <ClearProgressButton onClear={clearGlobalState} />
     <div class="content">
       <div class="games-grid">
-        <a href="{base}/lrnz25/music" class="game-button" data-key="music">{musicDone ? '2' : '?'}</a>
-        <a href="{base}/lrnz25/connections" class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
-        <a href="{base}/lrnz25/picture" class="game-button" data-key="picture">{pictureDone ? '3' : '?'}</a>
-        <a href="{base}/lrnz25/guess" class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
+        <a href={resolve('/lrnz25/music')} class="game-button" data-key="music">{musicDone ? '2' : '?'}</a>
+        <a href={resolve('/lrnz25/connections')} class="game-button" data-key="connections">{connectionsDone ? '5' : '?'}</a>
+        <a href={resolve('/lrnz25/picture')} class="game-button" data-key="picture">{pictureDone ? '3' : '?'}</a>
+        <a href={resolve('/lrnz25/guess')} class="game-button" data-key="guess">{guessDone ? '7' : '?'}</a>
       </div>
       <div class="arrow">↓</div>
       <div class="code-section">
         {#if allPuzzlesCompleted}
-          <a href="{base}/lrnz25/code" class="final-image-container">
-            <img src="{base}/lrnz25/final.png" alt="Final reward" class="final-image" />
+          <a href={resolve('/lrnz25/code')} class="final-image-container">
+            <img src={asset('/lrnz25/final.png')} alt="Final reward" class="final-image" />
           </a>
         {:else}
-          <a href="{base}/lrnz25/code" class="code-button">?</a>
+          <a href={resolve('/lrnz25/code')} class="code-button">?</a>
         {/if}
       </div>
     </div>
@@ -215,27 +203,4 @@
     margin: 1rem 0;
   }
 
-  .clear-button {
-    position: fixed;
-    top: 0;
-    left: 1rem;
-    font-size: 2rem;
-    background: none;
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-    z-index: 100;
-  }
-
-  .clear-button:hover {
-    background: rgba(220, 53, 69, 0.1);
-    transform: scale(1.1);
-  }
-
-  .clear-button:active {
-    transform: scale(0.95);
-  }
 </style>

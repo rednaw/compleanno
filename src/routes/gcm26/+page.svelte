@@ -1,18 +1,44 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { checkOrientation, setupOrientationListeners } from '../lrnz25/utils.js';
+	import {
+		checkOrientation,
+		setupOrientationListeners,
+		loadPuzzleState,
+		clearPuzzleKeys
+	} from '../lrnz25/utils.js';
+	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+	import { films } from './a/films.js';
 
 	let showRotateMessage = false;
+	let gameADone = false;
 
 	onMount(() => {
+		try {
+			gameADone = loadPuzzleState('gcm26_game_a_done');
+		} catch {
+			void 0;
+		}
+
 		const updateOrientation = () => {
 			showRotateMessage = !checkOrientation(true);
 		};
 		updateOrientation();
 		return setupOrientationListeners(updateOrientation);
 	});
+
+	function clearGlobalState() {
+		try {
+			clearPuzzleKeys([
+				'gcm26_game_a_done',
+				...films.map((_, i) => `gcm26_film_${i}`)
+			]);
+			gameADone = false;
+		} catch {
+			void 0;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -23,16 +49,17 @@
 
 {#if !showRotateMessage}
 <main>
+	<ClearProgressButton onClear={clearGlobalState} />
 	<div class="content">
 		<div class="games-grid">
-			<a href="{base}/gcm26/a/" class="game-button">?</a>
-			<a href="{base}/gcm26/b/" class="game-button">?</a>
-			<a href="{base}/gcm26/c/" class="game-button">?</a>
-			<a href="{base}/gcm26/d/" class="game-button">?</a>
+			<a href={resolve('/gcm26/a')} class="game-button">{gameADone ? '✓' : '?'}</a>
+			<a href={resolve('/gcm26/b')} class="game-button">?</a>
+			<a href={resolve('/gcm26/c')} class="game-button">?</a>
+			<a href={resolve('/gcm26/d')} class="game-button">?</a>
 		</div>
 		<div class="arrow">↓</div>
 		<div class="code-section">
-			<a href="{base}/gcm26/code/" class="code-button">?</a>
+			<a href={resolve('/gcm26/code')} class="code-button">?</a>
 		</div>
 	</div>
 </main>
@@ -132,4 +159,5 @@
 		color: var(--color-text);
 		margin: 1rem 0;
 	}
+
 </style>
