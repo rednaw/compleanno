@@ -32,6 +32,7 @@
 		try {
 			clearPuzzleKeys([
 				'gcm26_game_a_done',
+				'gcm26_game_a_common',
 				...films.map((_, i) => `gcm26_film_${i}`)
 			]);
 			gameADone = false;
