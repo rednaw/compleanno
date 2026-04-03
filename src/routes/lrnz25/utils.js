@@ -34,7 +34,9 @@ export function setupOrientationListeners(callback) {
 export function savePuzzleState(key, value) {
   try {
     localStorage.setItem(key, value);
-  } catch {}
+  } catch {
+    // localStorage may be unavailable (private mode, disabled storage, quota).
+  }
 }
 
 /**
@@ -57,5 +59,17 @@ export function loadPuzzleState(key) {
 export function clearPuzzleState(key) {
   try {
     localStorage.removeItem(key);
-  } catch {}
+  } catch {
+    // localStorage may be unavailable (private mode, disabled storage, quota).
+  }
+}
+
+/**
+ * Remove several puzzle keys (e.g. reset one game hub).
+ * @param {string[]} keys
+ */
+export function clearPuzzleKeys(keys) {
+  for (const key of keys) {
+    clearPuzzleState(key);
+  }
 }
