@@ -2,7 +2,12 @@
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { films, filmTitleMatches } from './films.js';
-	import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../../lrnz25/utils.js';
+	import {
+		checkOrientation,
+		setupOrientationListeners,
+		savePuzzleState,
+		clearPuzzleState
+	} from '../../lrnz25/utils.js';
 	import BackButton from '../../lrnz25/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 
@@ -19,6 +24,16 @@
 	}));
 
 	let allCompleted = false;
+
+	const COMMON_QUESTION = 'Cosa hanno in comune tutti questi film?';
+	const COMMON_ANSWER = 'Gwyneth Paltrow';
+
+	let commonGuess = '';
+	let commonFeedback = '';
+	/** @type {'not-started' | 'correct' | 'wrong'} */
+	let commonStatus = 'not-started';
+
+	$: filmsAllCorrect = clipStates.every((s) => s.status === 'correct');
 
 	function clipSrc(id) {
 		return `${base}/gcm26/${id}.mp4`;
@@ -78,10 +93,38 @@
 	}
 
 	function checkAllCompleted() {
-		allCompleted = clipStates.every((s) => s.status === 'correct');
+		allCompleted =
+			clipStates.every((s) => s.status === 'correct') && commonStatus === 'correct';
 		if (allCompleted) {
 			savePuzzleState('gcm26_game_a_done', '1');
+		} else {
+			clearPuzzleState('gcm26_game_a_done');
 		}
+	}
+
+	function checkCommonGuess() {
+		if (!filmsAllCorrect) return;
+		if (!commonGuess.trim()) return;
+
+		if (filmTitleMatches(commonGuess, COMMON_ANSWER)) {
+			commonFeedback = 'correct';
+			commonStatus = 'correct';
+		} else {
+			commonFeedback = 'wrong';
+			commonStatus = 'wrong';
+			commonGuess = '';
+		}
+
+		try {
+			localStorage.setItem(
+				'gcm26_game_a_common',
+				JSON.stringify({ status: commonStatus, feedback: commonFeedback })
+			);
+		} catch {
+			void 0;
+		}
+
+		checkAllCompleted();
 	}
 
 	onMount(() => {
@@ -95,11 +138,21 @@
 				}
 			});
 
-			if (loadPuzzleState('gcm26_game_a_done')) {
-				allCompleted = true;
-			} else {
-				checkAllCompleted();
+			const rawCommon = localStorage.getItem('gcm26_game_a_common');
+			if (rawCommon) {
+				const parsed = JSON.parse(rawCommon);
+				commonStatus = parsed.status;
+				commonFeedback = parsed.feedback ?? '';
 			}
+
+			const filmsOk = clipStates.every((s) => s.status === 'correct');
+			if (commonStatus === 'correct' && !filmsOk) {
+				commonStatus = 'not-started';
+				commonFeedback = '';
+				clearPuzzleState('gcm26_game_a_common');
+			}
+
+			checkAllCompleted();
 		} catch {
 			void 0;
 		}
@@ -179,6 +232,37 @@
 					</div>
 				</div>
 			{/each}
+
+			<div class="common-section" class:common-disabled={!filmsAllCorrect}>
+				<p class="common-question">{COMMON_QUESTION}</p>
+				<div class="clip-row {commonStatus === 'correct' ? 'correct' : ''} {commonStatus === 'wrong' ? 'wrong' : ''}">
+					{#if commonStatus !== 'correct'}
+						<button
+							type="button"
+							on:click={() => checkCommonGuess()}
+							disabled={!filmsAllCorrect || !commonGuess.trim() || commonStatus === 'correct'}
+						>
+							Check
+						</button>
+					{:else}
+						<span class="feedback correct">✅</span>
+					{/if}
+				</div>
+				<div class="input-row">
+					{#if commonStatus !== 'correct'}
+						<input
+							type="text"
+							placeholder={filmsAllCorrect ? 'La tua risposta' : 'Indovina prima tutti i film'}
+							bind:value={commonGuess}
+							autocomplete="off"
+							disabled={!filmsAllCorrect || commonStatus === 'correct'}
+							on:keydown={(e) => e.key === 'Enter' && checkCommonGuess()}
+						/>
+					{:else}
+						<span class="feedback correct">✅</span>
+					{/if}
+				</div>
+			</div>
 
 			{#if allCompleted}
 				<div class="result-section">
@@ -350,6 +434,25 @@
 
 	.feedback.correct {
 		color: #388e3c;
+	}
+
+	.common-section {
+		width: 100%;
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.common-section.common-disabled {
+		opacity: 0.72;
+	}
+
+	.common-question {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--color-text);
+		text-align: center;
+		margin: 0 0 0.75rem;
+		line-height: 1.35;
 	}
 
 	.result-section {
