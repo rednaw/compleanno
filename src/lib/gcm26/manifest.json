@@ -13,6 +13,20 @@
 			"url": "https://www.youtube.com/watch?v=vqWz0ZCpYBs",
 			"start": "1:15",
 			"end": "1:17"
+		},
+		{
+			"id": "marty-supreme",
+			"title": "Marty Supreme",
+			"url": "https://www.youtube.com/watch?v=s9gSuKaKcqM",
+			"start": "1:29",
+			"end": "1:30"
+		},
+		{
+			"id": "se7en",
+			"title": "Se7en",
+			"url": "https://www.youtube.com/watch?v=KPOuJGkpblk",
+			"start": "0:09",
+			"end": "0:10"
 		}
 	]
 }
