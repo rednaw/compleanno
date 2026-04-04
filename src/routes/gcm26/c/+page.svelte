@@ -15,17 +15,17 @@
 	const ITEMS = [
 		{
 			id: 'gawx',
-			question: 'Wat is de nieuwe naam van Gawx?',
+			question: 'Quid est novum nomen Gawxis?',
 			answer: 'Aqasix Yanagawn'
 		},
 		{
 			id: 'nuatoma',
-			question: 'Wat is de titel van een clanhoofd van de Unkalaki?',
+			question: 'Quis est titulus principis gentis Unkalakicae?',
 			answer: 'Nuatoma'
 		},
 		{
 			id: 'karavaniga',
-			question: 'Hoe heet de tweede kleindochter van Taravangian?',
+			question: 'Quo nomine vocatur secunda neptis Taravangii?',
 			answer: 'Karavaniga'
 		}
 	];
@@ -112,7 +112,7 @@
 </script>
 
 <svelte:head>
-	<title>Stormlight quiz</title>
+	<title>Certamen Stormlight</title>
 </svelte:head>
 
 <BackButton href={resolve('/gcm26')} />
@@ -123,7 +123,7 @@
 	<main>
 		<div class="quiz-wrap">
 			<p class="progress-hint" aria-live="polite">
-				{solvedCount} / {ITEMS.length} vragen goed
+				Recte solutae: {solvedCount} / {ITEMS.length}
 			</p>
 
 			{#each ITEMS as item, i (item.id)}
@@ -138,7 +138,7 @@
 					>
 						<input
 							type="text"
-							placeholder="Antwoord"
+							placeholder="Responsum"
 							bind:value={guesses[i]}
 							autocomplete="off"
 							readonly={rowStatus[i] === 'correct'}
@@ -150,7 +150,7 @@
 								onclick={() => checkItem(i)}
 								disabled={!guesses[i].trim()}
 							>
-								Controleer
+								Conproba
 							</button>
 						{:else}
 							<span class="feedback correct" aria-hidden="true">✅</span>
