@@ -20,7 +20,7 @@
 		},
 		{
 			id: 'nuatoma',
-			question: 'Hoe heet de leider van een clan van de Unkalaki?',
+			question: 'Wat is de titel van een clanhoofd van de Unkalaki?',
 			answer: 'Nuatoma'
 		},
 		{
