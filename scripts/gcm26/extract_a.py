@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Download YouTube trailers and cut [start, end) segments with ffmpeg.
+Download YouTube trailers and cut [start, end) segments with ffmpeg (game A).
 
 Requires on PATH: yt-dlp, ffmpeg
 
-  python3 scripts/gcm26/extract.py
-  python3 scripts/gcm26/extract.py --manifest src/routes/gcm26/a/manifest.json --out-dir static/gcm26/a
+  python3 scripts/gcm26/extract_a.py
+  python3 scripts/gcm26/extract_a.py --manifest src/routes/gcm26/a/manifest.json --out-dir static/gcm26/a
 """
 
 from __future__ import annotations

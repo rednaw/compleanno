@@ -13,7 +13,7 @@ The player hears **multiple songs at once**. **V1:** exactly **6** songs in one 
 - **Optional later:** **Web Audio API** with a **GainNode per source** for crossfades or a master bus; more control, more complexity.
 - **Sync:** start every clip at **t = 0** when the round begins; keep other tracks playing when one drops out.
 - **V1 loop length:** **20 seconds** per track, **no fade in/out** (hard cuts in source processing are fine; playback is a straight loop).
-- **Loudness:** **normalize** exports so one track does not dominate the mashup (e.g. **ffmpeg `loudnorm`** per clip, or a shared target **integrated LUFS** / **peak**; decide in extract script). Short loops, predictable hosting size.
+- **Loudness:** **normalize** exports so one track does not dominate the mashup (e.g. **ffmpeg `loudnorm`** per clip in **game B’s** extract script). Short loops, predictable hosting size.
 
 ## Difficulty and track count
 
@@ -31,7 +31,7 @@ The player hears **multiple songs at once**. **V1:** exactly **6** songs in one 
 ## Source: downloaded MP3s (not runtime YouTube)
 
 - **Static layout:** game **A** (films) → **`static/gcm26/a/`** (e.g. `.mp4`); game **B** (cacophony) → **`static/gcm26/b/`** (`.mp3`).
-- **Pipeline:** pick tracks on YouTube → download / trim locally (e.g. **yt-dlp** + **ffmpeg**, same family as `scripts/gcm26/extract.py` for game A) → game A clips land in **`static/gcm26/a/`**; game B loops in **`static/gcm26/b/`**.
+- **Pipeline:** YouTube → **yt-dlp** + **ffmpeg** locally. **Game A:** **`scripts/gcm26/extract_a.py`** → **`static/gcm26/a/`** (`.mp4`). **Game B:** **`scripts/gcm26/extract_b.py`** → **`static/gcm26/b/`** (`.mp3`).
 - **Birthday app, private use:** runtime plays **only local files**; predictable at the venue, no iframe stack or sync drift.
 - Prefer **short loops** for **repo size** and **mobile** load time.
 
@@ -55,7 +55,7 @@ The **lrnz25 music** puzzle (`src/routes/lrnz25/music/+page.svelte` + `src/route
 ## Integration sketch (gcm26)
 
 - **Route:** e.g. `gcm26/b` (replace placeholder if present).
-- **Data:** **manifest** for **6** tracks (slug, **title** = exact answer for guessing, YouTube trim window for tooling); audio files **`static/gcm26/b/<slug>.mp3`**, **20 s** loops, **normalized**.
+- **Data:** see **Manifest (V1 default)** below; audio **`static/gcm26/b/<id>.mp3`** per track.
 - **Hub:** wire tile completion and **clear progress** keys like game A.
 
 ## V1 decisions (locked)
@@ -72,12 +72,50 @@ The **lrnz25 music** puzzle (`src/routes/lrnz25/music/+page.svelte` + `src/route
 | Guess target | **Song title only** |
 | UI language | **English** (v1) |
 | Matching | **Exact** — trim + **case-insensitive** compare to manifest title; **no** fuzzy typos |
+| Manifest location | **`src/routes/gcm26/b/manifest.json`** (colocated with route, same idea as game A) |
+| Audio files | **`static/gcm26/b/<id>.mp3`** — **`id`** is **kebab-case** slug, one rule, no separate `file` field |
+| Extract tooling | **`scripts/gcm26/extract_a.py`** (game A), **`scripts/gcm26/extract_b.py`** (game B) |
+
+## Manifest (V1 default)
+
+- Path: **`src/routes/gcm26/b/manifest.json`**.
+- Shape: JSON object with a **`tracks`** array of exactly **6** objects for v1.
+- Each track (for app + extract tooling):
+
+| Field | Role |
+|--------|------|
+| **`id`** | Slug; basename of **`static/gcm26/b/<id>.mp3`** |
+| **`title`** | Canonical **song title** (exact-guess answer after trim + case fold) |
+| **`url`** | YouTube URL (extract script only) |
+| **`start`** | Segment start (e.g. `M:SS` — extract script only) |
+| **`end`** | Segment end (`start` + **20 s** wall-clock window, or explicit end time — script decides) |
+
+Example (placeholders):
+
+```json
+{
+	"tracks": [
+		{
+			"id": "example-slug",
+			"title": "Exact Title As Players Must Type",
+			"url": "https://www.youtube.com/watch?v=…",
+			"start": "0:45",
+			"end": "1:05"
+		}
+	]
+}
+```
+
+v1 requires **6** objects in **`tracks`**.
+
+## Tooling (game B)
+
+- **Script:** **`scripts/gcm26/extract_b.py`** — reads **`src/routes/gcm26/b/manifest.json`**, for each track: download source, cut **[start, end)** (or **20 s** from `start`), **loudnorm** (or equivalent), write **`static/gcm26/b/<id>.mp3`**.
+- Defaults can mirror A’s CLI polish (`--manifest`, `--out-dir`, `--cache-dir`) without sharing one big codepath.
 
 ## Open questions before implementation
 
-1. **File naming / manifest:** slug per track under `static/gcm26/b/` + **`manifest.json`** colocated with `gcm26/b` route.
-2. **Extract script:** extend `scripts/gcm26/` pipeline — yt-dlp → trim **20 s** → **loudnorm** (or equivalent) → `static/gcm26/b/<slug>.mp3`.
-3. **Wrong guess UX:** e.g. clear field + short message; **Enter** key submits (likely yes).
+1. **Wrong guess UX:** e.g. clear field + short message; **Enter** key submits (likely yes).
 
 ---
 

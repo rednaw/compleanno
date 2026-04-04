@@ -200,7 +200,7 @@
 							▶️ Play
 						</button>
 						{#if clipStates[i].videoError}
-							<span class="clip-hint">Video missing — run <code>scripts/gcm26/extract.py</code></span>
+							<span class="clip-hint">Video missing — run <code>scripts/gcm26/extract_a.py</code></span>
 						{/if}
 						{#if clipStates[i].status !== 'correct'}
 							<button
