@@ -35,7 +35,6 @@
 	/** @type {Record<string, boolean>} */
 	let solved = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
 
-	let mixStarted = $state(false);
 	let guessInput = $state('');
 	/** @type {'not-started' | 'wrong'} */
 	let guessRowStatus = $state('not-started');
@@ -73,7 +72,6 @@
 	}
 
 	function startMix() {
-		mixStarted = true;
 		for (let i = 0; i < tracks.length; i++) {
 			const t = tracks[i];
 			const a = audioById[t.id];
@@ -87,21 +85,8 @@
 		}
 	}
 
-	function restartMixAudio() {
-		if (!mixStarted) return;
-		for (let i = 0; i < tracks.length; i++) {
-			const t = tracks[i];
-			const a = audioById[t.id];
-			if (!a || audioLoadError[t.id] || solved[t.id]) continue;
-			a.currentTime = 0;
-			a.play().catch(() => {
-				audioLoadError = { ...audioLoadError, [t.id]: true };
-			});
-		}
-	}
-
 	function submitGuess() {
-		if (!mixStarted || allCompleted) return;
+		if (allCompleted) return;
 		const g = guessInput;
 		if (!g.trim()) return;
 
@@ -158,12 +143,16 @@
 			void 0;
 		}
 
-		void tick().then(() => applySolvedToAudios());
-
 		const updateOrientation = () => {
 			showRotateMessage = !checkOrientation(true);
 		};
 		updateOrientation();
+
+		void tick().then(() => {
+			applySolvedToAudios();
+			if (!allCompleted) startMix();
+		});
+
 		return setupOrientationListeners(updateOrientation);
 	});
 </script>
@@ -197,19 +186,7 @@
 				{/each}
 			</div>
 
-			{#if !mixStarted && !allCompleted}
-				<div class="start-wrap">
-					<button type="button" class="play-btn start-full" onclick={() => startMix()}>Start</button>
-				</div>
-			{:else if !allCompleted}
-				<div class="controls-wrap">
-					<button type="button" class="play-btn secondary" onclick={() => restartMixAudio()}>
-						Restart audio
-					</button>
-				</div>
-			{/if}
-
-			{#if mixStarted && !allCompleted}
+			{#if !allCompleted}
 				<div class="clip-row {guessRowStatus === 'wrong' ? 'wrong' : ''}">
 					<button
 						type="button"
@@ -231,7 +208,7 @@
 				</div>
 			{/if}
 
-			{#if solvedTracksOrdered.length > 0 && (mixStarted || allCompleted)}
+			{#if solvedTracksOrdered.length > 0}
 				<div class="solved-titles">
 					<p class="solved-titles-label">Identified</p>
 					<ul class="solved-titles-list" aria-live="polite">
@@ -301,14 +278,6 @@
 		opacity: 0;
 	}
 
-	.start-wrap {
-		margin: 1.5rem 0;
-	}
-
-	.controls-wrap {
-		margin: 0.75rem 0 1rem;
-	}
-
 	.clip-row {
 		display: flex;
 		align-items: center;
@@ -344,29 +313,6 @@
 		border: 2px solid var(--color-border);
 		width: 100%;
 		box-sizing: border-box;
-	}
-
-	.play-btn {
-		font-size: 1.05em;
-		padding: 0.6em 1.2em;
-		border-radius: 0.5em;
-		border: none;
-		background: var(--color-theme-1);
-		color: var(--color-white);
-		font-weight: bold;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-
-	.play-btn.secondary {
-		background: var(--color-theme-2);
-		font-weight: 600;
-		font-size: 0.95em;
-	}
-
-	.start-full {
-		font-size: 1.25em;
-		padding: 0.85em 2em;
 	}
 
 	.clip-row button[type='button'] {
