@@ -25,7 +25,8 @@ The player hears **multiple songs at once**. **V1:** exactly **6** songs in one 
 - **UI language:** **English** (labels, buttons, placeholders for now).
 - After **Start**, the UI shows **one text field** (e.g. placeholder **Song title**) and **Submit**.
 - **Matching: exact** — no fuzzy / typo tolerance (unlike game A). **Implementation note:** compare **canonical title** from the manifest to the player input after **trim** and **case-insensitive** equality (same approach as **lrnz25/music**: normalized strings, but **no** edit distance). No extra aliases in v1 unless the manifest spells the single accepted title.
-- **Submit:** compare against **unsolved** tracks only. If **exactly one** remaining song matches, **mute** that layer and **clear** the field. If **none** match, **wrong** feedback (TBD: inline message / shake) and **clear** the input. Collisions (two songs same title) should be avoided in curation.
+- **Submit:** compare against **unsolved** tracks only. If **exactly one** remaining song matches, **mute** that layer and **clear** the field. If **none** match, use the **same wrong-guess UX as game A** (see below). Collisions (two songs same title) should be avoided in curation.
+- **Wrong guess (locked — mirror game A):** set **`status` / `feedback` to `'wrong'`** on the guess row, **clear** the text field, and style the control row with the **same `.clip-row.wrong` rules** as `src/routes/gcm26/a/+page.svelte` (red-tint background, red border, dark red text). No separate toast or shake — the row *is* the feedback. Row stays in **`wrong`** until the next **correct** submit (same as A). **Enter** in the field submits the same as the **Submit** button (same as A’s per-film inputs).
 - Optional later: Italian copy, fuzzy matching, per-slot fields.
 
 ## Source: downloaded MP3s (not runtime YouTube)
@@ -49,7 +50,7 @@ The **lrnz25 music** puzzle (`src/routes/lrnz25/music/+page.svelte` + `src/route
 
 - **Round start (locked):** initial screen shows only **Start**; press it → **all** active tracks play **in sync** and **loop** (**20 s** files loop seamlessly if edited that way).
 - **Replay:** **Restart** all audible tracks from **t = 0** (e.g. secondary control after game started — detail TBD).
-- **Progress:** persist solved layers (e.g. **localStorage**), aligned with **gcm26 hub** and **clear progress** (new keys alongside game A).
+- **Progress:** persist solved layers (e.g. **localStorage**). **Hub “clear progress”** removes every key with prefix **`gcm26_`** so games stay **uncoupled** in code — each game only defines its own keys under that prefix (no hub imports of `./a/films.js` or other game modules).
 - **Accessibility:** e.g. **remaining count** / solved count so the screen is not audio-only.
 
 ## Integration sketch (gcm26)
@@ -72,6 +73,7 @@ The **lrnz25 music** puzzle (`src/routes/lrnz25/music/+page.svelte` + `src/route
 | Guess target | **Song title only** |
 | UI language | **English** (v1) |
 | Matching | **Exact** — trim + **case-insensitive** compare to manifest title; **no** fuzzy typos |
+| Wrong guess UX | **Same as game A** — `.clip-row.wrong`, clear input, `status: 'wrong'` until next correct guess; **Enter** submits |
 | Manifest location | **`src/routes/gcm26/b/manifest.json`** (colocated with route, same idea as game A) |
 | Audio files | **`static/gcm26/b/<id>.mp3`** — **`id`** is **kebab-case** slug, one rule, no separate `file` field |
 | Extract tooling | **`scripts/gcm26/extract_a.py`** (game A), **`scripts/gcm26/extract_b.py`** (game B) |
@@ -112,10 +114,6 @@ v1 requires **6** objects in **`tracks`**.
 
 - **Script:** **`scripts/gcm26/extract_b.py`** — reads **`src/routes/gcm26/b/manifest.json`**, for each track: download source, cut **[start, end)** (or **20 s** from `start`), **loudnorm** (or equivalent), write **`static/gcm26/b/<id>.mp3`**.
 - Defaults can mirror A’s CLI polish (`--manifest`, `--out-dir`, `--cache-dir`) without sharing one big codepath.
-
-## Open questions before implementation
-
-1. **Wrong guess UX:** e.g. clear field + short message; **Enter** key submits (likely yes).
 
 ---
 

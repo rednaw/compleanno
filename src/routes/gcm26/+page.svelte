@@ -6,10 +6,9 @@
 		checkOrientation,
 		setupOrientationListeners,
 		loadPuzzleState,
-		clearPuzzleKeys
-	} from '../lrnz25/utils.js';
+		clearPuzzleKeyPrefix
+	} from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
-	import { films } from './a/films.js';
 
 	let showRotateMessage = false;
 	let gameADone = false;
@@ -30,11 +29,8 @@
 
 	function clearGlobalState() {
 		try {
-			clearPuzzleKeys([
-				'gcm26_game_a_done',
-				'gcm26_game_a_common',
-				...films.map((_, i) => `gcm26_film_${i}`)
-			]);
+			/** All gcm26 games must use localStorage keys prefixed with `gcm26_` so the hub can reset without importing any game module. */
+			clearPuzzleKeyPrefix('gcm26_');
 			gameADone = false;
 		} catch {
 			void 0;

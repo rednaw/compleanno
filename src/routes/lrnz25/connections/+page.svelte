@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
   import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
-  import BackButton from '../components/BackButton.svelte';
+  import BackButton from '$lib/components/BackButton.svelte';
   import RotateMessage from '$lib/components/RotateMessage.svelte';
 
   const GROUPS = [

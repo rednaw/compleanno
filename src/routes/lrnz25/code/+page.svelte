@@ -3,7 +3,7 @@
   import { browser } from '$app/environment';
   import { base } from '$app/paths';
   import { savePuzzleState, loadPuzzleState } from '../utils.js';
-  import BackButton from '../components/BackButton.svelte';
+  import BackButton from '$lib/components/BackButton.svelte';
 
   const CORRECT_CODE = '7253';
   let code = '';

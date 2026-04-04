@@ -7,8 +7,8 @@
 		setupOrientationListeners,
 		savePuzzleState,
 		clearPuzzleState
-	} from '../../lrnz25/utils.js';
-	import BackButton from '../../lrnz25/components/BackButton.svelte';
+	} from '$lib/puzzle-utils.js';
+	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 
 	let showRotateMessage = false;
