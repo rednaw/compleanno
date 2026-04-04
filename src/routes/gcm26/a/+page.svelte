@@ -10,6 +10,7 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
+	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
 
 	let showRotateMessage = false;
 
@@ -73,6 +74,7 @@
 		if (filmTitleMatches(st.guess, title)) {
 			st.feedback = 'correct';
 			st.status = 'correct';
+			st.guess = title;
 		} else {
 			st.feedback = 'wrong';
 			st.status = 'wrong';
@@ -82,7 +84,7 @@
 		try {
 			localStorage.setItem(
 				`gcm26_film_${idx}`,
-				JSON.stringify({ status: st.status, feedback: st.feedback })
+				JSON.stringify({ status: st.status, feedback: st.feedback, guess: st.guess })
 			);
 		} catch {
 			void 0;
@@ -109,6 +111,7 @@
 		if (filmTitleMatches(commonGuess, COMMON_ANSWER)) {
 			commonFeedback = 'correct';
 			commonStatus = 'correct';
+			commonGuess = COMMON_ANSWER;
 		} else {
 			commonFeedback = 'wrong';
 			commonStatus = 'wrong';
@@ -118,7 +121,11 @@
 		try {
 			localStorage.setItem(
 				'gcm26_game_a_common',
-				JSON.stringify({ status: commonStatus, feedback: commonFeedback })
+				JSON.stringify({
+					status: commonStatus,
+					feedback: commonFeedback,
+					guess: commonGuess
+				})
 			);
 		} catch {
 			void 0;
@@ -135,6 +142,11 @@
 					const parsed = JSON.parse(raw);
 					st.status = parsed.status;
 					st.feedback = parsed.feedback;
+					if (typeof parsed.guess === 'string') {
+						st.guess = parsed.guess;
+					} else if (st.status === 'correct') {
+						st.guess = films[index].title;
+					}
 				}
 			});
 
@@ -143,15 +155,22 @@
 				const parsed = JSON.parse(rawCommon);
 				commonStatus = parsed.status;
 				commonFeedback = parsed.feedback ?? '';
+				if (typeof parsed.guess === 'string') {
+					commonGuess = parsed.guess;
+				} else if (commonStatus === 'correct') {
+					commonGuess = COMMON_ANSWER;
+				}
 			}
 
 			const filmsOk = clipStates.every((s) => s.status === 'correct');
 			if (commonStatus === 'correct' && !filmsOk) {
 				commonStatus = 'not-started';
 				commonFeedback = '';
+				commonGuess = '';
 				clearPuzzleState('gcm26_game_a_common');
 			}
 
+			clipStates = [...clipStates];
 			checkAllCompleted();
 		} catch {
 			void 0;
@@ -216,19 +235,19 @@
 							<span class="feedback correct">✅</span>
 						{/if}
 					</div>
-					<div class="input-row">
-						{#if clipStates[i].status !== 'correct'}
-							<input
-								type="text"
-								placeholder="Film title"
-								bind:value={clipStates[i].guess}
-								autocomplete="off"
-								disabled={clipStates[i].status === 'correct'}
-								on:keydown={(e) => e.key === 'Enter' && checkGuess(i)}
-							/>
-						{:else}
-							<span class="feedback correct">✅</span>
-						{/if}
+					<div
+						class="input-row"
+						class:input-row-solved={clipStates[i].status === 'correct'}
+					>
+						<input
+							type="text"
+							placeholder="Film title"
+							bind:value={clipStates[i].guess}
+							autocomplete="off"
+							readonly={clipStates[i].status === 'correct'}
+							on:keydown={(e) =>
+								clipStates[i].status !== 'correct' && e.key === 'Enter' && checkGuess(i)}
+						/>
 					</div>
 				</div>
 			{/each}
@@ -248,25 +267,29 @@
 						<span class="feedback correct">✅</span>
 					{/if}
 				</div>
-				<div class="input-row">
-					{#if commonStatus !== 'correct'}
-						<input
-							type="text"
-							placeholder={filmsAllCorrect ? 'La tua risposta' : 'Indovina prima tutti i film'}
-							bind:value={commonGuess}
-							autocomplete="off"
-							disabled={!filmsAllCorrect || commonStatus === 'correct'}
-							on:keydown={(e) => e.key === 'Enter' && checkCommonGuess()}
-						/>
-					{:else}
-						<span class="feedback correct">✅</span>
-					{/if}
+				<div class="input-row" class:input-row-solved={commonStatus === 'correct'}>
+					<input
+						type="text"
+						placeholder={filmsAllCorrect ? 'La tua risposta' : 'Indovina prima tutti i film'}
+						bind:value={commonGuess}
+						autocomplete="off"
+						disabled={!filmsAllCorrect}
+						readonly={commonStatus === 'correct'}
+						on:keydown={(e) =>
+							commonStatus !== 'correct' &&
+							filmsAllCorrect &&
+							e.key === 'Enter' &&
+							checkCommonGuess()}
+					/>
 				</div>
 			</div>
 
 			{#if allCompleted}
 				<div class="result-section">
-					<p class="result-text">🎉</p>
+					<p class="result-text">
+						<span class="result-emoji" aria-hidden="true">🎉</span>
+						<span class="result-digit">{gcm26HubDigit.a}</span>
+					</p>
 				</div>
 			{/if}
 		</div>
@@ -361,6 +384,11 @@
 		box-sizing: border-box;
 	}
 
+	.input-row-solved {
+		background: #e8f5e9;
+		border-color: #388e3c;
+	}
+
 	.clip-video {
 		width: 100%;
 		height: 100%;
@@ -427,6 +455,14 @@
 		box-sizing: border-box;
 	}
 
+	.input-row-solved input[type='text'] {
+		background: transparent;
+		border-color: rgba(56, 142, 60, 0.45);
+		color: #1b5e20;
+		font-weight: 600;
+		cursor: default;
+	}
+
 	.feedback {
 		font-size: 1.5em;
 		margin-left: 0.5em;
@@ -468,10 +504,18 @@
 	}
 
 	.result-text {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.45em;
 		font-size: 2.2rem;
 		margin: 0;
 		font-weight: bold;
 		color: var(--color-text);
+	}
+
+	.result-digit {
+		font-variant-numeric: tabular-nums;
 	}
 
 	@media (max-width: 480px) {

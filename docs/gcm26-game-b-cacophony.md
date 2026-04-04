@@ -81,7 +81,7 @@ The **lrnz25 music** puzzle (`src/routes/lrnz25/music/+page.svelte` + `src/route
 ## Manifest (V1 default)
 
 - Path: **`src/routes/gcm26/b/manifest.json`**.
-- Shape: JSON object with a **`tracks`** array of exactly **6** objects for v1.
+- Shape: JSON object with a **`tracks`** array (**6** planned for v1; **`manifest.json` may list fewer** until the mix is complete).
 - Each track (for app + extract tooling):
 
 | Field | Role |
@@ -108,12 +108,11 @@ Example (placeholders):
 }
 ```
 
-v1 requires **6** objects in **`tracks`**.
+Target **6** tracks for the full mix; **`src/routes/gcm26/b/manifest.json`** grows as songs are added (see repo for current list).
 
 ## Tooling (game B)
 
-- **Script:** **`scripts/gcm26/extract_b.py`** — reads **`src/routes/gcm26/b/manifest.json`**, for each track: download source, cut **[start, end)** (or **20 s** from `start`), **loudnorm** (or equivalent), write **`static/gcm26/b/<id>.mp3`**.
-- Defaults can mirror A’s CLI polish (`--manifest`, `--out-dir`, `--cache-dir`) without sharing one big codepath.
+- **Script:** **`scripts/gcm26/extract_b.py`** — reads **`src/routes/gcm26/b/manifest.json`**, for each track: **yt-dlp** (`ba/bestaudio/best`), **ffmpeg** cut **[start, end)**, **loudnorm** → **`static/gcm26/b/<id>.mp3`** (192k lame). Cache: **`.cache/gcm26/b/`**. Run: `python3 scripts/gcm26/extract_b.py`.
 
 ---
 

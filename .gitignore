@@ -24,3 +24,7 @@ vite.config.ts.timestamp-*
 
 # Local tooling (full YouTube downloads — clips in static/ are committed)
 .cache/
+
+# Python
+__pycache__/
+*.py[cod]
