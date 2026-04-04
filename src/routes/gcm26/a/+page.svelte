@@ -1,5 +1,5 @@
 <script>
-	import { base } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { films, filmTitleMatches } from './films.js';
 	import {
@@ -169,7 +169,7 @@
 	<title>GCM 26 — A</title>
 </svelte:head>
 
-<BackButton href="{base}/gcm26/" />
+<BackButton href={resolve('/gcm26')} />
 
 <RotateMessage show={showRotateMessage} encouragePortrait={true} />
 
