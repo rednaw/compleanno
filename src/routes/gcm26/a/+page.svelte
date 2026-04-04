@@ -36,7 +36,7 @@
 	$: filmsAllCorrect = clipStates.every((s) => s.status === 'correct');
 
 	function clipSrc(id) {
-		return `${base}/gcm26/${id}.mp4`;
+		return `${base}/gcm26/a/${id}.mp4`;
 	}
 
 	function playClip(idx) {
