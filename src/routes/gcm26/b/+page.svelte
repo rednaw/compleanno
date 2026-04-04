@@ -71,17 +71,37 @@
 		});
 	}
 
+	/** Nominal loop length (s) when metadata not ready yet; clips are ~20s from extract_b. */
+	const DEFAULT_LOOP_SEC = 20;
+
+	/** Evenly space playheads over one loop so layers don't all align at t=0 (same wall-clock start). */
+	function phaseOffsetSec(trackIndex, loopSec) {
+		const n = tracks.length;
+		if (n <= 1) return 0;
+		return (trackIndex / n) * loopSec;
+	}
+
 	function startMix() {
 		for (let i = 0; i < tracks.length; i++) {
 			const t = tracks[i];
 			const a = audioById[t.id];
 			if (!a || audioLoadError[t.id] || solved[t.id]) continue;
-			a.muted = false;
-			a.volume = 1;
-			a.currentTime = 0;
-			a.play().catch(() => {
-				audioLoadError = { ...audioLoadError, [t.id]: true };
-			});
+
+			const seekAndPlay = () => {
+				const loopSec =
+					Number.isFinite(a.duration) && a.duration > 0.1 ? a.duration : DEFAULT_LOOP_SEC;
+				const offset = phaseOffsetSec(i, loopSec);
+				a.currentTime = Math.min(offset, Math.max(0, loopSec - 0.05));
+				a.muted = false;
+				a.volume = 1;
+				a.play().catch(() => {
+					audioLoadError = { ...audioLoadError, [t.id]: true };
+				});
+			};
+
+			// HAVE_METADATA: duration/currentTime seek is reliable before play.
+			if (a.readyState >= 1) seekAndPlay();
+			else a.addEventListener('loadedmetadata', seekAndPlay, { once: true });
 		}
 	}
 
