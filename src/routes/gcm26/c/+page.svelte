@@ -112,7 +112,7 @@
 </script>
 
 <svelte:head>
-	<title>GCM 26 — C</title>
+	<title>Stormlight quiz</title>
 </svelte:head>
 
 <BackButton href={resolve('/gcm26')} />

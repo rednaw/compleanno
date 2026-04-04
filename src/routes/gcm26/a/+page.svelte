@@ -185,7 +185,7 @@
 </script>
 
 <svelte:head>
-	<title>GCM 26 — A</title>
+	<title>Indovina il film</title>
 </svelte:head>
 
 <BackButton href={resolve('/gcm26')} />
@@ -216,10 +216,12 @@
 							on:click={() => playClip(i)}
 							disabled={clipStates[i].playing || clipStates[i].videoError}
 						>
-							▶️ Play
+							▶️ Riproduci
 						</button>
 						{#if clipStates[i].videoError}
-							<span class="clip-hint">Video missing — run <code>scripts/gcm26/extract_a.py</code></span>
+							<span class="clip-hint"
+								>Video assente — esegui <code>scripts/gcm26/extract_a.py</code></span
+							>
 						{/if}
 						{#if clipStates[i].status !== 'correct'}
 							<button
@@ -229,7 +231,7 @@
 									!clipStates[i].guess.trim() ||
 									clipStates[i].status === 'correct'}
 							>
-								Check
+								Controlla
 							</button>
 						{:else}
 							<span class="feedback correct">✅</span>
@@ -241,7 +243,7 @@
 					>
 						<input
 							type="text"
-							placeholder="Film title"
+							placeholder="Titolo del film"
 							bind:value={clipStates[i].guess}
 							autocomplete="off"
 							readonly={clipStates[i].status === 'correct'}
@@ -261,7 +263,7 @@
 							on:click={() => checkCommonGuess()}
 							disabled={!filmsAllCorrect || !commonGuess.trim() || commonStatus === 'correct'}
 						>
-							Check
+							Controlla
 						</button>
 					{:else}
 						<span class="feedback correct">✅</span>

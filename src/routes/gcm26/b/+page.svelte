@@ -178,7 +178,7 @@
 </script>
 
 <svelte:head>
-	<title>GCM 26 — B</title>
+	<title>Cacophony</title>
 </svelte:head>
 
 <BackButton href={resolve('/gcm26')} />
