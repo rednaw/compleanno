@@ -1,6 +1,9 @@
 {
 	"name": "compleanno",
 	"image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/git-lfs:1": {}
+	},
 	"remoteUser": "node",
 	"mounts": [
 		"source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"
