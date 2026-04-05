@@ -1,5 +1,5 @@
 <script>
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import {
 		checkOrientation,
@@ -12,7 +12,13 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubDigit } from '../hub-digits.js';
 	import { gcm26Keys } from '../storage-keys.js';
-	import { GAME_D_HEADING, lineById, GAME_D_CORRECT_ORDER, GAME_D_START_ORDER } from './items.js';
+	import {
+		GAME_D_HEADING,
+		lineById,
+		GAME_D_CORRECT_ORDER,
+		GAME_D_START_ORDER,
+		isValidSavedOrder
+	} from './items.js';
 
 	let showRotateMessage = $state(false);
 
@@ -22,8 +28,10 @@
 	/** @type {'idle' | 'wrong'} */
 	let checkStatus = $state('idle');
 
-	function ordersMatch(a, b) {
-		return a.length === b.length && a.every((id, i) => id === b[i]);
+	/** @param {string} id */
+	function lineImageSrc(id) {
+		const file = lineById[id].image;
+		return file ? `${base}/gcm26/d/${file}` : null;
 	}
 
 	function persistOrder() {
@@ -40,31 +48,17 @@
 			const raw = localStorage.getItem(gcm26Keys.gameDOrder);
 			if (!raw) return null;
 			const parsed = JSON.parse(raw);
-			if (!Array.isArray(parsed) || parsed.length !== GAME_D_CORRECT_ORDER.length) return null;
-			const idSet = new Set(Object.keys(lineById));
-			if (!parsed.every((id) => typeof id === 'string' && idSet.has(id))) return null;
-			const canonical = [...GAME_D_CORRECT_ORDER].sort().join('\0');
-			const got = [...parsed].sort().join('\0');
-			if (canonical !== got) return null;
-			return parsed;
+			return isValidSavedOrder(parsed) ? parsed : null;
 		} catch {
 			return null;
 		}
 	}
 
-	function moveUp(i) {
-		if (solved || i <= 0) return;
+	/** @param {number} i @param {number} j */
+	function swapRows(i, j) {
+		if (solved || j < 0 || j >= orderIds.length) return;
 		const next = [...orderIds];
-		[next[i - 1], next[i]] = [next[i], next[i - 1]];
-		orderIds = next;
-		checkStatus = 'idle';
-		persistOrder();
-	}
-
-	function moveDown(i) {
-		if (solved || i >= orderIds.length - 1) return;
-		const next = [...orderIds];
-		[next[i], next[i + 1]] = [next[i + 1], next[i]];
+		[next[i], next[j]] = [next[j], next[i]];
 		orderIds = next;
 		checkStatus = 'idle';
 		persistOrder();
@@ -72,7 +66,7 @@
 
 	function checkOrder() {
 		if (solved) return;
-		if (ordersMatch(orderIds, GAME_D_CORRECT_ORDER)) {
+		if (GAME_D_CORRECT_ORDER.every((id, i) => orderIds[i] === id)) {
 			solved = true;
 			checkStatus = 'idle';
 			savePuzzleState(gcm26Keys.gameDDone, '1');
@@ -128,29 +122,42 @@
 				class:order-list-wrong={checkStatus === 'wrong'}
 			>
 				{#each orderIds as id, i (id)}
+					{@const imgSrc = lineImageSrc(id)}
 					<div class="order-row" role="listitem">
-						<span class="line-num" aria-hidden="true">{i + 1}.</span>
-						<span class="line-text">{lineById[id].text}</span>
-						<span class="move-btns">
-							<button
-								type="button"
-								class="move-btn"
-								onclick={() => moveUp(i)}
-								disabled={solved || i === 0}
-								aria-label="Sposta su: {lineById[id].text}"
-							>
-								Su
-							</button>
-							<button
-								type="button"
-								class="move-btn"
-								onclick={() => moveDown(i)}
-								disabled={solved || i === orderIds.length - 1}
-								aria-label="Sposta giù: {lineById[id].text}"
-							>
-								Giù
-							</button>
-						</span>
+						<p class="line-text">{lineById[id].text}</p>
+						<div class="order-row-controls">
+							{#if imgSrc}
+								<img
+									class="row-thumb"
+									src={imgSrc}
+									alt=""
+									loading="lazy"
+									decoding="async"
+									width="72"
+									height="72"
+								/>
+							{/if}
+							<span class="move-btns">
+								<button
+									type="button"
+									class="move-btn"
+									onclick={() => swapRows(i, i - 1)}
+									disabled={solved || i === 0}
+									aria-label="Sposta su: {lineById[id].text}"
+								>
+									Su
+								</button>
+								<button
+									type="button"
+									class="move-btn"
+									onclick={() => swapRows(i, i + 1)}
+									disabled={solved || i === orderIds.length - 1}
+									aria-label="Sposta giù: {lineById[id].text}"
+								>
+									Giù
+								</button>
+							</span>
+						</div>
 					</div>
 				{/each}
 			</div>
@@ -241,22 +248,29 @@
 
 	.order-row {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.55rem;
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid var(--color-border);
 		font-size: 1.05em;
 		line-height: 1.45;
 	}
 
-	.line-num {
-		flex: 0 0 auto;
-		width: 1.5rem;
-		font-weight: 700;
-		color: var(--color-text);
-		opacity: 0.75;
-		font-variant-numeric: tabular-nums;
+	.order-row-controls {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 100%;
+		gap: 0.65rem;
+	}
+
+	.row-thumb {
+		width: 4.5rem;
+		height: 4.5rem;
+		object-fit: cover;
+		display: block;
+		flex-shrink: 0;
 	}
 
 	.order-row:last-child {
@@ -264,7 +278,8 @@
 	}
 
 	.line-text {
-		flex: 1;
+		margin: 0;
+		width: 100%;
 		min-width: 0;
 		text-wrap: pretty;
 		hyphens: auto;
@@ -277,6 +292,7 @@
 		flex-direction: column;
 		gap: 0.35rem;
 		flex-shrink: 0;
+		margin-left: auto;
 	}
 
 	.move-btn {
@@ -310,18 +326,19 @@
 		cursor: pointer;
 	}
 
-	.wrong-msg {
-		color: #b71c1c;
+	.wrong-msg,
+	.solved-msg {
 		font-weight: 600;
 		margin: 0 0 1rem;
 		font-size: 0.95rem;
 	}
 
+	.wrong-msg {
+		color: #b71c1c;
+	}
+
 	.solved-msg {
 		color: #1b5e20;
-		font-weight: 600;
-		margin: 0 0 1rem;
-		font-size: 0.95rem;
 	}
 
 	.result-section {
@@ -352,14 +369,13 @@
 	}
 
 	@media (max-width: 480px) {
-		.order-row {
-			flex-direction: column;
-			align-items: stretch;
+		.row-thumb {
+			width: 3.75rem;
+			height: 3.75rem;
 		}
 
 		.move-btns {
 			flex-direction: row;
-			justify-content: flex-end;
 		}
 	}
 </style>

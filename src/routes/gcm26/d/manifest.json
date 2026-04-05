@@ -1,10 +1,10 @@
 {
 	"heading": "Metti in ordine",
 	"lines": [
-		{ "id": "fossa", "text": "La fossa dei leoni" },
-		{ "id": "gufo", "text": "Il verso del gufo" },
-		{ "id": "topo", "text": "Il topo nella scarpa" },
-		{ "id": "medusa", "text": "Il morso della medusa" }
+		{ "id": "fossa", "text": "La fossa dei leoni", "image": "leone.webp" },
+		{ "id": "gufo", "text": "Il verso del gufo", "image": "guffo.avif" },
+		{ "id": "topo", "text": "Il topo nella scarpa", "image": "topo.webp" },
+		{ "id": "medusa", "text": "Il morso della medusa", "image": "medusa.webp" }
 	],
 	"correctOrder": ["gufo", "fossa", "medusa", "topo"],
 	"startOrder": ["topo", "medusa", "fossa", "gufo"]
