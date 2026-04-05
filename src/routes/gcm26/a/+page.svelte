@@ -27,7 +27,8 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
+	import { gcm26HubDigit } from '../hub-digits.js';
+	import { gcm26Keys } from '../storage-keys.js';
 
 	let showRotateMessage = $state(false);
 
@@ -119,9 +120,9 @@
 			commonStatus === 'correct' &&
 			finalCodeStatus === 'correct';
 		if (allCompleted) {
-			savePuzzleState('gcm26_game_a_done', '1');
+			savePuzzleState(gcm26Keys.gameADone, '1');
 		} else {
-			clearPuzzleState('gcm26_game_a_done');
+			clearPuzzleState(gcm26Keys.gameADone);
 		}
 	}
 

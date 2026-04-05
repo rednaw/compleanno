@@ -10,7 +10,8 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
+	import { gcm26HubDigit } from '../hub-digits.js';
+	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
 	import { ITEMS } from './items.js';
 
 	let showRotateMessage = $state(false);
@@ -32,9 +33,9 @@
 	function checkAllCompleted() {
 		allCompleted = ITEMS.every((_, i) => rowStatus[i] === 'correct');
 		if (allCompleted) {
-			savePuzzleState('gcm26_game_c_done', '1');
+			savePuzzleState(gcm26Keys.gameCDone, '1');
 		} else {
-			clearPuzzleState('gcm26_game_c_done');
+			clearPuzzleState(gcm26Keys.gameCDone);
 		}
 	}
 
@@ -47,7 +48,7 @@
 		if (normalizeAnswer(g) === normalizeAnswer(expected)) {
 			rowStatus = rowStatus.map((s, i) => (i === index ? 'correct' : s));
 			guesses = guesses.map((v, i) => (i === index ? expected : v));
-			savePuzzleState(`gcm26_c_${ITEMS[index].id}`, '1');
+			savePuzzleState(gcm26CItemKey(ITEMS[index].id), '1');
 			checkAllCompleted();
 		} else {
 			rowStatus = rowStatus.map((s, i) => (i === index ? 'wrong' : s));
@@ -60,7 +61,7 @@
 			const nextGuesses = [...guesses];
 			const nextStatus = [...rowStatus];
 			ITEMS.forEach((item, index) => {
-				if (loadPuzzleState(`gcm26_c_${item.id}`)) {
+				if (loadPuzzleState(gcm26CItemKey(item.id))) {
 					nextStatus[index] = 'correct';
 					nextGuesses[index] = item.answer;
 				}
@@ -68,7 +69,7 @@
 			guesses = nextGuesses;
 			rowStatus = nextStatus;
 
-			if (loadPuzzleState('gcm26_game_c_done')) {
+			if (loadPuzzleState(gcm26Keys.gameCDone)) {
 				allCompleted = true;
 			} else {
 				checkAllCompleted();

@@ -1,12 +1,5 @@
 import { clearPuzzleState } from '$lib/puzzle-utils.js';
-
-const KEY_COMMON = 'gcm26_game_a_common';
-const KEY_CODE = 'gcm26_game_a_code';
-
-/** @param {number} index */
-function filmKey(index) {
-	return `gcm26_film_${index}`;
-}
+import { gcm26FilmProgressKey, gcm26Keys } from '../storage-keys.js';
 
 /**
  * @param {number} index
@@ -14,7 +7,7 @@ function filmKey(index) {
  */
 export function saveFilmProgress(index, data) {
 	try {
-		localStorage.setItem(filmKey(index), JSON.stringify(data));
+		localStorage.setItem(gcm26FilmProgressKey(index), JSON.stringify(data));
 	} catch {
 		// localStorage may be unavailable
 	}
@@ -26,7 +19,7 @@ export function saveFilmProgress(index, data) {
  */
 export function loadFilmProgress(index) {
 	try {
-		const raw = localStorage.getItem(filmKey(index));
+		const raw = localStorage.getItem(gcm26FilmProgressKey(index));
 		if (!raw) return null;
 		return JSON.parse(raw);
 	} catch {
@@ -37,7 +30,7 @@ export function loadFilmProgress(index) {
 /** @param {{ status: string; feedback: string; guess: string }} data */
 export function saveCommonProgress(data) {
 	try {
-		localStorage.setItem(KEY_COMMON, JSON.stringify(data));
+		localStorage.setItem(gcm26Keys.gameACommon, JSON.stringify(data));
 	} catch {
 		// localStorage may be unavailable
 	}
@@ -46,7 +39,7 @@ export function saveCommonProgress(data) {
 /** @returns {{ status: string; feedback: string; guess?: string } | null} */
 export function loadCommonProgress() {
 	try {
-		const raw = localStorage.getItem(KEY_COMMON);
+		const raw = localStorage.getItem(gcm26Keys.gameACommon);
 		if (!raw) return null;
 		return JSON.parse(raw);
 	} catch {
@@ -55,13 +48,13 @@ export function loadCommonProgress() {
 }
 
 export function clearCommonProgress() {
-	clearPuzzleState(KEY_COMMON);
+	clearPuzzleState(gcm26Keys.gameACommon);
 }
 
 /** @param {{ status: string; cells: string[] }} data */
 export function saveFinalCodeProgress(data) {
 	try {
-		localStorage.setItem(KEY_CODE, JSON.stringify(data));
+		localStorage.setItem(gcm26Keys.gameACode, JSON.stringify(data));
 	} catch {
 		// localStorage may be unavailable
 	}
@@ -70,7 +63,7 @@ export function saveFinalCodeProgress(data) {
 /** @returns {{ status: string; cells: string[] } | null} */
 export function loadFinalCodeProgress() {
 	try {
-		const raw = localStorage.getItem(KEY_CODE);
+		const raw = localStorage.getItem(gcm26Keys.gameACode);
 		if (!raw) return null;
 		return JSON.parse(raw);
 	} catch {
@@ -79,5 +72,5 @@ export function loadFinalCodeProgress() {
 }
 
 export function clearFinalCodeProgress() {
-	clearPuzzleState(KEY_CODE);
+	clearPuzzleState(gcm26Keys.gameACode);
 }

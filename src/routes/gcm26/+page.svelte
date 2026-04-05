@@ -9,7 +9,8 @@
 		clearPuzzleKeyPrefix
 	} from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
-	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
+	import { gcm26HubDigit } from './hub-digits.js';
+	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
 
 	let showRotateMessage = $state(false);
 	let gameADone = $state(false);
@@ -19,10 +20,10 @@
 
 	onMount(() => {
 		try {
-			gameADone = loadPuzzleState('gcm26_game_a_done');
-			gameBDone = loadPuzzleState('gcm26_game_b_done');
-			gameCDone = loadPuzzleState('gcm26_game_c_done');
-			gameDDone = loadPuzzleState('gcm26_game_d_done');
+			gameADone = loadPuzzleState(gcm26Keys.gameADone);
+			gameBDone = loadPuzzleState(gcm26Keys.gameBDone);
+			gameCDone = loadPuzzleState(gcm26Keys.gameCDone);
+			gameDDone = loadPuzzleState(gcm26Keys.gameDDone);
 		} catch {
 			void 0;
 		}
@@ -36,8 +37,8 @@
 
 	function clearGlobalState() {
 		try {
-			/** All gcm26 games must use localStorage keys prefixed with `gcm26_` so the hub can reset without importing any game module. */
-			clearPuzzleKeyPrefix('gcm26_');
+			/** Must stay in sync with `GCM26_STORAGE_PREFIX` / `gcm26Keys`. */
+			clearPuzzleKeyPrefix(GCM26_STORAGE_PREFIX);
 			gameADone = false;
 			gameBDone = false;
 			gameCDone = false;

@@ -11,7 +11,8 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
+	import { gcm26HubDigit } from '../hub-digits.js';
+	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks;
@@ -124,7 +125,7 @@
 				a.muted = true;
 				a.volume = 0;
 			}
-			savePuzzleState(`gcm26_b_solved_${t.id}`, '1');
+			savePuzzleState(gcm26BSolvedKey(t.id), '1');
 			checkAllCompleted();
 		} else {
 			guessRowStatus = 'wrong';
@@ -135,22 +136,22 @@
 	function checkAllCompleted() {
 		allCompleted = tracks.every((t) => solved[t.id]);
 		if (allCompleted) {
-			savePuzzleState('gcm26_game_b_done', '1');
+			savePuzzleState(gcm26Keys.gameBDone, '1');
 		} else {
-			clearPuzzleState('gcm26_game_b_done');
+			clearPuzzleState(gcm26Keys.gameBDone);
 		}
 	}
 
 	onMount(() => {
 		try {
 			tracks.forEach((t) => {
-				if (loadPuzzleState(`gcm26_b_solved_${t.id}`)) {
+				if (loadPuzzleState(gcm26BSolvedKey(t.id))) {
 					solved[t.id] = true;
 				}
 			});
 			solved = { ...solved };
 
-			if (loadPuzzleState('gcm26_game_b_done')) {
+			if (loadPuzzleState(gcm26Keys.gameBDone)) {
 				allCompleted = true;
 			} else {
 				checkAllCompleted();
