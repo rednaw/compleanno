@@ -11,11 +11,11 @@
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
 
-	let showRotateMessage = false;
-	let gameADone = false;
-	let gameBDone = false;
-	let gameCDone = false;
-	let gameDDone = false;
+	let showRotateMessage = $state(false);
+	let gameADone = $state(false);
+	let gameBDone = $state(false);
+	let gameCDone = $state(false);
+	let gameDDone = $state(false);
 
 	onMount(() => {
 		try {
@@ -55,21 +55,21 @@
 <RotateMessage show={showRotateMessage} encouragePortrait={true} />
 
 {#if !showRotateMessage}
-<main>
-	<ClearProgressButton onClear={clearGlobalState} />
-	<div class="content">
-		<div class="games-grid">
-			<a href={resolve('/gcm26/a')} class="game-button">{gameADone ? gcm26HubDigit.a : '?'}</a>
-			<a href={resolve('/gcm26/b')} class="game-button">{gameBDone ? gcm26HubDigit.b : '?'}</a>
-			<a href={resolve('/gcm26/c')} class="game-button">{gameCDone ? gcm26HubDigit.c : '?'}</a>
-			<a href={resolve('/gcm26/d')} class="game-button">{gameDDone ? gcm26HubDigit.d : '?'}</a>
+	<main>
+		<ClearProgressButton onClear={clearGlobalState} />
+		<div class="content">
+			<div class="games-grid">
+				<a href={resolve('/gcm26/a')} class="game-button">{gameADone ? gcm26HubDigit.a : '?'}</a>
+				<a href={resolve('/gcm26/b')} class="game-button">{gameBDone ? gcm26HubDigit.b : '?'}</a>
+				<a href={resolve('/gcm26/c')} class="game-button">{gameCDone ? gcm26HubDigit.c : '?'}</a>
+				<a href={resolve('/gcm26/d')} class="game-button">{gameDDone ? gcm26HubDigit.d : '?'}</a>
+			</div>
+			<div class="arrow">↓</div>
+			<div class="code-section">
+				<a href={resolve('/gcm26/code')} class="code-button">?</a>
+			</div>
 		</div>
-		<div class="arrow">↓</div>
-		<div class="code-section">
-			<a href={resolve('/gcm26/code')} class="code-button">?</a>
-		</div>
-	</div>
-</main>
+	</main>
 {/if}
 
 <style>
@@ -166,5 +166,4 @@
 		color: var(--color-text);
 		margin: 1rem 0;
 	}
-
 </style>

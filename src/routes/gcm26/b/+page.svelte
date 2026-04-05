@@ -124,11 +124,7 @@
 				a.muted = true;
 				a.volume = 0;
 			}
-			try {
-				savePuzzleState(`gcm26_b_solved_${t.id}`, '1');
-			} catch {
-				void 0;
-			}
+			savePuzzleState(`gcm26_b_solved_${t.id}`, '1');
 			checkAllCompleted();
 		} else {
 			guessRowStatus = 'wrong';
@@ -208,11 +204,7 @@
 
 			{#if !allCompleted}
 				<div class="clip-row {guessRowStatus === 'wrong' ? 'wrong' : ''}">
-					<button
-						type="button"
-						onclick={() => submitGuess()}
-						disabled={!guessInput.trim()}
-					>
+					<button type="button" onclick={() => submitGuess()} disabled={!guessInput.trim()}>
 						Submit
 					</button>
 				</div>

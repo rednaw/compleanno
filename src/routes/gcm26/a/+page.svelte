@@ -1,7 +1,24 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { films, filmTitleMatches } from './films.js';
+	import {
+		films,
+		filmTitleMatches,
+		COMMON_QUESTION,
+		COMMON_ANSWER,
+		FINAL_HINT_SEGMENTS,
+		FINAL_CODE_ANSWER
+	} from './films.js';
+	import {
+		saveFilmProgress,
+		loadFilmProgress,
+		saveCommonProgress,
+		loadCommonProgress,
+		clearCommonProgress,
+		saveFinalCodeProgress,
+		loadFinalCodeProgress,
+		clearFinalCodeProgress
+	} from './persistence.js';
 	import {
 		checkOrientation,
 		setupOrientationListeners,
@@ -12,39 +29,38 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
 
-	let showRotateMessage = false;
+	let showRotateMessage = $state(false);
 
 	/** @type {{ guess: string; feedback: string; status: string; playing: boolean; video: HTMLVideoElement | null; videoError: boolean }[]} */
-	let clipStates = films.map(() => ({
-		guess: '',
-		feedback: '',
-		status: 'not-started',
-		playing: false,
-		video: null,
-		videoError: false
-	}));
+	let clipStates = $state(
+		films.map(() => ({
+			guess: '',
+			feedback: '',
+			status: 'not-started',
+			playing: false,
+			video: null,
+			videoError: false
+		}))
+	);
 
-	let allCompleted = false;
+	let allCompleted = $state(false);
 
-	const COMMON_QUESTION = 'Cosa hanno in comune tutti questi film?';
-	const COMMON_ANSWER = 'Gwyneth Paltrow';
+	const FINAL_CODE_LEN = FINAL_CODE_ANSWER.length;
+	const FINAL_CODE_CELL_INDEXES = Array.from({ length: FINAL_CODE_LEN }, (_, i) => i);
 
-	const FINAL_HINT_SEGMENTS = ['3', '11', '2', '4', '3'];
-	const FINAL_CODE_ANSWER = '7nany';
-
-	let commonGuess = '';
-	let commonFeedback = '';
+	let commonGuess = $state('');
+	let commonFeedback = $state('');
 	/** @type {'not-started' | 'correct' | 'wrong'} */
-	let commonStatus = 'not-started';
+	let commonStatus = $state(/** @type {'not-started' | 'correct' | 'wrong'} */ ('not-started'));
 
 	/** @type {string[]} */
-	let finalCodeCells = ['', '', '', '', ''];
+	let finalCodeCells = $state(Array.from({ length: FINAL_CODE_LEN }, () => ''));
 	/** @type {'not-started' | 'wrong' | 'correct'} */
-	let finalCodeStatus = 'not-started';
+	let finalCodeStatus = $state(/** @type {'not-started' | 'wrong' | 'correct'} */ ('not-started'));
 
-	$: filmsAllCorrect = clipStates.every((s) => s.status === 'correct');
-	$: commonComplete = commonStatus === 'correct';
-	$: finalCodeReady = finalCodeCells.every((c) => (c || '').length > 0);
+	const filmsAllCorrect = $derived(clipStates.every((s) => s.status === 'correct'));
+	const commonComplete = $derived(commonStatus === 'correct');
+	const finalCodeReady = $derived(finalCodeCells.every((c) => (c || '').length > 0));
 
 	function clipSrc(id) {
 		return `${base}/gcm26/a/${id}.mp4`;
@@ -91,14 +107,7 @@
 			st.guess = '';
 		}
 
-		try {
-			localStorage.setItem(
-				`gcm26_film_${idx}`,
-				JSON.stringify({ status: st.status, feedback: st.feedback, guess: st.guess })
-			);
-		} catch {
-			void 0;
-		}
+		saveFilmProgress(idx, { status: st.status, feedback: st.feedback, guess: st.guess });
 
 		clipStates = [...clipStates];
 		checkAllCompleted();
@@ -118,8 +127,8 @@
 
 	function resetFinalCode() {
 		finalCodeStatus = 'not-started';
-		finalCodeCells = ['', '', '', '', ''];
-		clearPuzzleState('gcm26_game_a_code');
+		finalCodeCells = Array.from({ length: FINAL_CODE_LEN }, () => '');
+		clearFinalCodeProgress();
 	}
 
 	/** @param {number} index */
@@ -133,19 +142,12 @@
 	function checkFinalCode() {
 		if (!commonComplete || finalCodeStatus === 'correct') return;
 		const attempt = finalCodeCells.join('').toLowerCase();
-		if (attempt.length !== 5) return;
+		if (attempt.length !== FINAL_CODE_LEN) return;
 
 		if (attempt === FINAL_CODE_ANSWER) {
 			finalCodeStatus = 'correct';
 			finalCodeCells = FINAL_CODE_ANSWER.split('');
-			try {
-				localStorage.setItem(
-					'gcm26_game_a_code',
-					JSON.stringify({ status: finalCodeStatus, cells: finalCodeCells })
-				);
-			} catch {
-				void 0;
-			}
+			saveFinalCodeProgress({ status: finalCodeStatus, cells: finalCodeCells });
 		} else {
 			finalCodeStatus = 'wrong';
 			const ansChars = FINAL_CODE_ANSWER.split('');
@@ -170,18 +172,11 @@
 			commonGuess = '';
 		}
 
-		try {
-			localStorage.setItem(
-				'gcm26_game_a_common',
-				JSON.stringify({
-					status: commonStatus,
-					feedback: commonFeedback,
-					guess: commonGuess
-				})
-			);
-		} catch {
-			void 0;
-		}
+		saveCommonProgress({
+			status: commonStatus,
+			feedback: commonFeedback,
+			guess: commonGuess
+		});
 
 		checkAllCompleted();
 	}
@@ -189,26 +184,23 @@
 	onMount(() => {
 		try {
 			clipStates.forEach((st, index) => {
-				const raw = localStorage.getItem(`gcm26_film_${index}`);
-				if (raw) {
-					const parsed = JSON.parse(raw);
-					st.status = parsed.status;
-					st.feedback = parsed.feedback;
-					if (typeof parsed.guess === 'string') {
-						st.guess = parsed.guess;
-					} else if (st.status === 'correct') {
-						st.guess = films[index].title;
-					}
+				const parsed = loadFilmProgress(index);
+				if (!parsed) return;
+				st.status = parsed.status;
+				st.feedback = parsed.feedback;
+				if (typeof parsed.guess === 'string') {
+					st.guess = parsed.guess;
+				} else if (st.status === 'correct') {
+					st.guess = films[index].title;
 				}
 			});
 
-			const rawCommon = localStorage.getItem('gcm26_game_a_common');
-			if (rawCommon) {
-				const parsed = JSON.parse(rawCommon);
-				commonStatus = parsed.status;
-				commonFeedback = parsed.feedback ?? '';
-				if (typeof parsed.guess === 'string') {
-					commonGuess = parsed.guess;
+			const commonParsed = loadCommonProgress();
+			if (commonParsed) {
+				commonStatus = commonParsed.status;
+				commonFeedback = commonParsed.feedback ?? '';
+				if (typeof commonParsed.guess === 'string') {
+					commonGuess = commonParsed.guess;
 				} else if (commonStatus === 'correct') {
 					commonGuess = COMMON_ANSWER;
 				}
@@ -219,21 +211,19 @@
 				commonStatus = 'not-started';
 				commonFeedback = '';
 				commonGuess = '';
-				clearPuzzleState('gcm26_game_a_common');
+				clearCommonProgress();
 			}
 
 			if (commonStatus === 'correct') {
-				try {
-					const rawFinal = localStorage.getItem('gcm26_game_a_code');
-					if (rawFinal) {
-						const parsed = JSON.parse(rawFinal);
-						if (parsed.status === 'correct' && Array.isArray(parsed.cells) && parsed.cells.length === 5) {
-							finalCodeStatus = 'correct';
-							finalCodeCells = [...parsed.cells];
-						}
-					}
-				} catch {
-					void 0;
+				const finalParsed = loadFinalCodeProgress();
+				if (
+					finalParsed &&
+					finalParsed.status === 'correct' &&
+					Array.isArray(finalParsed.cells) &&
+					finalParsed.cells.length === FINAL_CODE_LEN
+				) {
+					finalCodeStatus = 'correct';
+					finalCodeCells = [...finalParsed.cells];
 				}
 			}
 
@@ -276,15 +266,15 @@
 							src={clipSrc(film.id)}
 							playsinline
 							preload="metadata"
-							on:ended={() => onClipEnded(i)}
-							on:error={() => onClipError(i)}
+							onended={() => onClipEnded(i)}
+							onerror={() => onClipError(i)}
 						></video>
 					</div>
 					<div class="clip-row {clipStates[i].status}">
 						<button
 							type="button"
 							class="play-btn"
-							on:click={() => playClip(i)}
+							onclick={() => playClip(i)}
 							disabled={clipStates[i].playing || clipStates[i].videoError}
 						>
 							▶️ Riproduci
@@ -297,7 +287,7 @@
 						{#if clipStates[i].status !== 'correct'}
 							<button
 								type="button"
-								on:click={() => checkGuess(i)}
+								onclick={() => checkGuess(i)}
 								disabled={clipStates[i].playing ||
 									!clipStates[i].guess.trim() ||
 									clipStates[i].status === 'correct'}
@@ -305,39 +295,55 @@
 								Controlla
 							</button>
 						{:else}
-							<span class="feedback correct">✅</span>
+							<span class="feedback correct"
+								><span class="visually-hidden">Corretto. </span><span aria-hidden="true">✅</span
+								></span
+							>
 						{/if}
 					</div>
-					<div
-						class="input-row"
-						class:input-row-solved={clipStates[i].status === 'correct'}
-					>
+					<div class="input-row" class:input-row-solved={clipStates[i].status === 'correct'}>
 						<input
 							type="text"
 							placeholder="Titolo del film"
 							bind:value={clipStates[i].guess}
 							autocomplete="off"
 							readonly={clipStates[i].status === 'correct'}
-							on:keydown={(e) =>
+							aria-invalid={clipStates[i].status === 'wrong'}
+							aria-describedby="gcm26a-film-{i}-status"
+							onkeydown={(e) =>
 								clipStates[i].status !== 'correct' && e.key === 'Enter' && checkGuess(i)}
 						/>
 					</div>
+					<p id="gcm26a-film-{i}-status" class="field-feedback" role="status" aria-live="polite">
+						{#if clipStates[i].status === 'wrong'}
+							Titolo non corretto. Riprova con il titolo esatto.
+						{:else if clipStates[i].status === 'correct'}
+							Titolo corretto.
+						{/if}
+					</p>
 				</div>
 			{/each}
 
 			<div class="common-section" class:common-disabled={!filmsAllCorrect}>
 				<p class="common-question">{COMMON_QUESTION}</p>
-				<div class="clip-row {commonStatus === 'correct' ? 'correct' : ''} {commonStatus === 'wrong' ? 'wrong' : ''}">
+				<div
+					class="clip-row {commonStatus === 'correct' ? 'correct' : ''} {commonStatus === 'wrong'
+						? 'wrong'
+						: ''}"
+				>
 					{#if commonStatus !== 'correct'}
 						<button
 							type="button"
-							on:click={() => checkCommonGuess()}
+							onclick={() => checkCommonGuess()}
 							disabled={!filmsAllCorrect || !commonGuess.trim() || commonStatus === 'correct'}
 						>
 							Controlla
 						</button>
 					{:else}
-						<span class="feedback correct">✅</span>
+						<span class="feedback correct"
+							><span class="visually-hidden">Corretto. </span><span aria-hidden="true">✅</span
+							></span
+						>
 					{/if}
 				</div>
 				<div class="input-row" class:input-row-solved={commonStatus === 'correct'}>
@@ -348,13 +354,22 @@
 						autocomplete="off"
 						disabled={!filmsAllCorrect}
 						readonly={commonStatus === 'correct'}
-						on:keydown={(e) =>
+						aria-invalid={commonStatus === 'wrong'}
+						aria-describedby="gcm26a-common-status"
+						onkeydown={(e) =>
 							commonStatus !== 'correct' &&
 							filmsAllCorrect &&
 							e.key === 'Enter' &&
 							checkCommonGuess()}
 					/>
 				</div>
+				<p id="gcm26a-common-status" class="field-feedback" role="status" aria-live="polite">
+					{#if commonStatus === 'wrong'}
+						Risposta non corretta. Riprova.
+					{:else if commonStatus === 'correct'}
+						Risposta corretta.
+					{/if}
+				</p>
 			</div>
 
 			<div class="final-code-section" class:common-disabled={!commonComplete}>
@@ -377,7 +392,7 @@
 					class:input-row-solved={finalCodeStatus === 'correct'}
 					class:answer-row-wrong={finalCodeStatus === 'wrong'}
 				>
-					{#each [0, 1, 2, 3, 4] as ci (ci)}
+					{#each FINAL_CODE_CELL_INDEXES as ci (ci)}
 						<input
 							type="text"
 							class="code-cell"
@@ -390,8 +405,10 @@
 							disabled={!commonComplete}
 							readonly={finalCodeStatus === 'correct'}
 							aria-label="Codice carattere {ci + 1}"
-							on:input={() => onFinalCodeInput(ci)}
-							on:keydown={(e) =>
+							aria-invalid={finalCodeStatus === 'wrong'}
+							aria-describedby="gcm26a-code-status"
+							oninput={() => onFinalCodeInput(ci)}
+							onkeydown={(e) =>
 								finalCodeStatus !== 'correct' &&
 								commonComplete &&
 								e.key === 'Enter' &&
@@ -401,15 +418,25 @@
 					{#if finalCodeStatus !== 'correct'}
 						<button
 							type="button"
-							on:click={() => checkFinalCode()}
+							onclick={() => checkFinalCode()}
 							disabled={!commonComplete || !finalCodeReady}
 						>
 							Controlla
 						</button>
 					{:else}
-						<span class="feedback correct">✅</span>
+						<span class="feedback correct"
+							><span class="visually-hidden">Corretto. </span><span aria-hidden="true">✅</span
+							></span
+						>
 					{/if}
 				</div>
+				<p id="gcm26a-code-status" class="field-feedback" role="status" aria-live="polite">
+					{#if finalCodeStatus === 'wrong'}
+						Codice non corretto. Le lettere indovinate restano.
+					{:else if finalCodeStatus === 'correct'}
+						Codice corretto.
+					{/if}
+				</p>
 			</div>
 
 			{#if allCompleted}
@@ -452,6 +479,26 @@
 	.clip-container {
 		margin-bottom: 1.5em;
 		width: 100%;
+	}
+
+	.field-feedback {
+		margin: 0.35rem 0 0;
+		min-height: 1.25em;
+		font-size: 0.875rem;
+		text-align: center;
+		color: var(--color-text);
+		line-height: 1.35;
+	}
+
+	.clip-row.wrong ~ .input-row + .field-feedback,
+	.answer-row-wrong + .field-feedback {
+		color: #b71c1c;
+		font-weight: 600;
+	}
+
+	.input-row-solved + .field-feedback {
+		color: #1b5e20;
+		font-weight: 600;
 	}
 
 	.clip-preview {

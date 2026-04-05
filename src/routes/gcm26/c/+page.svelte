@@ -34,12 +34,7 @@
 
 	/** @param {string} s */
 	function normalizeAnswer(s) {
-		return s
-			.trim()
-			.toLowerCase()
-			.normalize('NFD')
-			.replace(/\p{M}/gu, '')
-			.replace(/\s+/g, ' ');
+		return s.trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/\s+/g, ' ');
 	}
 
 	/** @type {string[]} */
@@ -69,11 +64,7 @@
 		if (normalizeAnswer(g) === normalizeAnswer(expected)) {
 			rowStatus = rowStatus.map((s, i) => (i === index ? 'correct' : s));
 			guesses = guesses.map((v, i) => (i === index ? expected : v));
-			try {
-				savePuzzleState(`gcm26_c_${ITEMS[index].id}`, '1');
-			} catch {
-				void 0;
-			}
+			savePuzzleState(`gcm26_c_${ITEMS[index].id}`, '1');
 			checkAllCompleted();
 		} else {
 			rowStatus = rowStatus.map((s, i) => (i === index ? 'wrong' : s));
@@ -145,11 +136,7 @@
 							onkeydown={(e) => rowStatus[i] !== 'correct' && e.key === 'Enter' && checkItem(i)}
 						/>
 						{#if rowStatus[i] !== 'correct'}
-							<button
-								type="button"
-								onclick={() => checkItem(i)}
-								disabled={!guesses[i].trim()}
-							>
+							<button type="button" onclick={() => checkItem(i)} disabled={!guesses[i].trim()}>
 								Conproba
 							</button>
 						{:else}

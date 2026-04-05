@@ -1,5 +1,32 @@
 import manifest from './manifest.json';
 
+const { commonQuestion, commonAnswer, finalCode } = manifest;
+
+if (
+	typeof commonQuestion !== 'string' ||
+	typeof commonAnswer !== 'string' ||
+	!finalCode ||
+	typeof finalCode.answer !== 'string' ||
+	!Array.isArray(finalCode.hintSegments)
+) {
+	throw new Error(
+		'gcm26/a manifest.json: require commonQuestion, commonAnswer, and finalCode { answer, hintSegments }'
+	);
+}
+
+export const COMMON_QUESTION = commonQuestion;
+export const COMMON_ANSWER = commonAnswer;
+export const FINAL_CODE_ANSWER = finalCode.answer;
+export const FINAL_HINT_SEGMENTS = finalCode.hintSegments;
+
+if (import.meta.env.DEV) {
+	if (FINAL_HINT_SEGMENTS.length !== FINAL_CODE_ANSWER.length) {
+		console.error(
+			`[gcm26/a] manifest finalCode: hintSegments length (${FINAL_HINT_SEGMENTS.length}) must equal answer length (${FINAL_CODE_ANSWER.length})`
+		);
+	}
+}
+
 /**
  * @param {string} s
  */
@@ -14,37 +41,7 @@ export function normalizeFilmTitle(s) {
 }
 
 /**
- * Levenshtein edit distance (insert / delete / substitute).
- * @param {string} a
- * @param {string} b
- */
-function levenshtein(a, b) {
-	if (a === b) return 0;
-	if (!a.length) return b.length;
-	if (!b.length) return a.length;
-	/** @type {number[]} */
-	let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
-	/** @type {number[]} */
-	let cur = new Array(b.length + 1);
-	for (let i = 1; i <= a.length; i++) {
-		cur[0] = i;
-		for (let j = 1; j <= b.length; j++) {
-			const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-			cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
-		}
-		[cur, prev] = [prev, cur];
-	}
-	return prev[b.length];
-}
-
-/** Max typos we allow vs title length (avoids loose matches on very short names). */
-function maxAllowedEdits(canonicalNormalizedLength) {
-	if (canonicalNormalizedLength <= 2) return 0;
-	if (canonicalNormalizedLength <= 5) return 1;
-	return 2;
-}
-
-/**
+ * Exact match after normalization (case, accents, punctuation). No typo tolerance.
  * @param {string} guess
  * @param {string} canonicalTitle
  */
@@ -59,11 +56,9 @@ export function filmTitleMatches(guess, canonicalTitle) {
 		[u, stripThe(c)],
 		[stripThe(u), c]
 	];
-	const maxD = maxAllowedEdits(c.length);
 	for (const [a, b] of pairs) {
 		if (!a || !b) continue;
 		if (a === b) return true;
-		if (levenshtein(a, b) <= maxD) return true;
 	}
 	return false;
 }
