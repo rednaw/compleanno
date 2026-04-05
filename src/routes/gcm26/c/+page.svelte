@@ -11,24 +11,7 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubDigit } from '$lib/gcm26-hub-digits.js';
-
-	const ITEMS = [
-		{
-			id: 'gawx',
-			question: 'Quid est novum nomen Gawxis?',
-			answer: 'Aqasix Yanagawn'
-		},
-		{
-			id: 'nuatoma',
-			question: 'Quis est titulus principis gentis Unkalakicae?',
-			answer: 'Nuatoma'
-		},
-		{
-			id: 'karavaniga',
-			question: 'Quo nomine vocatur secunda neptis Taravangii?',
-			answer: 'Karavaniga'
-		}
-	];
+	import { ITEMS } from './items.js';
 
 	let showRotateMessage = $state(false);
 
