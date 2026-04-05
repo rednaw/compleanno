@@ -29,12 +29,22 @@
 	const COMMON_QUESTION = 'Cosa hanno in comune tutti questi film?';
 	const COMMON_ANSWER = 'Gwyneth Paltrow';
 
+	const FINAL_HINT_SEGMENTS = ['3', '11', '2', '4', '3'];
+	const FINAL_CODE_ANSWER = '7nany';
+
 	let commonGuess = '';
 	let commonFeedback = '';
 	/** @type {'not-started' | 'correct' | 'wrong'} */
 	let commonStatus = 'not-started';
 
+	/** @type {string[]} */
+	let finalCodeCells = ['', '', '', '', ''];
+	/** @type {'not-started' | 'wrong' | 'correct'} */
+	let finalCodeStatus = 'not-started';
+
 	$: filmsAllCorrect = clipStates.every((s) => s.status === 'correct');
+	$: commonComplete = commonStatus === 'correct';
+	$: finalCodeReady = finalCodeCells.every((c) => (c || '').length > 0);
 
 	function clipSrc(id) {
 		return `${base}/gcm26/a/${id}.mp4`;
@@ -96,12 +106,54 @@
 
 	function checkAllCompleted() {
 		allCompleted =
-			clipStates.every((s) => s.status === 'correct') && commonStatus === 'correct';
+			clipStates.every((s) => s.status === 'correct') &&
+			commonStatus === 'correct' &&
+			finalCodeStatus === 'correct';
 		if (allCompleted) {
 			savePuzzleState('gcm26_game_a_done', '1');
 		} else {
 			clearPuzzleState('gcm26_game_a_done');
 		}
+	}
+
+	function resetFinalCode() {
+		finalCodeStatus = 'not-started';
+		finalCodeCells = ['', '', '', '', ''];
+		clearPuzzleState('gcm26_game_a_code');
+	}
+
+	/** @param {number} index */
+	function onFinalCodeInput(index) {
+		if (finalCodeStatus === 'wrong') finalCodeStatus = 'not-started';
+		let v = (finalCodeCells[index] || '').slice(-1);
+		if (/[a-z]/i.test(v)) v = v.toLowerCase();
+		finalCodeCells = finalCodeCells.map((c, i) => (i === index ? v : c));
+	}
+
+	function checkFinalCode() {
+		if (!commonComplete || finalCodeStatus === 'correct') return;
+		const attempt = finalCodeCells.join('').toLowerCase();
+		if (attempt.length !== 5) return;
+
+		if (attempt === FINAL_CODE_ANSWER) {
+			finalCodeStatus = 'correct';
+			finalCodeCells = FINAL_CODE_ANSWER.split('');
+			try {
+				localStorage.setItem(
+					'gcm26_game_a_code',
+					JSON.stringify({ status: finalCodeStatus, cells: finalCodeCells })
+				);
+			} catch {
+				void 0;
+			}
+		} else {
+			finalCodeStatus = 'wrong';
+			const ansChars = FINAL_CODE_ANSWER.split('');
+			const guessChars = attempt.split('');
+			finalCodeCells = ansChars.map((ch, i) => (guessChars[i] === ch ? ch : ''));
+		}
+
+		checkAllCompleted();
 	}
 
 	function checkCommonGuess() {
@@ -168,6 +220,25 @@
 				commonFeedback = '';
 				commonGuess = '';
 				clearPuzzleState('gcm26_game_a_common');
+			}
+
+			if (commonStatus === 'correct') {
+				try {
+					const rawFinal = localStorage.getItem('gcm26_game_a_code');
+					if (rawFinal) {
+						const parsed = JSON.parse(rawFinal);
+						if (parsed.status === 'correct' && Array.isArray(parsed.cells) && parsed.cells.length === 5) {
+							finalCodeStatus = 'correct';
+							finalCodeCells = [...parsed.cells];
+						}
+					}
+				} catch {
+					void 0;
+				}
+			}
+
+			if (commonStatus !== 'correct') {
+				resetFinalCode();
 			}
 
 			clipStates = [...clipStates];
@@ -283,6 +354,61 @@
 							e.key === 'Enter' &&
 							checkCommonGuess()}
 					/>
+				</div>
+			</div>
+
+			<div class="final-code-section" class:common-disabled={!commonComplete}>
+				<p class="final-code-heading">Suggerimento</p>
+				<div class="code-cells-row">
+					{#each FINAL_HINT_SEGMENTS as seg, hi (hi)}
+						<input
+							type="text"
+							class="code-cell hint-cell"
+							class:code-cell-wide={seg.length > 1}
+							value={seg}
+							disabled
+							aria-label="Suggerimento {hi + 1}"
+						/>
+					{/each}
+				</div>
+				<p class="final-code-heading">Codice</p>
+				<div
+					class="input-row final-code-answer-row"
+					class:input-row-solved={finalCodeStatus === 'correct'}
+					class:answer-row-wrong={finalCodeStatus === 'wrong'}
+				>
+					{#each [0, 1, 2, 3, 4] as ci (ci)}
+						<input
+							type="text"
+							class="code-cell"
+							maxlength="1"
+							inputmode="text"
+							autocomplete="off"
+							autocorrect="off"
+							spellcheck="false"
+							bind:value={finalCodeCells[ci]}
+							disabled={!commonComplete}
+							readonly={finalCodeStatus === 'correct'}
+							aria-label="Codice carattere {ci + 1}"
+							on:input={() => onFinalCodeInput(ci)}
+							on:keydown={(e) =>
+								finalCodeStatus !== 'correct' &&
+								commonComplete &&
+								e.key === 'Enter' &&
+								checkFinalCode()}
+						/>
+					{/each}
+					{#if finalCodeStatus !== 'correct'}
+						<button
+							type="button"
+							on:click={() => checkFinalCode()}
+							disabled={!commonComplete || !finalCodeReady}
+						>
+							Controlla
+						</button>
+					{:else}
+						<span class="feedback correct">✅</span>
+					{/if}
 				</div>
 			</div>
 
@@ -491,6 +617,146 @@
 		text-align: center;
 		margin: 0 0 0.75rem;
 		line-height: 1.35;
+	}
+
+	.final-code-section {
+		width: 100%;
+		margin-top: 1.25rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.final-code-section.common-disabled {
+		opacity: 0.72;
+	}
+
+	.final-code-heading {
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: var(--color-text);
+		text-align: center;
+		margin: 0 0 0.45rem;
+		letter-spacing: 0.02em;
+	}
+
+	.code-cells-row {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		justify-content: center;
+		gap: 0;
+		margin: 0 auto 1rem;
+		width: fit-content;
+		max-width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.code-cells-row .code-cell {
+		flex: 0 0 auto;
+		border-radius: 0;
+		margin: 0;
+		border-right-width: 0;
+	}
+
+	.code-cells-row .code-cell:first-child {
+		border-top-left-radius: 0.4em;
+		border-bottom-left-radius: 0.4em;
+	}
+
+	.code-cells-row .code-cell:last-child {
+		border-top-right-radius: 0.4em;
+		border-bottom-right-radius: 0.4em;
+		border-right-width: 2px;
+	}
+
+	/* Beat global `input[type='text']` (width: 100%) so all hint cells stay visible in a row */
+	.code-cells-row input[type='text'].code-cell {
+		width: 2.35rem;
+		max-width: none;
+		min-width: 0;
+		height: 2.45rem;
+		padding: 0.15rem;
+		flex: 0 0 2.35rem;
+		border-width: 2px;
+		border-radius: 0;
+	}
+
+	.code-cells-row input[type='text'].code-cell-wide {
+		width: 2.85rem;
+		flex: 0 0 2.85rem;
+	}
+
+	.code-cell {
+		width: 2.35rem;
+		height: 2.45rem;
+		padding: 0.15rem;
+		font-size: 1.2rem;
+		font-family: var(--font-mono);
+		font-weight: 600;
+		text-align: center;
+		border-radius: 0.4em;
+		border: 2px solid var(--color-border);
+		box-sizing: border-box;
+		background: var(--color-white);
+		color: var(--color-text);
+		line-height: 1;
+	}
+
+	.code-cell-wide {
+		width: 2.85rem;
+	}
+
+	.hint-cell {
+		background: var(--color-lilac);
+		color: var(--color-text);
+		opacity: 1;
+		cursor: default;
+	}
+
+	.final-code-answer-row {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		justify-content: center;
+	}
+
+	.final-code-answer-row .code-cell {
+		flex: 0 0 auto;
+	}
+
+	.answer-row-wrong {
+		background: #ffcdd2;
+		border-color: #d32f2f;
+		color: #b71c1c;
+	}
+
+	.answer-row-wrong .code-cell {
+		border-color: rgba(211, 47, 47, 0.6);
+	}
+
+	.final-code-answer-row button[type='button'] {
+		font-size: 1.05em;
+		padding: 0.55em 1em;
+		border-radius: 0.5em;
+		border: none;
+		background: var(--color-theme-2);
+		color: var(--color-white);
+		font-weight: 600;
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.final-code-answer-row button[type='button']:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.final-code-answer-row input.code-cell[type='text'] {
+		width: 2.35rem;
+		max-width: none;
+		min-width: 0;
+		padding: 0.15rem;
+		height: 2.45rem;
+		text-align: center;
 	}
 
 	.result-section {
