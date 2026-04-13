@@ -17,7 +17,6 @@
 	let gameBDone = $state(false);
 	let gameCDone = $state(false);
 	let gameDDone = $state(false);
-	let gameEDone = $state(false);
 
 	onMount(() => {
 		try {
@@ -25,7 +24,6 @@
 			gameBDone = loadPuzzleState(gcm26Keys.gameBDone);
 			gameCDone = loadPuzzleState(gcm26Keys.gameCDone);
 			gameDDone = loadPuzzleState(gcm26Keys.gameDDone);
-			gameEDone = loadPuzzleState(gcm26Keys.gameEDone);
 		} catch {
 			void 0;
 		}
@@ -45,7 +43,6 @@
 			gameBDone = false;
 			gameCDone = false;
 			gameDDone = false;
-			gameEDone = false;
 		} catch {
 			void 0;
 		}
@@ -67,15 +64,6 @@
 				<a href={resolve('/gcm26/b')} class="game-button">{gameBDone ? gcm26HubDigit.b : '?'}</a>
 				<a href={resolve('/gcm26/c')} class="game-button">{gameCDone ? gcm26HubDigit.c : '?'}</a>
 				<a href={resolve('/gcm26/d')} class="game-button">{gameDDone ? gcm26HubDigit.d : '?'}</a>
-			</div>
-			<div class="labyrinth-row">
-				<a
-					href={resolve('/gcm26/e')}
-					class="game-button game-button-labyrinth"
-					aria-label="Labirinto di legno"
-				>
-					{gameEDone ? gcm26HubDigit.e : '?'}
-				</a>
 			</div>
 			<div class="arrow">↓</div>
 			<div class="code-section">
@@ -108,20 +96,6 @@
 		max-width: 400px;
 		width: 100%;
 		margin: 0 auto;
-	}
-
-	.labyrinth-row {
-		display: flex;
-		justify-content: center;
-		max-width: 400px;
-		width: 100%;
-		margin: 1rem auto 0;
-	}
-
-	.game-button-labyrinth {
-		width: 100%;
-		max-width: calc((100% - 1rem) / 2);
-		aspect-ratio: 1;
 	}
 
 	.code-section {
