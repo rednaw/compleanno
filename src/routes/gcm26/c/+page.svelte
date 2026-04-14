@@ -10,7 +10,7 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubImage } from '../hub-digits.js';
+	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
 	import { ITEMS } from './items.js';
 
@@ -310,7 +310,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #000;
+		background: var(--color-background);
 	}
 
 	.result-fullscreen-img {

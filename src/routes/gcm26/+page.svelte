@@ -9,7 +9,7 @@
 		clearPuzzleKeyPrefix
 	} from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
-	import { gcm26HubImage } from './hub-digits.js';
+	import { gcm26HubImage } from './hub-images.js';
 	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
 
 	let showRotateMessage = $state(false);
@@ -27,7 +27,7 @@
 			gameBDone = loadPuzzleState(gcm26Keys.gameBDone);
 			gameCDone = loadPuzzleState(gcm26Keys.gameCDone);
 			gameDDone = loadPuzzleState(gcm26Keys.gameDDone);
-			codeDone = loadPuzzleState(gcm26Keys.gameCodeDone);
+			codeDone = loadPuzzleState(gcm26Keys.codeDone);
 		} catch {
 			void 0;
 		}
@@ -163,7 +163,6 @@
 
 	.code-button-solved {
 		padding: 0;
-		overflow: hidden;
 	}
 
 	.code-button-disabled {

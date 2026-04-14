@@ -12,10 +12,10 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26Keys } from '../storage-keys.js';
 	import {
-		GAME_D_HEADING,
+		CODE_HEADING,
 		lineById,
-		GAME_D_CORRECT_ORDER,
-		GAME_D_START_ORDER,
+		CODE_CORRECT_ORDER,
+		CODE_START_ORDER,
 		isValidSavedOrder
 	} from './items.js';
 
@@ -23,7 +23,7 @@
 
 	let solved = $state(false);
 	/** @type {string[]} */
-	let orderIds = $state([...GAME_D_START_ORDER]);
+	let orderIds = $state([...CODE_START_ORDER]);
 	/** @type {'idle' | 'wrong'} */
 	let checkStatus = $state('idle');
 
@@ -36,7 +36,7 @@
 	function persistOrder() {
 		if (solved) return;
 		try {
-			localStorage.setItem(gcm26Keys.gameCodeOrder, JSON.stringify(orderIds));
+			localStorage.setItem(gcm26Keys.codeOrder, JSON.stringify(orderIds));
 		} catch {
 			void 0;
 		}
@@ -44,7 +44,7 @@
 
 	function loadSavedOrder() {
 		try {
-			const raw = localStorage.getItem(gcm26Keys.gameCodeOrder);
+			const raw = localStorage.getItem(gcm26Keys.codeOrder);
 			if (!raw) return null;
 			const parsed = JSON.parse(raw);
 			return isValidSavedOrder(parsed) ? parsed : null;
@@ -65,11 +65,11 @@
 
 	function checkOrder() {
 		if (solved) return;
-		if (GAME_D_CORRECT_ORDER.every((id, i) => orderIds[i] === id)) {
+		if (CODE_CORRECT_ORDER.every((id, i) => orderIds[i] === id)) {
 			solved = true;
 			checkStatus = 'idle';
-			savePuzzleState(gcm26Keys.gameCodeDone, '1');
-			clearPuzzleState(gcm26Keys.gameCodeOrder);
+			savePuzzleState(gcm26Keys.codeDone, '1');
+			clearPuzzleState(gcm26Keys.codeOrder);
 		} else {
 			checkStatus = 'wrong';
 		}
@@ -77,9 +77,9 @@
 
 	onMount(() => {
 		try {
-			if (loadPuzzleState(gcm26Keys.gameCodeDone)) {
+			if (loadPuzzleState(gcm26Keys.codeDone)) {
 				solved = true;
-				orderIds = [...GAME_D_CORRECT_ORDER];
+				orderIds = [...CODE_CORRECT_ORDER];
 			} else {
 				const saved = loadSavedOrder();
 				if (saved) orderIds = saved;
@@ -112,7 +112,7 @@
 	{:else}
 		<main>
 			<div class="quiz-wrap">
-				<h1 class="game-heading">{GAME_D_HEADING}</h1>
+				<h1 class="game-heading">{CODE_HEADING}</h1>
 
 				<div
 					class="order-list"
@@ -301,9 +301,6 @@
 		font-weight: 600;
 		margin: 0 0 1rem;
 		font-size: 0.95rem;
-	}
-
-	.wrong-msg {
 		color: #b71c1c;
 	}
 
