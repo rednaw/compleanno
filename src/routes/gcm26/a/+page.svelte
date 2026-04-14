@@ -29,6 +29,8 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
+	import ResultFullscreen from '../ResultFullscreen.svelte';
+	import '../quiz-shared.css';
 
 	let showRotateMessage = $state(false);
 
@@ -388,11 +390,11 @@
 					{/each}
 				</div>
 				<p class="final-code-heading">Codice</p>
-				<div
-					class="input-row final-code-answer-row"
-					class:input-row-solved={finalCodeStatus === 'correct'}
-					class:answer-row-wrong={finalCodeStatus === 'wrong'}
-				>
+			<div
+				class="final-code-answer-row"
+				class:final-code-solved={finalCodeStatus === 'correct'}
+				class:answer-row-wrong={finalCodeStatus === 'wrong'}
+			>
 					{#each FINAL_CODE_CELL_INDEXES as ci (ci)}
 						<input
 							type="text"
@@ -440,11 +442,9 @@
 				</p>
 			</div>
 
-			{#if allCompleted}
-				<div class="result-fullscreen">
-					<img src="{base}/gcm26/code/{gcm26HubImage.a}" alt="" class="result-fullscreen-img" />
-				</div>
-			{/if}
+		{#if allCompleted}
+			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.a}" />
+		{/if}
 		</div>
 	</main>
 {/if}
@@ -514,53 +514,12 @@
 		justify-content: center;
 	}
 
-	.clip-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-		padding: 0.8em 1em;
-		border-radius: 0.5em;
-		margin-bottom: 0.4em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		transition:
-			border 0.2s,
-			background 0.2s;
-		font-size: 1.05em;
-		gap: 0.8em;
-		width: 100%;
-		box-sizing: border-box;
-	}
-
 	.clip-row.correct {
 		background: #a5d6a7;
 		border-color: #388e3c;
 		color: #1b5e20;
 	}
 
-	.clip-row.wrong {
-		background: #ffcdd2;
-		border-color: #d32f2f;
-		color: #b71c1c;
-	}
-
-	.input-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		width: 100%;
-		box-sizing: border-box;
-	}
-
-	.input-row-solved {
-		background: #e8f5e9;
-		border-color: #388e3c;
-	}
 
 	.clip-video {
 		width: 100%;
@@ -613,27 +572,6 @@
 	.clip-row button[type='button']:not(.play-btn):disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-	}
-
-	input[type='text'] {
-		font-size: 1.05em;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		border: 1px solid var(--color-border);
-		min-width: 0;
-		width: 100%;
-		max-width: 280px;
-		background: var(--color-white);
-		color: var(--color-text);
-		box-sizing: border-box;
-	}
-
-	.input-row-solved input[type='text'] {
-		background: transparent;
-		border-color: rgba(56, 142, 60, 0.45);
-		color: #1b5e20;
-		font-weight: 600;
-		cursor: default;
 	}
 
 	.feedback {
@@ -759,9 +697,22 @@
 	}
 
 	.final-code-answer-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.6em 1em;
+		border-radius: 0.5em;
+		background: var(--color-white);
+		border: 2px solid var(--color-border);
+		width: 100%;
+		box-sizing: border-box;
 		flex-wrap: wrap;
 		gap: 0.5rem;
-		justify-content: center;
+	}
+
+	.final-code-solved {
+		background: #e8f5e9;
+		border-color: #388e3c;
 	}
 
 	.final-code-answer-row .code-cell {
@@ -804,28 +755,7 @@
 		text-align: center;
 	}
 
-	.result-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--color-background);
-	}
-
-	.result-fullscreen-img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
 	@media (max-width: 480px) {
-		.clip-row {
-			font-size: 0.95em;
-			gap: 0.5em;
-		}
-
 		.play-btn {
 			font-size: 0.95em;
 		}

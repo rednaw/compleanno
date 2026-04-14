@@ -18,6 +18,7 @@
 		CODE_START_ORDER,
 		isValidSavedOrder
 	} from './items.js';
+	import ResultFullscreen from '../ResultFullscreen.svelte';
 
 	let showRotateMessage = $state(false);
 
@@ -106,9 +107,7 @@
 
 {#if !showRotateMessage}
 	{#if solved}
-		<div class="result-fullscreen">
-			<img src="{base}/gcm26/code/madagascar.webp" alt="" class="result-fullscreen-img" />
-		</div>
+		<ResultFullscreen src="{base}/gcm26/code/madagascar.webp" />
 	{:else}
 		<main>
 			<div class="quiz-wrap">
@@ -302,22 +301,6 @@
 		margin: 0 0 1rem;
 		font-size: 0.95rem;
 		color: #b71c1c;
-	}
-
-	.result-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--color-background);
-	}
-
-	.result-fullscreen-img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
 	}
 
 	@media (max-width: 480px) {

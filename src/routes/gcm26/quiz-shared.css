@@ -1,0 +1,85 @@
+/*
+ * Base styles shared by gcm26 quiz-type game pages (a, b, c).
+ * Import from each page that uses the card / input-row pattern.
+ *
+ * These selectors are intentionally low-specificity (single class) so that
+ * Svelte scoped styles in each page override them automatically.
+ */
+
+/* ── Card-style row ─────────────────────────────────────────── */
+
+.clip-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	padding: 0.8em 1em;
+	border-radius: 0.5em;
+	margin-bottom: 0.4em;
+	background: var(--color-white);
+	border: 2px solid var(--color-border);
+	transition:
+		border 0.2s,
+		background 0.2s;
+	font-size: 1.05em;
+	gap: 0.8em;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.clip-row.wrong {
+	background: #ffcdd2;
+	border-color: #d32f2f;
+	color: #b71c1c;
+}
+
+/* ── Input row ──────────────────────────────────────────────── */
+
+.input-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.6em 1em;
+	border-radius: 0.5em;
+	background: var(--color-white);
+	border: 2px solid var(--color-border);
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.input-row-solved {
+	background: #e8f5e9;
+	border-color: #388e3c;
+}
+
+/* ── Text input inside .input-row ───────────────────────────── */
+
+.input-row input[type='text'] {
+	font-size: 1.05em;
+	padding: 0.6em 1em;
+	border-radius: 0.5em;
+	border: 1px solid var(--color-border);
+	min-width: 0;
+	width: 100%;
+	max-width: 280px;
+	background: var(--color-white);
+	color: var(--color-text);
+	box-sizing: border-box;
+}
+
+.input-row-solved input[type='text'] {
+	background: transparent;
+	border-color: rgba(56, 142, 60, 0.45);
+	color: #1b5e20;
+	font-weight: 600;
+	cursor: default;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+	.clip-row {
+		font-size: 0.95em;
+		gap: 0.5em;
+	}
+}

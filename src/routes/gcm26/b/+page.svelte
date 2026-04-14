@@ -13,6 +13,8 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
+	import ResultFullscreen from '../ResultFullscreen.svelte';
+	import '../quiz-shared.css';
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks;
@@ -238,11 +240,9 @@
 				</p>
 			{/if}
 
-			{#if allCompleted}
-				<div class="result-fullscreen">
-					<img src="{base}/gcm26/code/{gcm26HubImage.b}" alt="" class="result-fullscreen-img" />
-				</div>
-			{/if}
+		{#if allCompleted}
+			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.b}" />
+		{/if}
 		</div>
 	</main>
 {/if}
@@ -288,43 +288,6 @@
 		opacity: 0;
 	}
 
-	.clip-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-		padding: 0.8em 1em;
-		border-radius: 0.5em;
-		margin-bottom: 0.4em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		transition:
-			border 0.2s,
-			background 0.2s;
-		font-size: 1.05em;
-		gap: 0.8em;
-		width: 100%;
-		box-sizing: border-box;
-	}
-
-	.clip-row.wrong {
-		background: #ffcdd2;
-		border-color: #d32f2f;
-		color: #b71c1c;
-	}
-
-	.input-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		width: 100%;
-		box-sizing: border-box;
-	}
-
 	.clip-row button[type='button'] {
 		font-size: 1.05em;
 		padding: 0.55em 1em;
@@ -339,19 +302,6 @@
 	.clip-row button[type='button']:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-	}
-
-	input[type='text'] {
-		font-size: 1.05em;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		border: 1px solid var(--color-border);
-		min-width: 0;
-		width: 100%;
-		max-width: 280px;
-		background: var(--color-white);
-		color: var(--color-text);
-		box-sizing: border-box;
 	}
 
 	.solved-titles {
@@ -406,26 +356,4 @@
 		font-size: 0.68rem;
 	}
 
-	.result-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--color-background);
-	}
-
-	.result-fullscreen-img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
-	@media (max-width: 480px) {
-		.clip-row {
-			font-size: 0.95em;
-			gap: 0.5em;
-		}
-	}
 </style>

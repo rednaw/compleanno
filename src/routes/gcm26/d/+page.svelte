@@ -11,6 +11,7 @@
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
+	import ResultFullscreen from '../ResultFullscreen.svelte';
 
 	const ACCEPTED = ['placeholder'];
 
@@ -86,9 +87,7 @@
 		<img src="{base}/gcm26/d/spider.png" alt="Puzzle D" class="puzzle-image" />
 
 		{#if solved}
-			<div class="result-fullscreen">
-				<img src="{base}/gcm26/code/{gcm26HubImage.d}" alt="" class="result-fullscreen-img" />
-			</div>
+			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.d}" />
 		{/if}
 	</main>
 
@@ -134,22 +133,6 @@
 	.puzzle-image {
 		width: 100%;
 		height: 100vh;
-		object-fit: contain;
-	}
-
-	.result-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--color-background);
-	}
-
-	.result-fullscreen-img {
-		width: 100%;
-		height: 100%;
 		object-fit: contain;
 	}
 

@@ -13,6 +13,8 @@
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
 	import { ITEMS } from './items.js';
+	import ResultFullscreen from '../ResultFullscreen.svelte';
+	import '../quiz-shared.css';
 
 	let showRotateMessage = $state(false);
 
@@ -130,11 +132,9 @@
 				</div>
 			{/each}
 
-			{#if allCompleted}
-				<div class="result-fullscreen">
-					<img src="{base}/gcm26/code/{gcm26HubImage.c}" alt="" class="result-fullscreen-img" />
-				</div>
-			{/if}
+		{#if allCompleted}
+			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.c}" />
+		{/if}
 		</div>
 	</main>
 {/if}
@@ -198,35 +198,10 @@
 	}
 
 	.clip-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
 		padding: 0.85em 1em;
-		border-radius: 0.5em;
 		margin-bottom: 0.45em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-		transition:
-			border 0.2s,
-			background 0.2s;
-		font-size: 1.05em;
 		gap: 0.75rem 1rem;
-		width: 100%;
-		box-sizing: border-box;
-	}
-
-	.input-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		width: 100%;
-		box-sizing: border-box;
 	}
 
 	.answer-row {
@@ -243,11 +218,6 @@
 
 	.answer-row-wrong input[type='text'] {
 		border-color: rgba(211, 47, 47, 0.55);
-	}
-
-	.input-row-solved {
-		background: #e8f5e9;
-		border-color: #388e3c;
 	}
 
 	.answer-row button[type='button'] {
@@ -271,31 +241,10 @@
 		flex-shrink: 0;
 	}
 
-	input[type='text'] {
-		font-size: 1.05em;
-		padding: 0.6em 1em;
-		border-radius: 0.5em;
-		border: 1px solid var(--color-border);
-		min-width: 0;
-		width: 100%;
-		max-width: 100%;
-		background: var(--color-white);
-		color: var(--color-text);
-		box-sizing: border-box;
-	}
-
 	.answer-row input[type='text'] {
 		flex: 1 1 8rem;
 		width: auto;
 		max-width: none;
-	}
-
-	.input-row-solved input[type='text'] {
-		background: transparent;
-		border-color: rgba(56, 142, 60, 0.45);
-		color: #1b5e20;
-		font-weight: 600;
-		cursor: default;
 	}
 
 	.feedback.correct {
@@ -303,25 +252,8 @@
 		color: #388e3c;
 	}
 
-	.result-fullscreen {
-		position: fixed;
-		inset: 0;
-		z-index: 90;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--color-background);
-	}
-
-	.result-fullscreen-img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
 	@media (max-width: 480px) {
 		.clip-row {
-			font-size: 0.95em;
 			gap: 0.5em;
 		}
 
