@@ -11,7 +11,7 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '../hub-digits.js';
+	import { gcm26HubImage } from '../hub-digits.js';
 	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
 
 	/** @type {{ id: string; title: string }[]} */
@@ -239,11 +239,8 @@
 			{/if}
 
 			{#if allCompleted}
-				<div class="result-section">
-					<p class="result-text">
-						<span class="result-emoji" aria-hidden="true">🎉</span>
-						<span class="result-digit">{gcm26HubDigit.b}</span>
-					</p>
+				<div class="result-fullscreen">
+					<img src="{base}/gcm26/code/{gcm26HubImage.b}" alt="" class="result-fullscreen-img" />
 				</div>
 			{/if}
 		</div>
@@ -409,31 +406,20 @@
 		font-size: 0.68rem;
 	}
 
-	.result-section {
-		text-align: center;
-		background: rgba(255, 255, 255, 0.9);
-		border-radius: 0.5rem;
-		border: 2px solid var(--color-border);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		padding: 1.2rem 1.5rem;
-		width: fit-content;
-		min-width: 140px;
-		margin: 2rem auto;
-	}
-
-	.result-text {
+	.result-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.45em;
-		font-size: 2.2rem;
-		margin: 0;
-		font-weight: bold;
-		color: var(--color-text);
+		background: #000;
 	}
 
-	.result-digit {
-		font-variant-numeric: tabular-nums;
+	.result-fullscreen-img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	@media (max-width: 480px) {

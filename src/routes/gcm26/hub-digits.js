@@ -1,11 +1,12 @@
 /**
- * Digit revealed on the GCM26 hub when each game is completed.
- * Keep in sync with the final code puzzle design.
+ * Image shown on the GCM26 hub when each game (a–d) is completed.
+ * The order must differ from both correctOrder and startOrder in the code puzzle manifest.
+ * Each value is the filename inside `static/gcm26/code/`.
  * @type {Readonly<Record<'a' | 'b' | 'c' | 'd', string>>}
  */
-export const gcm26HubDigit = Object.freeze({
-	a: '1',
-	b: '2',
-	c: '3',
-	d: '4'
+export const gcm26HubImage = Object.freeze({
+	a: 'medusa.webp',
+	b: 'topo.webp',
+	c: 'guffo.avif',
+	d: 'leone.webp'
 });

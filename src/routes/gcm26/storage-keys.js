@@ -11,7 +11,8 @@ export const gcm26Keys = Object.freeze({
 	gameBDone: 'gcm26_game_b_done',
 	gameCDone: 'gcm26_game_c_done',
 	gameDDone: 'gcm26_game_d_done',
-	gameDOrder: 'gcm26_game_d_order',
+	gameCodeDone: 'gcm26_game_code_done',
+	gameCodeOrder: 'gcm26_game_code_order',
 	gameACommon: 'gcm26_game_a_common',
 	gameACode: 'gcm26_game_a_code'
 });

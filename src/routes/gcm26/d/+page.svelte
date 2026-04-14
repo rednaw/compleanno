@@ -9,7 +9,7 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '../hub-digits.js';
+	import { gcm26HubImage } from '../hub-digits.js';
 	import { gcm26Keys } from '../storage-keys.js';
 
 	const ACCEPTED = ['placeholder'];
@@ -82,11 +82,8 @@
 		<img src="{base}/gcm26/d/spider.png" alt="Puzzle D" class="puzzle-image" />
 
 		{#if solved}
-			<div class="result-overlay">
-				<p class="result-text">
-					<span class="result-emoji" aria-hidden="true">🎉</span>
-					<span class="result-digit">{gcm26HubDigit.d}</span>
-				</p>
+			<div class="result-fullscreen">
+				<img src="{base}/gcm26/code/{gcm26HubImage.d}" alt="" class="result-fullscreen-img" />
 			</div>
 		{/if}
 	</main>
@@ -136,29 +133,20 @@
 		object-fit: contain;
 	}
 
-	.result-overlay {
-		position: absolute;
+	.result-fullscreen {
+		position: fixed;
 		inset: 0;
+		z-index: 90;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.55);
-		pointer-events: none;
+		background: #000;
 	}
 
-	.result-text {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-		font-size: 3.5rem;
-		font-weight: 700;
-		color: #fff;
-		margin: 0;
-		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
-	}
-
-	.result-digit {
-		font-variant-numeric: tabular-nums;
+	.result-fullscreen-img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.bar-backdrop {

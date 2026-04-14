@@ -10,7 +10,6 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import { gcm26HubDigit } from '../hub-digits.js';
 	import { gcm26Keys } from '../storage-keys.js';
 	import {
 		GAME_D_HEADING,
@@ -37,7 +36,7 @@
 	function persistOrder() {
 		if (solved) return;
 		try {
-			localStorage.setItem(gcm26Keys.gameDOrder, JSON.stringify(orderIds));
+			localStorage.setItem(gcm26Keys.gameCodeOrder, JSON.stringify(orderIds));
 		} catch {
 			void 0;
 		}
@@ -45,7 +44,7 @@
 
 	function loadSavedOrder() {
 		try {
-			const raw = localStorage.getItem(gcm26Keys.gameDOrder);
+			const raw = localStorage.getItem(gcm26Keys.gameCodeOrder);
 			if (!raw) return null;
 			const parsed = JSON.parse(raw);
 			return isValidSavedOrder(parsed) ? parsed : null;
@@ -69,8 +68,8 @@
 		if (GAME_D_CORRECT_ORDER.every((id, i) => orderIds[i] === id)) {
 			solved = true;
 			checkStatus = 'idle';
-			savePuzzleState(gcm26Keys.gameDDone, '1');
-			clearPuzzleState(gcm26Keys.gameDOrder);
+			savePuzzleState(gcm26Keys.gameCodeDone, '1');
+			clearPuzzleState(gcm26Keys.gameCodeOrder);
 		} else {
 			checkStatus = 'wrong';
 		}
@@ -78,7 +77,7 @@
 
 	onMount(() => {
 		try {
-			if (loadPuzzleState(gcm26Keys.gameDDone)) {
+			if (loadPuzzleState(gcm26Keys.gameCodeDone)) {
 				solved = true;
 				orderIds = [...GAME_D_CORRECT_ORDER];
 			} else {
@@ -106,83 +105,71 @@
 <RotateMessage show={showRotateMessage} encouragePortrait={true} />
 
 {#if !showRotateMessage}
-	<main>
-		<div class="quiz-wrap">
-			<h1 class="game-heading">{GAME_D_HEADING}</h1>
+	{#if solved}
+		<div class="result-fullscreen">
+			<img src="{base}/gcm26/code/madagascar.webp" alt="" class="result-fullscreen-img" />
+		</div>
+	{:else}
+		<main>
+			<div class="quiz-wrap">
+				<h1 class="game-heading">{GAME_D_HEADING}</h1>
 
-			<p class="help-text" id="order-hint">
-				Usa Su e Giù per ordinare le frasi, poi premi Controlla.
-			</p>
-
-			<div
-				class="order-list"
-				role="list"
-				aria-describedby="order-hint"
-				class:order-list-solved={solved}
-				class:order-list-wrong={checkStatus === 'wrong'}
-			>
-				{#each orderIds as id, i (id)}
-					{@const imgSrc = lineImageSrc(id)}
-					<div class="order-row" role="listitem">
-						<p class="line-text">{lineById[id].text}</p>
-						<div class="order-row-controls">
-							{#if imgSrc}
-								<img
-									class="row-thumb"
-									src={imgSrc}
-									alt=""
-									loading="lazy"
-									decoding="async"
-									width="72"
-									height="72"
-								/>
-							{/if}
-							<span class="move-btns">
-								<button
-									type="button"
-									class="move-btn"
-									onclick={() => swapRows(i, i - 1)}
-									disabled={solved || i === 0}
-									aria-label="Sposta su: {lineById[id].text}"
-								>
-									Su
-								</button>
-								<button
-									type="button"
-									class="move-btn"
-									onclick={() => swapRows(i, i + 1)}
-									disabled={solved || i === orderIds.length - 1}
-									aria-label="Sposta giù: {lineById[id].text}"
-								>
-									Giù
-								</button>
-							</span>
+				<div
+					class="order-list"
+					role="list"
+					aria-describedby="order-hint"
+					class:order-list-wrong={checkStatus === 'wrong'}
+				>
+					{#each orderIds as id, i (id)}
+						{@const imgSrc = lineImageSrc(id)}
+						<div class="order-row" role="listitem">
+							<p class="line-text">{lineById[id].text}</p>
+							<div class="order-row-controls">
+								{#if imgSrc}
+									<img
+										class="row-thumb"
+										src={imgSrc}
+										alt=""
+										loading="lazy"
+										decoding="async"
+										width="72"
+										height="72"
+									/>
+								{/if}
+								<span class="move-btns">
+									<button
+										type="button"
+										class="move-btn"
+										onclick={() => swapRows(i, i - 1)}
+										disabled={i === 0}
+										aria-label="Sposta su: {lineById[id].text}"
+									>
+										Su
+									</button>
+									<button
+										type="button"
+										class="move-btn"
+										onclick={() => swapRows(i, i + 1)}
+										disabled={i === orderIds.length - 1}
+										aria-label="Sposta giù: {lineById[id].text}"
+									>
+										Giù
+									</button>
+								</span>
+							</div>
 						</div>
-					</div>
-				{/each}
-			</div>
+					{/each}
+				</div>
 
-			{#if !solved}
 				<div class="check-row">
 					<button type="button" class="check-btn" onclick={() => checkOrder()}> Controlla </button>
 				</div>
 				{#if checkStatus === 'wrong'}
 					<p class="wrong-msg" role="status">Ordine errato. Continua a riordinare.</p>
 				{/if}
-			{:else}
-				<p class="solved-msg" role="status">Ordine corretto.</p>
-			{/if}
-
-			{#if solved}
-				<div class="result-section">
-					<p class="result-text">
-						<span class="result-emoji" aria-hidden="true">🎉</span>
-						<span class="result-digit">{gcm26HubDigit.d}</span>
-					</p>
-				</div>
-			{/if}
-		</div>
-	</main>
+			</div>
+		</main>
+	{/if}
 {/if}
 
 <style>
@@ -193,9 +180,6 @@
 		justify-content: flex-start;
 		min-height: 100vh;
 		background: var(--color-background);
-		padding: 1rem 0.5rem 1rem 0.5rem;
-		box-sizing: border-box;
-		margin-top: 4rem;
 	}
 
 	.quiz-wrap {
@@ -215,14 +199,6 @@
 		line-height: 1.3;
 	}
 
-	.help-text {
-		font-size: 0.95rem;
-		color: var(--color-text);
-		margin: 0 0 1.25rem;
-		line-height: 1.4;
-		opacity: 0.92;
-	}
-
 	.order-list {
 		padding: 0;
 		margin: 0 auto 1.25rem;
@@ -239,11 +215,6 @@
 	.order-list-wrong {
 		border-color: #d32f2f;
 		background: #ffcdd2;
-	}
-
-	.order-list-solved {
-		border-color: #388e3c;
-		background: #e8f5e9;
 	}
 
 	.order-row {
@@ -326,8 +297,7 @@
 		cursor: pointer;
 	}
 
-	.wrong-msg,
-	.solved-msg {
+	.wrong-msg {
 		font-weight: 600;
 		margin: 0 0 1rem;
 		font-size: 0.95rem;
@@ -337,35 +307,20 @@
 		color: #b71c1c;
 	}
 
-	.solved-msg {
-		color: #1b5e20;
-	}
-
-	.result-section {
-		text-align: center;
-		background: rgba(255, 255, 255, 0.9);
-		border-radius: 0.5rem;
-		border: 2px solid var(--color-border);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		padding: 1.2rem 1.5rem;
-		width: fit-content;
-		min-width: 140px;
-		margin: 1.5rem auto 0;
-	}
-
-	.result-text {
+	.result-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.45em;
-		font-size: 2.2rem;
-		margin: 0;
-		font-weight: bold;
-		color: var(--color-text);
+		background: var(--color-background);
 	}
 
-	.result-digit {
-		font-variant-numeric: tabular-nums;
+	.result-fullscreen-img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	@media (max-width: 480px) {
