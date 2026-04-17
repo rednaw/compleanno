@@ -2,14 +2,11 @@
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import {
-		checkOrientation,
-		setupOrientationListeners,
 		savePuzzleState,
 		loadPuzzleState,
 		clearPuzzleState
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26Keys } from '../storage-keys.js';
 	import {
 		CODE_HEADING,
@@ -19,8 +16,6 @@
 		isValidSavedOrder
 	} from './items.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
-
-	let showRotateMessage = $state(false);
 
 	let solved = $state(false);
 	/** @type {string[]} */
@@ -88,12 +83,6 @@
 		} catch {
 			void 0;
 		}
-
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(true);
-		};
-		updateOrientation();
-		return setupOrientationListeners(updateOrientation);
 	});
 </script>
 
@@ -103,10 +92,7 @@
 
 <BackButton href={resolve('/gcm26')} />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
-	{#if solved}
+{#if solved}
 		<ResultFullscreen src="{base}/gcm26/code/madagascar.webp" />
 	{:else}
 		<main>
@@ -168,7 +154,6 @@
 				{/if}
 			</div>
 		</main>
-	{/if}
 {/if}
 
 <style>

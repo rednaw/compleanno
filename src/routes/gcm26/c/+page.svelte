@@ -2,21 +2,16 @@
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import {
-		checkOrientation,
-		setupOrientationListeners,
 		savePuzzleState,
 		loadPuzzleState,
 		clearPuzzleState
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
 	import { ITEMS } from './items.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 	import '../quiz-shared.css';
-
-	let showRotateMessage = $state(false);
 
 	/** @param {string} s */
 	function normalizeAnswer(s) {
@@ -48,28 +43,24 @@
 		if (!g.trim()) return;
 		const expected = ITEMS[index].answer;
 		if (normalizeAnswer(g) === normalizeAnswer(expected)) {
-			rowStatus = rowStatus.map((s, i) => (i === index ? 'correct' : s));
-			guesses = guesses.map((v, i) => (i === index ? expected : v));
+			rowStatus[index] = 'correct';
+			guesses[index] = expected;
 			savePuzzleState(gcm26CItemKey(ITEMS[index].id), '1');
 			checkAllCompleted();
 		} else {
-			rowStatus = rowStatus.map((s, i) => (i === index ? 'wrong' : s));
-			guesses = guesses.map((v, i) => (i === index ? '' : v));
+			rowStatus[index] = 'wrong';
+			guesses[index] = '';
 		}
 	}
 
 	onMount(() => {
 		try {
-			const nextGuesses = [...guesses];
-			const nextStatus = [...rowStatus];
 			ITEMS.forEach((item, index) => {
 				if (loadPuzzleState(gcm26CItemKey(item.id))) {
-					nextStatus[index] = 'correct';
-					nextGuesses[index] = item.answer;
+					rowStatus[index] = 'correct';
+					guesses[index] = item.answer;
 				}
 			});
-			guesses = nextGuesses;
-			rowStatus = nextStatus;
 
 			if (loadPuzzleState(gcm26Keys.gameCDone)) {
 				allCompleted = true;
@@ -79,12 +70,6 @@
 		} catch {
 			void 0;
 		}
-
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(true);
-		};
-		updateOrientation();
-		return setupOrientationListeners(updateOrientation);
 	});
 </script>
 
@@ -94,10 +79,7 @@
 
 <BackButton href={resolve('/gcm26')} />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
-	<main>
+<main>
 		<div class="quiz-wrap">
 			<p class="progress-hint" aria-live="polite">
 				Recte solutae: {solvedCount} / {ITEMS.length}
@@ -136,8 +118,7 @@
 			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.c}" />
 		{/if}
 		</div>
-	</main>
-{/if}
+</main>
 
 <style>
 	main {

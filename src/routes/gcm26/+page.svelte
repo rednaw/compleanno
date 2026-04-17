@@ -1,18 +1,11 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
-	import {
-		checkOrientation,
-		setupOrientationListeners,
-		loadPuzzleState,
-		clearPuzzleKeyPrefix
-	} from '$lib/puzzle-utils.js';
+	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import { gcm26HubImage } from './hub-images.js';
 	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
 
-	let showRotateMessage = $state(false);
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
 	let gameCDone = $state(false);
@@ -31,12 +24,6 @@
 		} catch {
 			void 0;
 		}
-
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(true);
-		};
-		updateOrientation();
-		return setupOrientationListeners(updateOrientation);
 	});
 
 	function clearGlobalState() {
@@ -58,10 +45,7 @@
 	<title>GCM 26</title>
 </svelte:head>
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
-	<main>
+<main>
 		<ClearProgressButton onClear={clearGlobalState} />
 		<div class="content">
 			<div class="games-grid">
@@ -91,8 +75,7 @@
 				{/if}
 			</div>
 		</div>
-	</main>
-{/if}
+</main>
 
 <style>
 	main {

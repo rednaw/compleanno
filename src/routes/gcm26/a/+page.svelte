@@ -19,20 +19,12 @@
 		loadFinalCodeProgress,
 		clearFinalCodeProgress
 	} from './persistence.js';
-	import {
-		checkOrientation,
-		setupOrientationListeners,
-		savePuzzleState,
-		clearPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 	import '../quiz-shared.css';
-
-	let showRotateMessage = $state(false);
 
 	/** @type {{ guess: string; feedback: string; status: string; playing: boolean; video: HTMLVideoElement | null; videoError: boolean }[]} */
 	let clipStates = $state(
@@ -74,25 +66,21 @@
 		const video = st.video;
 		if (!video || st.videoError) return;
 		st.playing = true;
-		clipStates = [...clipStates];
 		video.pause();
 		video.currentTime = 0;
 		video.play().catch(() => {
 			st.videoError = true;
 			st.playing = false;
-			clipStates = [...clipStates];
 		});
 	}
 
 	function onClipEnded(idx) {
 		clipStates[idx].playing = false;
-		clipStates = [...clipStates];
 	}
 
 	function onClipError(idx) {
 		clipStates[idx].videoError = true;
 		clipStates[idx].playing = false;
-		clipStates = [...clipStates];
 	}
 
 	function checkGuess(idx) {
@@ -111,8 +99,6 @@
 		}
 
 		saveFilmProgress(idx, { status: st.status, feedback: st.feedback, guess: st.guess });
-
-		clipStates = [...clipStates];
 		checkAllCompleted();
 	}
 
@@ -139,7 +125,7 @@
 		if (finalCodeStatus === 'wrong') finalCodeStatus = 'not-started';
 		let v = (finalCodeCells[index] || '').slice(-1);
 		if (/[a-z]/i.test(v)) v = v.toLowerCase();
-		finalCodeCells = finalCodeCells.map((c, i) => (i === index ? v : c));
+		finalCodeCells[index] = v;
 	}
 
 	function checkFinalCode() {
@@ -230,21 +216,14 @@
 				}
 			}
 
-			if (commonStatus !== 'correct') {
-				resetFinalCode();
-			}
+		if (commonStatus !== 'correct') {
+			resetFinalCode();
+		}
 
-			clipStates = [...clipStates];
 			checkAllCompleted();
 		} catch {
 			void 0;
 		}
-
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(true);
-		};
-		updateOrientation();
-		return setupOrientationListeners(updateOrientation);
 	});
 </script>
 
@@ -254,10 +233,7 @@
 
 <BackButton href={resolve('/gcm26')} />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
-	<main>
+<main>
 		<div class="clip-list">
 			{#each films as film, i (film.id)}
 				<div class="clip-container">
@@ -446,8 +422,7 @@
 			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.a}" />
 		{/if}
 		</div>
-	</main>
-{/if}
+</main>
 
 <style>
 	main {

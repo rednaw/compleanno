@@ -3,14 +3,11 @@
 	import { onMount, tick } from 'svelte';
 	import manifest from './manifest.json';
 	import {
-		checkOrientation,
-		setupOrientationListeners,
 		savePuzzleState,
 		loadPuzzleState,
 		clearPuzzleState
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
@@ -18,8 +15,6 @@
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks;
-
-	let showRotateMessage = $state(false);
 
 	/** @type {Record<string, HTMLAudioElement | undefined>} */
 	const audioById = {};
@@ -97,9 +92,9 @@
 				a.currentTime = Math.min(offset, Math.max(0, loopSec - 0.05));
 				a.muted = false;
 				a.volume = 1;
-				a.play().catch(() => {
-					audioLoadError = { ...audioLoadError, [t.id]: true };
-				});
+			a.play().catch(() => {
+				audioLoadError[t.id] = true;
+			});
 			};
 
 			// HAVE_METADATA: duration/currentTime seek is reliable before play.
@@ -118,7 +113,7 @@
 
 		if (matches.length === 1) {
 			const t = matches[0];
-			solved = { ...solved, [t.id]: true };
+			solved[t.id] = true;
 			guessRowStatus = 'not-started';
 			guessInput = '';
 			const a = audioById[t.id];
@@ -146,12 +141,11 @@
 
 	onMount(() => {
 		try {
-			tracks.forEach((t) => {
-				if (loadPuzzleState(gcm26BSolvedKey(t.id))) {
-					solved[t.id] = true;
-				}
-			});
-			solved = { ...solved };
+		tracks.forEach((t) => {
+			if (loadPuzzleState(gcm26BSolvedKey(t.id))) {
+				solved[t.id] = true;
+			}
+		});
 
 			if (loadPuzzleState(gcm26Keys.gameBDone)) {
 				allCompleted = true;
@@ -162,17 +156,10 @@
 			void 0;
 		}
 
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(true);
-		};
-		updateOrientation();
-
 		void tick().then(() => {
 			applySolvedToAudios();
 			if (!allCompleted) startMix();
 		});
-
-		return setupOrientationListeners(updateOrientation);
 	});
 </script>
 
@@ -182,10 +169,7 @@
 
 <BackButton href={resolve('/gcm26')} />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
-	<main>
+<main>
 		<div class="clip-list">
 			<p class="progress-hint" aria-live="polite">
 				{solvedTally} / {tracks.length} songs identified
@@ -198,9 +182,9 @@
 						src={trackSrc(track.id)}
 						loop
 						preload="metadata"
-						onerror={() => {
-							audioLoadError = { ...audioLoadError, [track.id]: true };
-						}}
+					onerror={() => {
+						audioLoadError[track.id] = true;
+					}}
 					></audio>
 				{/each}
 			</div>
@@ -244,8 +228,7 @@
 			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.b}" />
 		{/if}
 		</div>
-	</main>
-{/if}
+</main>
 
 <style>
 	main {

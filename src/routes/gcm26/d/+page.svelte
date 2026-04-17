@@ -1,21 +1,14 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import {
-		checkOrientation,
-		setupOrientationListeners,
-		savePuzzleState,
-		loadPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 
 	const ACCEPTED = ['placeholder'];
 
-	let showRotateMessage = $state(false);
 	let barOpen = $state(false);
 	let guess = $state('');
 	let shaking = $state(false);
@@ -63,12 +56,6 @@
 		} catch {
 			void 0;
 		}
-
-		const updateOrientation = () => {
-			showRotateMessage = !checkOrientation(false);
-		};
-		updateOrientation();
-		return setupOrientationListeners(updateOrientation);
 	});
 </script>
 
@@ -78,13 +65,10 @@
 
 <BackButton href={resolve('/gcm26')} />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={false} />
-
-{#if !showRotateMessage}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<main onclick={openBar}>
-		<img src="{base}/gcm26/d/spider.png" alt="Puzzle D" class="puzzle-image" />
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<main onclick={openBar}>
+		<img src="{base}/gcm26/d/spider.jpg" alt="Puzzle D" class="puzzle-image" />
 
 		{#if solved}
 			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.d}" />
@@ -115,7 +99,6 @@
 			</form>
 		</div>
 	{/if}
-{/if}
 
 <style>
 	main {
