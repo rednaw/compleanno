@@ -31,3 +31,8 @@ export function gcm26BSolvedKey(trackId) {
 export function gcm26CItemKey(itemId) {
 	return `gcm26_c_${itemId}`;
 }
+
+/** @param {string} clueId clue `id` (game D) */
+export function gcm26DClueKey(clueId) {
+	return `gcm26_d_clue_${clueId}`;
+}
