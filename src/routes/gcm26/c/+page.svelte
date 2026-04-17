@@ -81,7 +81,7 @@
 
 			{#each ITEMS as item, i (item.id)}
 				<div class="quiz-item">
-					<div class="clip-row question-row">
+					<div class="card-row question-row">
 						<p class="quiz-question">{item.question}</p>
 					</div>
 					<div
@@ -172,7 +172,7 @@
 		text-align: left;
 	}
 
-	.clip-row {
+	.card-row {
 		padding: 0.85em 1em;
 		margin-bottom: 0.45em;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
@@ -228,7 +228,7 @@
 	}
 
 	@media (max-width: 480px) {
-		.clip-row {
+		.card-row {
 			gap: 0.5em;
 		}
 

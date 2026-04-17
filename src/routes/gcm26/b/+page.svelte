@@ -191,22 +191,29 @@
 			</div>
 
 			{#if !allCompleted}
-				<div class="clip-row {guessRowStatus === 'wrong' ? 'wrong' : ''}">
-					<button type="button" onclick={() => submitGuess()} disabled={!guessInput.trim()}>
-						Submit
-					</button>
-				</div>
-				<div class="input-row">
-					<input
-						type="text"
-						placeholder="Song title"
-						bind:value={guessInput}
-						autocomplete="off"
-						disabled={allCompleted}
-						onkeydown={(e) => e.key === 'Enter' && submitGuess()}
-					/>
-				</div>
-			{/if}
+			<div class="card-row {guessRowStatus === 'wrong' ? 'wrong' : ''}">
+				<button type="button" onclick={() => submitGuess()} disabled={!guessInput.trim()}>
+					Submit
+				</button>
+			</div>
+			<div class="input-row">
+				<input
+					type="text"
+					placeholder="Song title"
+					bind:value={guessInput}
+					autocomplete="off"
+					disabled={allCompleted}
+					aria-invalid={guessRowStatus === 'wrong'}
+					aria-describedby="gcm26b-guess-status"
+					onkeydown={(e) => e.key === 'Enter' && submitGuess()}
+				/>
+			</div>
+			<p id="gcm26b-guess-status" class="field-feedback" role="status" aria-live="polite">
+				{#if guessRowStatus === 'wrong'}
+					Song not recognized. Try again.
+				{/if}
+			</p>
+		{/if}
 
 			{#if solvedTracksOrdered.length > 0}
 				<div class="solved-titles">
@@ -272,7 +279,7 @@
 		opacity: 0;
 	}
 
-	.clip-row button[type='button'] {
+	.card-row button[type='button'] {
 		font-size: 1.05em;
 		padding: 0.55em 1em;
 		border-radius: 0.5em;
@@ -283,9 +290,23 @@
 		cursor: pointer;
 	}
 
-	.clip-row button[type='button']:disabled {
+	.card-row button[type='button']:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	.field-feedback {
+		margin: 0.35rem 0 0;
+		min-height: 1.25em;
+		font-size: 0.875rem;
+		text-align: center;
+		color: var(--color-text);
+		line-height: 1.35;
+	}
+
+	.card-row.wrong ~ .input-row + .field-feedback {
+		color: var(--color-error-text);
+		font-weight: 600;
 	}
 
 	.solved-titles {

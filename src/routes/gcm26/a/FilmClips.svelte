@@ -96,7 +96,7 @@
 				onerror={() => onClipError(i)}
 			></video>
 		</div>
-		<div class="clip-row {clipStates[i].status}">
+		<div class="card-row {clipStates[i].status}">
 			<button
 				type="button"
 				class="play-btn"
@@ -165,7 +165,7 @@
 		line-height: 1.35;
 	}
 
-	.clip-row.wrong ~ .input-row + .field-feedback {
+	.card-row.wrong ~ .input-row + .field-feedback {
 		color: var(--color-error-text);
 		font-weight: 600;
 	}
@@ -190,7 +190,7 @@
 		justify-content: center;
 	}
 
-	.clip-row.correct {
+	.card-row.correct {
 		background: var(--color-success-bg-strong);
 		border-color: var(--color-success-border);
 		color: var(--color-success-text);
@@ -233,7 +233,7 @@
 		cursor: not-allowed;
 	}
 
-	.clip-row button[type='button']:not(.play-btn) {
+	.card-row button[type='button']:not(.play-btn) {
 		font-size: 1.05em;
 		padding: 0.55em 1em;
 		border-radius: 0.5em;
@@ -244,7 +244,7 @@
 		cursor: pointer;
 	}
 
-	.clip-row button[type='button']:not(.play-btn):disabled {
+	.card-row button[type='button']:not(.play-btn):disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}

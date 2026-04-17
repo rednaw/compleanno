@@ -8,7 +8,7 @@
 
 /* ── Card-style row ─────────────────────────────────────────── */
 
-.clip-row {
+.card-row {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -27,7 +27,7 @@
 	box-sizing: border-box;
 }
 
-.clip-row.wrong {
+.card-row.wrong {
 	background: var(--color-error-bg);
 	border-color: var(--color-error-border);
 	color: var(--color-error-text);
@@ -78,7 +78,7 @@
 /* ── Responsive ─────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-	.clip-row {
+	.card-row {
 		font-size: 0.95em;
 		gap: 0.5em;
 	}

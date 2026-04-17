@@ -61,7 +61,7 @@
 <div class="common-section" class:common-disabled={!enabled}>
 	<p class="common-question">{COMMON_QUESTION}</p>
 	<div
-		class="clip-row {status === 'correct' ? 'correct' : ''} {status === 'wrong' ? 'wrong' : ''}"
+		class="card-row {status === 'correct' ? 'correct' : ''} {status === 'wrong' ? 'wrong' : ''}"
 	>
 		{#if status !== 'correct'}
 			<button
@@ -119,7 +119,7 @@
 		line-height: 1.35;
 	}
 
-	.clip-row button[type='button'] {
+	.card-row button[type='button'] {
 		font-size: 1.05em;
 		padding: 0.55em 1em;
 		border-radius: 0.5em;
@@ -130,7 +130,7 @@
 		cursor: pointer;
 	}
 
-	.clip-row button[type='button']:disabled {
+	.card-row button[type='button']:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}
@@ -153,7 +153,7 @@
 		line-height: 1.35;
 	}
 
-	.clip-row.wrong ~ .input-row + .field-feedback {
+	.card-row.wrong ~ .input-row + .field-feedback {
 		color: var(--color-error-text);
 		font-weight: 600;
 	}
