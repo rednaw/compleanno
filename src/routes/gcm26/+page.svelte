@@ -1,10 +1,35 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
+	import { loadPuzzleState, savePuzzleState, clearPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import { gcm26HubImage } from './hub-images.js';
 	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
+
+	// ── DEV_MODE ── set to false (or delete this block) before release ──
+	const DEV_MODE = true;
+
+	const devKeys = [
+		{ label: 'A', key: gcm26Keys.gameADone,  get done() { return gameADone; } },
+		{ label: 'B', key: gcm26Keys.gameBDone,  get done() { return gameBDone; } },
+		{ label: 'C', key: gcm26Keys.gameCDone,  get done() { return gameCDone; } },
+		{ label: 'D', key: gcm26Keys.gameDDone,  get done() { return gameDDone; } },
+		{ label: '🔑', key: gcm26Keys.codeDone, get done() { return codeDone; } },
+	];
+
+	function devToggle(idx) {
+		const dk = devKeys[idx];
+		const states = [gameADone, gameBDone, gameCDone, gameDDone, codeDone];
+		const next = !states[idx];
+		if (next) savePuzzleState(dk.key, '1');
+		else clearPuzzleState(dk.key);
+		if (idx === 0) gameADone = next;
+		else if (idx === 1) gameBDone = next;
+		else if (idx === 2) gameCDone = next;
+		else if (idx === 3) gameDDone = next;
+		else codeDone = next;
+	}
+	// ── /DEV_MODE ──
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
@@ -47,6 +72,15 @@
 
 <main>
 		<ClearProgressButton onClear={clearGlobalState} />
+		{#if DEV_MODE}
+			<div class="dev-bar">
+				{#each devKeys as dk, i (dk.label)}
+					<button class="dev-btn" class:dev-on={dk.done} onclick={() => devToggle(i)}>
+						{dk.label}
+					</button>
+				{/each}
+			</div>
+		{/if}
 		<div class="content">
 			<div class="games-grid">
 				<a href={resolve('/gcm26/a')} class="game-button" class:game-button-solved={gameADone}>
@@ -193,4 +227,36 @@
 		color: var(--color-text);
 		margin: 1rem 0;
 	}
+
+	/* ── DEV_MODE styles ── */
+	.dev-bar {
+		position: fixed;
+		top: 0;
+		right: 0;
+		z-index: 999;
+		display: flex;
+		gap: 2px;
+		padding: 4px;
+		background: rgba(0, 0, 0, 0.6);
+		border-bottom-left-radius: 6px;
+	}
+
+	.dev-btn {
+		font-size: 0.7rem;
+		padding: 3px 7px;
+		border: 1px solid #888;
+		border-radius: 3px;
+		background: #333;
+		color: #ccc;
+		cursor: pointer;
+		font-weight: 600;
+		line-height: 1;
+	}
+
+	.dev-btn.dev-on {
+		background: #2e7d32;
+		border-color: #4caf50;
+		color: #fff;
+	}
+	/* ── /DEV_MODE styles ── */
 </style>
