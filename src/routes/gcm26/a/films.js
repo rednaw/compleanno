@@ -27,41 +27,7 @@ if (import.meta.env.DEV) {
 	}
 }
 
-/**
- * @param {string} s
- */
-export function normalizeFilmTitle(s) {
-	return s
-		.toLowerCase()
-		.normalize('NFD')
-		.replace(/\p{M}/gu, '')
-		.replace(/[^a-z0-9\s]/gu, ' ')
-		.replace(/\s+/g, ' ')
-		.trim();
-}
-
-/**
- * Exact match after normalization (case, accents, punctuation). No typo tolerance.
- * @param {string} guess
- * @param {string} canonicalTitle
- */
-export function filmTitleMatches(guess, canonicalTitle) {
-	const u = normalizeFilmTitle(guess);
-	const c = normalizeFilmTitle(canonicalTitle);
-	if (!u || !c) return false;
-	const stripThe = (x) => x.replace(/^the\s+/, '');
-	const pairs = [
-		[u, c],
-		[stripThe(u), stripThe(c)],
-		[u, stripThe(c)],
-		[stripThe(u), c]
-	];
-	for (const [a, b] of pairs) {
-		if (!a || !b) continue;
-		if (a === b) return true;
-	}
-	return false;
-}
+export { normalizeAnswer as normalizeFilmTitle, answerMatches as filmTitleMatches } from '../normalize.js';
 
 /** @type {{ id: string; title: string; url?: string }[]} */
 export const films = manifest.clips;

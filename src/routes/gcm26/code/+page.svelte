@@ -33,9 +33,7 @@
 		if (solved) return;
 		try {
 			localStorage.setItem(gcm26Keys.codeOrder, JSON.stringify(orderIds));
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	}
 
 	function loadSavedOrder() {
@@ -80,9 +78,7 @@
 				const saved = loadSavedOrder();
 				if (saved) orderIds = saved;
 			}
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	});
 </script>
 

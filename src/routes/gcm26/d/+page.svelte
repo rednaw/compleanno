@@ -35,9 +35,7 @@
 			if (loadPuzzleState(gcm26Keys.gameDDone)) {
 				allCompleted = true;
 			}
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	});
 </script>
 

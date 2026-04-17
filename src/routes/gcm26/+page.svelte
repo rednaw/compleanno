@@ -46,23 +46,18 @@
 			gameCDone = loadPuzzleState(gcm26Keys.gameCDone);
 			gameDDone = loadPuzzleState(gcm26Keys.gameDDone);
 			codeDone = loadPuzzleState(gcm26Keys.codeDone);
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	});
 
 	function clearGlobalState() {
 		try {
-			/** Must stay in sync with `GCM26_STORAGE_PREFIX` / `gcm26Keys`. */
 			clearPuzzleKeyPrefix(GCM26_STORAGE_PREFIX);
 			gameADone = false;
 			gameBDone = false;
 			gameCDone = false;
 			gameDDone = false;
 			codeDone = false;
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	}
 </script>
 

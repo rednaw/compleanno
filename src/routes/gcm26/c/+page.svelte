@@ -9,14 +9,10 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
+	import { answerMatches } from '../normalize.js';
 	import { ITEMS } from './items.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 	import '../quiz-shared.css';
-
-	/** @param {string} s */
-	function normalizeAnswer(s) {
-		return s.trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/\s+/g, ' ');
-	}
 
 	/** @type {string[]} */
 	let guesses = $state(ITEMS.map(() => ''));
@@ -42,7 +38,7 @@
 		const g = guesses[index];
 		if (!g.trim()) return;
 		const expected = ITEMS[index].answer;
-		if (normalizeAnswer(g) === normalizeAnswer(expected)) {
+		if (answerMatches(g, expected)) {
 			rowStatus[index] = 'correct';
 			guesses[index] = expected;
 			savePuzzleState(gcm26CItemKey(ITEMS[index].id), '1');
@@ -67,9 +63,7 @@
 			} else {
 				checkAllCompleted();
 			}
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	});
 </script>
 

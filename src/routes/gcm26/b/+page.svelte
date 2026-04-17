@@ -10,6 +10,7 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
+	import { answerMatches } from '../normalize.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 	import '../quiz-shared.css';
 
@@ -48,10 +49,6 @@
 
 	function trackSrc(id) {
 		return `${base}/gcm26/b/${id}.mp3`;
-	}
-
-	function titleMatches(guess, title) {
-		return guess.trim().toLowerCase() === title.trim().toLowerCase();
 	}
 
 	function applySolvedToAudios() {
@@ -109,7 +106,7 @@
 		if (!g.trim()) return;
 
 		const unsolved = tracks.filter((t) => !solved[t.id]);
-		const matches = unsolved.filter((t) => titleMatches(g, t.title));
+		const matches = unsolved.filter((t) => answerMatches(g, t.title));
 
 		if (matches.length === 1) {
 			const t = matches[0];
@@ -141,25 +138,29 @@
 
 	onMount(() => {
 		try {
-		tracks.forEach((t) => {
-			if (loadPuzzleState(gcm26BSolvedKey(t.id))) {
-				solved[t.id] = true;
-			}
-		});
+			tracks.forEach((t) => {
+				if (loadPuzzleState(gcm26BSolvedKey(t.id))) {
+					solved[t.id] = true;
+				}
+			});
 
 			if (loadPuzzleState(gcm26Keys.gameBDone)) {
 				allCompleted = true;
 			} else {
 				checkAllCompleted();
 			}
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 
 		void tick().then(() => {
 			applySolvedToAudios();
 			if (!allCompleted) startMix();
 		});
+
+		return () => {
+			for (const a of Object.values(audioById)) {
+				if (a) { a.pause(); a.currentTime = 0; }
+			}
+		};
 	});
 </script>
 

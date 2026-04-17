@@ -221,9 +221,7 @@
 		}
 
 			checkAllCompleted();
-		} catch {
-			void 0;
-		}
+		} catch { /* localStorage may be unavailable */ }
 	});
 </script>
 
