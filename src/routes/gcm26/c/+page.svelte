@@ -186,13 +186,13 @@
 	}
 
 	.answer-row-wrong {
-		background: #ffcdd2;
-		border-color: #d32f2f;
-		color: #b71c1c;
+		background: var(--color-error-bg);
+		border-color: var(--color-error-border);
+		color: var(--color-error-text);
 	}
 
 	.answer-row-wrong input[type='text'] {
-		border-color: rgba(211, 47, 47, 0.55);
+		border-color: color-mix(in srgb, var(--color-error-border) 55%, transparent);
 	}
 
 	.answer-row button[type='button'] {
@@ -224,7 +224,7 @@
 
 	.feedback.correct {
 		font-size: 1.5em;
-		color: #388e3c;
+		color: var(--color-success-border);
 	}
 
 	@media (max-width: 480px) {

@@ -193,8 +193,8 @@
 	}
 
 	.order-list-wrong {
-		border-color: #d32f2f;
-		background: #ffcdd2;
+		border-color: var(--color-error-border);
+		background: var(--color-error-bg);
 	}
 
 	.order-row {
@@ -281,7 +281,7 @@
 		font-weight: 600;
 		margin: 0 0 1rem;
 		font-size: 0.95rem;
-		color: #b71c1c;
+		color: var(--color-error-text);
 	}
 
 	@media (max-width: 480px) {

@@ -251,8 +251,8 @@
 	}
 
 	.answer-row-solved {
-		background: #e8f5e9;
-		border-color: #388e3c;
+		background: var(--color-success-bg);
+		border-color: var(--color-success-border);
 	}
 
 	.answer-row .code-cell {
@@ -260,13 +260,13 @@
 	}
 
 	.answer-row-wrong {
-		background: #ffcdd2;
-		border-color: #d32f2f;
-		color: #b71c1c;
+		background: var(--color-error-bg);
+		border-color: var(--color-error-border);
+		color: var(--color-error-text);
 	}
 
 	.answer-row-wrong .code-cell {
-		border-color: rgba(211, 47, 47, 0.6);
+		border-color: color-mix(in srgb, var(--color-error-border) 60%, transparent);
 	}
 
 	.answer-row button[type='button'] {
@@ -301,7 +301,7 @@
 	}
 
 	.feedback.correct {
-		color: #388e3c;
+		color: var(--color-success-border);
 	}
 
 	.field-feedback {
@@ -314,12 +314,12 @@
 	}
 
 	.answer-row-wrong + .field-feedback {
-		color: #b71c1c;
+		color: var(--color-error-text);
 		font-weight: 600;
 	}
 
 	.answer-row-solved + .field-feedback {
-		color: #1b5e20;
+		color: var(--color-success-text);
 		font-weight: 600;
 	}
 </style>

@@ -141,7 +141,7 @@
 	}
 
 	.feedback.correct {
-		color: #388e3c;
+		color: var(--color-success-border);
 	}
 
 	.field-feedback {
@@ -154,12 +154,12 @@
 	}
 
 	.clip-row.wrong ~ .input-row + .field-feedback {
-		color: #b71c1c;
+		color: var(--color-error-text);
 		font-weight: 600;
 	}
 
 	.input-row-solved + .field-feedback {
-		color: #1b5e20;
+		color: var(--color-success-text);
 		font-weight: 600;
 	}
 </style>

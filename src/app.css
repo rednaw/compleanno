@@ -25,6 +25,15 @@
 	--color-close: #ffc107;
 	--color-missing: #90a4ae;
 
+	/* Feedback colors */
+	--color-error-bg: #ffcdd2;
+	--color-error-border: #d32f2f;
+	--color-error-text: #b71c1c;
+	--color-success-bg: #e8f5e9;
+	--color-success-bg-strong: #a5d6a7;
+	--color-success-border: #388e3c;
+	--color-success-text: #1b5e20;
+
 	/* Fonts */
 	--font-body:
 		Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,

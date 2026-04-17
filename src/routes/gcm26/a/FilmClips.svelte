@@ -166,12 +166,12 @@
 	}
 
 	.clip-row.wrong ~ .input-row + .field-feedback {
-		color: #b71c1c;
+		color: var(--color-error-text);
 		font-weight: 600;
 	}
 
 	.input-row-solved + .field-feedback {
-		color: #1b5e20;
+		color: var(--color-success-text);
 		font-weight: 600;
 	}
 
@@ -191,9 +191,9 @@
 	}
 
 	.clip-row.correct {
-		background: #a5d6a7;
-		border-color: #388e3c;
-		color: #1b5e20;
+		background: var(--color-success-bg-strong);
+		border-color: var(--color-success-border);
+		color: var(--color-success-text);
 	}
 
 	.clip-video {
@@ -255,7 +255,7 @@
 	}
 
 	.feedback.correct {
-		color: #388e3c;
+		color: var(--color-success-border);
 	}
 
 	@media (max-width: 480px) {
