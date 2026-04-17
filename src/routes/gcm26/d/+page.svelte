@@ -1,65 +1,39 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { savePuzzleState, loadPuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
-	import { gcm26DClueKey, gcm26Keys } from '../storage-keys.js';
+	import { gcm26Keys } from '../storage-keys.js';
 	import { INTRO_TEXT, QUESTION_STEM, PARTIES, CLUES } from './clues.js';
 	import ResultFullscreen from '../ResultFullscreen.svelte';
 	import '../quiz-shared.css';
 
 	/** @type {string[]} */
 	let answers = $state(CLUES.map(() => ''));
-	/** @type {('idle' | 'wrong' | 'correct')[]} */
-	let rowStatus = $state(CLUES.map(() => /** @type {'idle'} */ ('idle')));
-
 	let allCompleted = $state(false);
+	let showWrong = $state(false);
 
 	const allFilled = $derived(answers.every((a) => a !== ''));
-	const solvedCount = $derived(rowStatus.filter((s) => s === 'correct').length);
 
 	function checkAnswers() {
 		if (!allFilled || allCompleted) return;
 
-		let allCorrect = true;
-		CLUES.forEach((clue, i) => {
-			if (rowStatus[i] === 'correct') return;
-			if (answers[i] === clue.answer) {
-				rowStatus[i] = 'correct';
-				savePuzzleState(gcm26DClueKey(clue.id), '1');
-			} else {
-				rowStatus[i] = 'wrong';
-				answers[i] = '';
-				allCorrect = false;
-			}
-		});
-
-		if (allCorrect && rowStatus.every((s) => s === 'correct')) {
+		const allCorrect = CLUES.every((clue, i) => answers[i] === clue.answer);
+		if (allCorrect) {
 			allCompleted = true;
 			savePuzzleState(gcm26Keys.gameDDone, '1');
+		} else {
+			showWrong = true;
+			answers = CLUES.map(() => '');
+			setTimeout(() => { showWrong = false; }, 1200);
 		}
-	}
-
-	/** @param {number} i */
-	function onSelect(i) {
-		if (rowStatus[i] === 'wrong') rowStatus[i] = 'idle';
 	}
 
 	onMount(() => {
 		try {
-			CLUES.forEach((clue, i) => {
-				if (loadPuzzleState(gcm26DClueKey(clue.id))) {
-					rowStatus[i] = 'correct';
-					answers[i] = clue.answer;
-				}
-			});
-
 			if (loadPuzzleState(gcm26Keys.gameDDone)) {
 				allCompleted = true;
-			} else if (rowStatus.every((s) => s === 'correct')) {
-				allCompleted = true;
-				savePuzzleState(gcm26Keys.gameDDone, '1');
 			}
 		} catch {
 			void 0;
@@ -83,17 +57,12 @@
 
 		<div class="clue-list">
 			{#each CLUES as clue, i (clue.id)}
-				<div
-					class="clue-row"
-					class:clue-correct={rowStatus[i] === 'correct'}
-					class:clue-wrong={rowStatus[i] === 'wrong'}
-				>
+				<div class="clue-row">
 					<p class="clue-text">{clue.text}</p>
 					<select
 						class="clue-select"
 						bind:value={answers[i]}
-						disabled={rowStatus[i] === 'correct'}
-						onchange={() => onSelect(i)}
+						disabled={allCompleted}
 					>
 						<option value="">—</option>
 						{#each PARTIES as party (party)}
@@ -106,13 +75,13 @@
 
 		{#if !allCompleted}
 			<div class="check-row">
-				<p class="progress-hint" aria-live="polite">
-					{solvedCount} / {CLUES.length} correct
-				</p>
+				{#if showWrong}
+					<p class="wrong-hint" aria-live="polite">Fout! Probeer opnieuw.</p>
+				{/if}
 				<button
 					type="button"
 					class="check-btn"
-					disabled={!allFilled}
+					disabled={!allFilled || showWrong}
 					onclick={checkAnswers}
 				>
 					Controleer
@@ -194,19 +163,6 @@
 		background: var(--color-white);
 		border: 2px solid var(--color-border);
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-		transition:
-			border-color 0.2s,
-			background 0.2s;
-	}
-
-	.clue-correct {
-		background: #e8f5e9;
-		border-color: #388e3c;
-	}
-
-	.clue-wrong {
-		background: #ffcdd2;
-		border-color: #d32f2f;
 	}
 
 	.clue-text {
@@ -233,18 +189,6 @@
 		min-width: 5.5rem;
 	}
 
-	.clue-correct .clue-select {
-		background: transparent;
-		border-color: rgba(56, 142, 60, 0.45);
-		color: #1b5e20;
-		font-weight: 600;
-		cursor: default;
-	}
-
-	.clue-wrong .clue-select {
-		border-color: rgba(211, 47, 47, 0.55);
-	}
-
 	.check-row {
 		display: flex;
 		flex-direction: column;
@@ -253,10 +197,10 @@
 		margin-bottom: 1rem;
 	}
 
-	.progress-hint {
-		font-size: 0.9rem;
-		font-weight: 600;
-		color: var(--color-white);
+	.wrong-hint {
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: #ffcdd2;
 		margin: 0;
 	}
 
