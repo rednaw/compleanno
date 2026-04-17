@@ -117,6 +117,7 @@
 		min-height: 105vh;
 		display: flex;
 		background: var(--color-background);
+		width: 100%;
 	}
 
 	.content {
@@ -146,7 +147,7 @@
 		color: var(--color-text);
 		text-decoration: none;
 		font-size: 2rem;
-		padding: 2rem;
+		padding: 0;
 		background: var(--color-white);
 		border: 2px solid var(--color-border);
 		border-radius: 0.5rem;
@@ -154,32 +155,25 @@
 		font-weight: 500;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 		aspect-ratio: 1;
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
-	}
-
-	.game-button-solved {
-		padding: 0;
+		box-sizing: border-box;
 	}
 
 	.hub-img {
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		object-fit: contain;
 		display: block;
 	}
 
 	.code-button {
 		font-size: 3rem;
-		padding: 3rem;
-		max-width: 200px;
+		max-width: 170px;
 		margin: 0 auto;
-	}
-
-	.code-button-solved {
-		padding: 0;
 	}
 
 	.code-button-disabled {
@@ -212,12 +206,10 @@
 		}
 
 		.game-button {
-			padding: 1.5rem;
 			font-size: 1.75rem;
 		}
 
 		.code-button {
-			padding: 2rem;
 			font-size: 2.5rem;
 		}
 	}
