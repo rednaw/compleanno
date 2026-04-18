@@ -7,7 +7,7 @@
 	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
 
 	// ── DEV_MODE ── set to false (or delete this block) before release ──
-	const DEV_MODE = false;
+	const DEV_MODE = true;
 
 	const devKeys = [
 		{ label: 'A', key: gcm26Keys.gameADone,  get done() { return gameADone; } },
