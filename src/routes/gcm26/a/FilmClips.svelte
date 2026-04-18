@@ -82,6 +82,7 @@
 	});
 </script>
 
+<div class="film-clips-root" data-phase-complete={done}>
 {#each films as film, i (film.id)}
 	<div class="clip-container">
 		<div class="clip-preview">
@@ -149,8 +150,13 @@
 		</p>
 	</div>
 {/each}
+</div>
 
 <style>
+	.film-clips-root {
+		width: 100%;
+	}
+
 	.clip-container {
 		margin-bottom: 1.5em;
 		width: 100%;

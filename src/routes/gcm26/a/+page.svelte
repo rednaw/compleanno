@@ -19,11 +19,6 @@
 
 	const allCompleted = $derived(previouslyDone || (filmsDone && commonDone && codeDone));
 
-	/** @type {CommonQuestion} */
-	let commonRef;
-	/** @type {FinalCode} */
-	let codeRef;
-
 	$effect(() => {
 		if (allCompleted) savePuzzleState(gcm26Keys.gameADone, '1');
 	});
@@ -34,8 +29,6 @@
 				previouslyDone = true;
 			}
 		} catch { /* localStorage may be unavailable */ }
-		commonRef.restore(filmsDone);
-		codeRef.restore(commonDone);
 	});
 </script>
 
@@ -48,8 +41,12 @@
 <main>
 	<div class="content-wrap">
 		<FilmClips bind:done={filmsDone} />
-		<CommonQuestion bind:this={commonRef} enabled={filmsDone} bind:done={commonDone} />
-		<FinalCode bind:this={codeRef} enabled={commonDone} bind:done={codeDone} />
+		{#if filmsDone}
+			<CommonQuestion bind:done={commonDone} />
+		{/if}
+		{#if commonDone}
+			<FinalCode bind:done={codeDone} />
+		{/if}
 
 		{#if allCompleted}
 			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.a}" />

@@ -1,17 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import { FINAL_HINT_SEGMENTS, FINAL_CODE_ANSWER } from './films.js';
-	import {
-		saveFinalCodeProgress,
-		loadFinalCodeProgress,
-		clearFinalCodeProgress
-	} from './persistence.js';
+	import { saveFinalCodeProgress, loadFinalCodeProgress } from './persistence.js';
 
 	const CODE_LEN = FINAL_CODE_ANSWER.length;
 	const CELL_INDEXES = Array.from({ length: CODE_LEN }, (_, i) => i);
 
-	/** @type {{ enabled: boolean; done: boolean }} */
-	let { enabled, done = $bindable(false) } = $props();
+	/** @type {{ done: boolean }} */
+	let { done = $bindable(false) } = $props();
 
 	/** @type {string[]} */
 	let cells = $state(Array.from({ length: CODE_LEN }, () => ''));
@@ -19,12 +15,6 @@
 	let status = $state(/** @type {'not-started' | 'wrong' | 'correct'} */ ('not-started'));
 
 	const allFilled = $derived(cells.every((c) => (c || '').length > 0));
-
-	function reset() {
-		status = 'not-started';
-		cells = Array.from({ length: CODE_LEN }, () => '');
-		clearFinalCodeProgress();
-	}
 
 	/** @param {number} index */
 	function onInput(index) {
@@ -35,7 +25,7 @@
 	}
 
 	function check() {
-		if (!enabled || status === 'correct') return;
+		if (status === 'correct') return;
 		const attempt = cells.join('').toLowerCase();
 		if (attempt.length !== CODE_LEN) return;
 
@@ -52,33 +42,28 @@
 		}
 	}
 
-	/**
-	 * Called by the parent after mount to restore persisted state.
-	 * Resets if the common question isn't solved yet.
-	 * @param {boolean} commonOk
-	 */
-	export function restore(commonOk) {
+	function restore() {
 		try {
-			if (commonOk) {
-				const parsed = loadFinalCodeProgress();
-				if (
-					parsed &&
-					parsed.status === 'correct' &&
-					Array.isArray(parsed.cells) &&
-					parsed.cells.length === CODE_LEN
-				) {
-					status = 'correct';
-					cells = [...parsed.cells];
-					done = true;
-				}
+			const parsed = loadFinalCodeProgress();
+			if (
+				parsed &&
+				parsed.status === 'correct' &&
+				Array.isArray(parsed.cells) &&
+				parsed.cells.length === CODE_LEN
+			) {
+				status = 'correct';
+				cells = [...parsed.cells];
+				done = true;
 			}
-
-			if (!commonOk) reset();
 		} catch { /* localStorage may be unavailable */ }
 	}
+
+	onMount(() => {
+		restore();
+	});
 </script>
 
-<div class="final-code-section" class:section-disabled={!enabled}>
+<div class="final-code-section" data-phase-complete={done}>
 	<p class="heading">Suggerimento</p>
 	<div class="code-cells-row">
 		{#each FINAL_HINT_SEGMENTS as seg, hi (hi)}
@@ -108,21 +93,19 @@
 				autocorrect="off"
 				spellcheck="false"
 				bind:value={cells[ci]}
-				disabled={!enabled}
 				readonly={status === 'correct'}
 				aria-label="Codice carattere {ci + 1}"
 				aria-invalid={status === 'wrong'}
 				aria-describedby="gcm26a-code-status"
 				oninput={() => onInput(ci)}
-				onkeydown={(e) =>
-					status !== 'correct' && enabled && e.key === 'Enter' && check()}
+				onkeydown={(e) => status !== 'correct' && e.key === 'Enter' && check()}
 			/>
 		{/each}
 		{#if status !== 'correct'}
 			<button
 				type="button"
 				onclick={() => check()}
-				disabled={!enabled || !allFilled}
+				disabled={!allFilled}
 			>
 				Controlla
 			</button>
@@ -146,10 +129,6 @@
 		width: 100%;
 		margin-top: 1.25rem;
 		margin-bottom: 0.5rem;
-	}
-
-	.final-code-section.section-disabled {
-		opacity: 0.72;
 	}
 
 	.heading {

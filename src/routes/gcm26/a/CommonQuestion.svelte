@@ -1,10 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
 	import { filmTitleMatches, COMMON_QUESTION, COMMON_ANSWER } from './films.js';
-	import { saveCommonProgress, loadCommonProgress, clearCommonProgress } from './persistence.js';
+	import { saveCommonProgress, loadCommonProgress } from './persistence.js';
 
-	/** @type {{ enabled: boolean; done: boolean }} */
-	let { enabled, done = $bindable(false) } = $props();
+	/** @type {{ done: boolean }} */
+	let { done = $bindable(false) } = $props();
 
 	let guess = $state('');
 	let feedback = $state('');
@@ -12,7 +12,7 @@
 	let status = $state(/** @type {'not-started' | 'correct' | 'wrong'} */ ('not-started'));
 
 	function check() {
-		if (!enabled || !guess.trim()) return;
+		if (!guess.trim()) return;
 
 		if (filmTitleMatches(guess, COMMON_ANSWER)) {
 			feedback = 'correct';
@@ -28,12 +28,7 @@
 		saveCommonProgress({ status, feedback, guess });
 	}
 
-	/**
-	 * Called by the parent after mount to restore persisted state.
-	 * Resets to not-started if films aren't all solved yet.
-	 * @param {boolean} filmsOk
-	 */
-	export function restore(filmsOk) {
+	function restore() {
 		try {
 			const parsed = loadCommonProgress();
 			if (parsed) {
@@ -46,19 +41,16 @@
 				}
 			}
 
-			if (status === 'correct' && !filmsOk) {
-				status = 'not-started';
-				feedback = '';
-				guess = '';
-				clearCommonProgress();
-			}
-
 			done = status === 'correct';
 		} catch { /* localStorage may be unavailable */ }
 	}
+
+	onMount(() => {
+		restore();
+	});
 </script>
 
-<div class="common-section" class:common-disabled={!enabled}>
+<div class="common-section" data-phase-complete={done}>
 	<p class="common-question">{COMMON_QUESTION}</p>
 	<div
 		class="card-row {status === 'correct' ? 'correct' : ''} {status === 'wrong' ? 'wrong' : ''}"
@@ -67,7 +59,7 @@
 			<button
 				type="button"
 				onclick={() => check()}
-				disabled={!enabled || !guess.trim() || status === 'correct'}
+				disabled={!guess.trim() || status === 'correct'}
 			>
 				Controlla
 			</button>
@@ -80,14 +72,13 @@
 	<div class="input-row" class:input-row-solved={status === 'correct'}>
 		<input
 			type="text"
-			placeholder={enabled ? 'La tua risposta' : 'Indovina prima tutti i film'}
+			placeholder="La tua risposta"
 			bind:value={guess}
 			autocomplete="off"
-			disabled={!enabled}
 			readonly={status === 'correct'}
 			aria-invalid={status === 'wrong'}
 			aria-describedby="gcm26a-common-status"
-			onkeydown={(e) => status !== 'correct' && enabled && e.key === 'Enter' && check()}
+			onkeydown={(e) => status !== 'correct' && e.key === 'Enter' && check()}
 		/>
 	</div>
 	<p id="gcm26a-common-status" class="field-feedback" role="status" aria-live="polite">
@@ -104,10 +95,6 @@
 		width: 100%;
 		margin-top: 0.5rem;
 		margin-bottom: 0.5rem;
-	}
-
-	.common-section.common-disabled {
-		opacity: 0.72;
 	}
 
 	.common-question {
