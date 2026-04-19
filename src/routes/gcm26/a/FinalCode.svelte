@@ -36,9 +36,7 @@
 			saveFinalCodeProgress({ status, cells });
 		} else {
 			status = 'wrong';
-			const ansChars = FINAL_CODE_ANSWER.split('');
-			const guessChars = attempt.split('');
-			cells = ansChars.map((ch, i) => (guessChars[i] === ch ? ch : ''));
+			cells = Array.from({ length: CODE_LEN }, () => '');
 		}
 	}
 
@@ -117,7 +115,7 @@
 	</div>
 	<p id="gcm26a-code-status" class="field-feedback" role="status" aria-live="polite">
 		{#if status === 'wrong'}
-			Codice non corretto. Le lettere indovinate restano.
+			Codice non corretto. Riprova da capo.
 		{:else if status === 'correct'}
 			Codice corretto.
 		{/if}
