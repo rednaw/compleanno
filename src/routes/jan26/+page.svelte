@@ -27,14 +27,26 @@
 		{ type: 'text', value: 'θ', tone: 'white', top: '64%', left: '94%', rotate: 15, scale: 1.05, delay: '1.8s' },
 		{ type: 'icon', icon: 'code', tone: 'lilac', top: '42%', left: '0%', rotate: -12, scale: 0.95, delay: '1s' }
 	];
+	
+	let opened = $state(false);
+	let opening = $state(false);
+
+	function openPresent() {
+		if (opened || opening) return;
+		opening = true;
+		window.setTimeout(() => {
+			opened = true;
+			opening = false;
+		}, 900);
+	}
 </script>
 
 <svelte:head>
-	<title>3 oktober 2026</title>
+	<title>Gefeliciteerd!</title>
 </svelte:head>
 
-<main>
-	<div class="playground" aria-hidden="true">
+<main class:revealed={opened}>
+	<div class="playground" class:visible={opened} aria-hidden={!opened}>
 		{#each decorations as item, i (i)}
 			<div
 				class="floaty floaty--{item.tone}"
@@ -192,22 +204,47 @@
 		{/each}
 	</div>
 
-	<article class="invitation">
-		<h1 class="date">3 oktober 2026</h1>
-		<p class="message">
-			Een dagje naar de Wetenschapsdag Amsterdam Science Park met je familie!
-		</p>
-		<p class="link-row">
-			<a
-				class="event-link"
-				href="https://wetenschapsdagamsterdamsciencepark.nl/"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				wetenschapsdagamsterdamsciencepark.nl
-			</a>
-		</p>
-	</article>
+	<div class="center-stage">
+		<button
+			type="button"
+			class="present-trigger"
+			class:opening
+			class:opened
+			onclick={openPresent}
+			disabled={opened || opening}
+			aria-label="Open het cadeau"
+			aria-hidden={opened}
+		>
+			<div class="present" aria-hidden="true">
+				<div class="present-lid">
+					<div class="ribbon ribbon-h"></div>
+					<div class="bow"></div>
+				</div>
+				<div class="present-base">
+					<div class="ribbon ribbon-v"></div>
+				</div>
+			</div>
+			<span class="present-hint">Tik om te openen</span>
+		</button>
+
+		<article class="invitation" class:revealed={opened} aria-hidden={!opened}>
+			<h1 class="headline">Gefeliciteerd!</h1>
+			<p class="event-date">3 oktober 2026</p>
+			<p class="message">
+				Een dagje naar de Wetenschapsdag Amsterdam Science Park met je familie!
+			</p>
+			<p class="link-row">
+				<a
+					class="event-link"
+					href="https://wetenschapsdagamsterdamsciencepark.nl/"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					wetenschapsdagamsterdamsciencepark.nl
+				</a>
+			</p>
+		</article>
+	</div>
 </main>
 
 <style>
@@ -234,6 +271,178 @@
 		z-index: 0;
 		pointer-events: none;
 		overflow: hidden;
+		opacity: 0;
+		transition: opacity 0.6s ease 0.15s;
+	}
+
+	.playground.visible {
+		opacity: 1;
+	}
+
+	.center-stage {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		width: 100%;
+		max-width: 22rem;
+		margin: 0 auto;
+	}
+
+	.present-trigger {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		margin: 1.25rem auto 0;
+		padding: 0;
+		border: none;
+		background: none;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition: opacity 0.35s ease, transform 0.35s ease;
+	}
+
+	.present-trigger:disabled:not(.opening) {
+		cursor: default;
+	}
+
+	.present-trigger.opened {
+		opacity: 0;
+		transform: scale(0.92);
+		pointer-events: none;
+		position: absolute;
+		visibility: hidden;
+	}
+
+	.present-hint {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-lilac);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+		transition: opacity 0.25s ease;
+	}
+
+	.present-trigger.opening .present-hint,
+	.present-trigger.opened .present-hint {
+		opacity: 0;
+	}
+
+	.present {
+		position: relative;
+		width: clamp(11rem, 62vw, 16rem);
+		height: clamp(11rem, 62vw, 16rem);
+		perspective: 900px;
+		filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.28));
+	}
+
+	.present-trigger:not(.opening):not(.opened) .present {
+		animation: present-wiggle 2.8s ease-in-out infinite;
+	}
+
+	.present-base,
+	.present-lid {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		border-radius: 0.35rem;
+		box-sizing: border-box;
+	}
+
+	.present-base {
+		bottom: 0;
+		height: 68%;
+		background: linear-gradient(160deg, #ff524a 0%, var(--color-chili-pepper) 100%);
+		transition: opacity 0.45s ease 0.35s, transform 0.45s ease 0.35s;
+	}
+
+	.present-lid {
+		top: 0;
+		height: 36%;
+		background: linear-gradient(160deg, #ff6b63 0%, #ff453d 100%);
+		transform-origin: bottom center;
+		transition: transform 0.85s cubic-bezier(0.34, 1.2, 0.64, 1);
+		z-index: 2;
+	}
+
+	.present-trigger.opening .present-lid,
+	.present-trigger.opened .present-lid {
+		transform: translateY(-115%) rotate(-28deg);
+	}
+
+	.present-trigger.opening .present-base,
+	.present-trigger.opened .present-base {
+		opacity: 0;
+		transform: scale(0.88);
+	}
+
+	.ribbon {
+		position: absolute;
+		background: var(--color-lilac);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+	}
+
+	.ribbon-v {
+		top: 0;
+		left: 50%;
+		width: 18%;
+		height: 100%;
+		transform: translateX(-50%);
+	}
+
+	.ribbon-h {
+		top: 50%;
+		left: 0;
+		width: 100%;
+		height: 18%;
+		transform: translateY(-50%);
+	}
+
+	.bow {
+		position: absolute;
+		top: 72%;
+		left: 50%;
+		width: 42%;
+		height: 34%;
+		transform: translate(-50%, -50%);
+	}
+
+	.bow::before,
+	.bow::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		width: 46%;
+		height: 100%;
+		border: 0.35rem solid var(--color-white);
+		border-radius: 999px 999px 0 999px;
+		box-sizing: border-box;
+	}
+
+	.bow::before {
+		left: 0;
+		transform: rotate(-28deg);
+	}
+
+	.bow::after {
+		right: 0;
+		transform: rotate(28deg) scaleX(-1);
+	}
+
+	@keyframes present-wiggle {
+		0%,
+		100% {
+			transform: rotate(0deg) scale(1);
+		}
+
+		25% {
+			transform: rotate(-2deg) scale(1.01);
+		}
+
+		75% {
+			transform: rotate(2deg) scale(1.01);
+		}
 	}
 
 	.floaty {
@@ -311,17 +520,30 @@
 	}
 
 	.invitation {
-		position: relative;
-		z-index: 1;
 		width: 100%;
-		max-width: 22rem;
-		margin: 0 auto;
 		box-sizing: border-box;
 		text-align: left;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(1.25rem);
+		transition:
+			opacity 0.55s ease 0.2s,
+			transform 0.55s ease 0.2s,
+			visibility 0s linear 0.75s;
 	}
 
-	.date {
-		margin: 0 0 1rem;
+	.invitation.revealed {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		transition:
+			opacity 0.55s ease 0.2s,
+			transform 0.55s ease 0.2s,
+			visibility 0s linear 0s;
+	}
+
+	.headline {
+		margin: 0 0 0.5rem;
 		font-size: clamp(2rem, 9vw, 2.75rem);
 		font-weight: 700;
 		line-height: 1.12;
@@ -330,6 +552,18 @@
 		text-wrap: balance;
 		-webkit-font-smoothing: antialiased;
 		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	}
+
+	.event-date {
+		margin: 0 0 1rem;
+		font-size: 0.8125rem;
+		font-weight: 400;
+		line-height: 1.3;
+		letter-spacing: 0.02em;
+		color: var(--color-lilac);
+		opacity: 0.85;
+		text-wrap: balance;
+		-webkit-font-smoothing: antialiased;
 	}
 
 	.message {
@@ -371,6 +605,18 @@
 	@media (prefers-reduced-motion: reduce) {
 		.floaty {
 			animation: none;
+		}
+
+		.present-trigger:not(.opening):not(.opened) .present {
+			animation: none;
+		}
+
+		.present-lid,
+		.present-base,
+		.present-trigger,
+		.invitation,
+		.playground {
+			transition: none;
 		}
 	}
 </style>
