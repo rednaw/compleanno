@@ -229,7 +229,6 @@
 
 		<article class="invitation" class:revealed={opened} aria-hidden={!opened}>
 			<h1 class="headline">Gefeliciteerd!</h1>
-			<p class="event-date">3 oktober 2026</p>
 			<p class="message">
 				Een dagje naar de Wetenschapsdag Amsterdam Science Park met je familie!
 			</p>
@@ -243,6 +242,7 @@
 					wetenschapsdagamsterdamsciencepark.nl
 				</a>
 			</p>
+      <p class="event-date">3 oktober 2026</p>
 		</article>
 	</div>
 </main>
