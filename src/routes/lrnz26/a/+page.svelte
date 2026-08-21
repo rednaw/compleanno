@@ -214,7 +214,7 @@
 		padding: 0.55em 1.5em;
 		border-radius: 0.5em;
 		border: none;
-		background: var(--color-theme-1);
+		background: var(--color-royal-blue);
 		color: var(--color-white);
 		font-weight: 700;
 		cursor: pointer;

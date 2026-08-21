@@ -8,9 +8,9 @@
 
 <div class="clue" class:clue--flag={kind === 'flag'} class:clue--shape={kind === 'shape'}>
 	{#if kind === 'shape'}
-		<img class="clue-img" src={asset(`/lrnz26/${SHAPE_FILES[id]}`)} alt="" />
+		<img class="clue-img" src={asset(`/lrnz26/a/${SHAPE_FILES[id]}`)} alt="" />
 	{:else}
-		<img class="clue-img" src={asset(`/lrnz26/${FLAG_FILES[id]}`)} alt="" />
+		<img class="clue-img" src={asset(`/lrnz26/a/${FLAG_FILES[id]}`)} alt="" />
 	{/if}
 </div>
 
