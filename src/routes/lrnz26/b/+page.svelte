@@ -10,6 +10,7 @@
 		EXERCISE_2_IMAGE,
 		ANSWER_1,
 		ANSWER_2,
+		HINT_2,
 		matchesAnswer1
 	} from './exercises.js';
 
@@ -17,6 +18,7 @@
 	let step1Done = $state(false);
 	let completed = $state(false);
 	let showWrong = $state(false);
+	let showHint2 = $state(false);
 
 	const onStep2 = $derived(step1Done && !completed);
 
@@ -67,32 +69,32 @@
 <main>
 	<div class="quiz-wrap">
 		<div class="exercise-block">
-			<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_1_IMAGE}`)} alt="Esercizio 1" />
+			<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_1_IMAGE}`)} alt="Exercise 1" />
 			{#if step1Done}
 				<div class="input-row input-row-solved">
-					<input type="text" class="answer-input" value={ANSWER_1} readonly aria-label="Risposta 1" />
+					<input type="text" class="answer-input" value={ANSWER_1} readonly aria-label="Answer 1" />
 				</div>
 			{/if}
 		</div>
 
 		{#if step1Done}
 			<div class="exercise-block">
-				<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_2_IMAGE}`)} alt="Esercizio 2" />
+				<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_2_IMAGE}`)} alt="Exercise 2" />
 			</div>
 		{/if}
 
 		{#if completed}
 			<div class="input-row input-row-solved">
-				<input type="text" class="answer-input" value={ANSWER_2} readonly aria-label="Risposta 2" />
+				<input type="text" class="answer-input" value={ANSWER_2} readonly aria-label="Answer 2" />
 			</div>
-			<p class="success" aria-live="polite">Corretto!</p>
+			<p class="success" aria-live="polite">Correct!</p>
 		{:else}
 			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
 					type="text"
 					class="answer-input"
-					placeholder="Risposta"
-					aria-label={onStep2 ? 'Risposta 2' : 'Risposta 1'}
+					placeholder="Answer"
+					aria-label={onStep2 ? 'Answer 2' : 'Answer 1'}
 					autocomplete="off"
 					spellcheck="false"
 					bind:value={guess}
@@ -102,16 +104,26 @@
 			</div>
 			<div class="check-row">
 				{#if showWrong}
-					<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
+					<p class="wrong-hint" aria-live="polite">Incorrect. Try again.</p>
 				{/if}
-				<button
-					type="button"
-					class="check-btn"
-					disabled={!guess.trim() || showWrong}
-					onclick={checkAnswer}
-				>
-					Controlla
-				</button>
+				<div class="check-actions">
+					<button
+						type="button"
+						class="check-btn"
+						disabled={!guess.trim() || showWrong}
+						onclick={checkAnswer}
+					>
+						Check
+					</button>
+					{#if onStep2}
+						<button type="button" class="hint-link" onclick={() => (showHint2 = !showHint2)}>
+							hint
+						</button>
+					{/if}
+				</div>
+				{#if showHint2 && onStep2}
+					<p class="hint-text" aria-live="polite">{HINT_2}</p>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -207,6 +219,35 @@
 	.check-row {
 		text-align: center;
 		margin-bottom: 0.5rem;
+	}
+
+	.check-actions {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.hint-link {
+		padding: 0;
+		border: none;
+		background: none;
+		font-size: 0.85rem;
+		color: var(--color-text);
+		opacity: 0.65;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	.hint-link:hover {
+		opacity: 1;
+	}
+
+	.hint-text {
+		margin: 0.75rem 0 0;
+		font-size: 0.95rem;
+		font-style: italic;
+		color: var(--color-text);
+		opacity: 0.9;
 	}
 
 	.check-btn {
