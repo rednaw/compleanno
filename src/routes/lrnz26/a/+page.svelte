@@ -57,18 +57,18 @@
 		</ol>
 
 		{#if completed}
-			<p class="success" aria-live="polite">
-				Corretto — <strong>{ANSWER.charAt(0).toUpperCase() + ANSWER.slice(1)}</strong>!
-			</p>
+			<div class="input-row input-row-solved">
+				<input
+					type="text"
+					class="answer-input"
+					value={ANSWER.charAt(0).toUpperCase() + ANSWER.slice(1)}
+					readonly
+					aria-label="Paese"
+				/>
+			</div>
+			<p class="success" aria-live="polite">Corretto!</p>
 		{:else}
-			<form
-				class="answer-row"
-				class:answer-row--wrong={showWrong}
-				onsubmit={(e) => {
-					e.preventDefault();
-					checkAnswer();
-				}}
-			>
+			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
 					id="country-guess"
 					type="text"
@@ -79,11 +79,22 @@
 					spellcheck="false"
 					bind:value={guess}
 					disabled={showWrong}
+					onkeydown={(e) => e.key === 'Enter' && checkAnswer()}
 				/>
+			</div>
+			<div class="check-row">
 				{#if showWrong}
-					<p class="wrong-hint" aria-live="polite">Riprova</p>
+					<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
 				{/if}
-			</form>
+				<button
+					type="button"
+					class="check-btn"
+					disabled={!guess.trim() || showWrong}
+					onclick={checkAnswer}
+				>
+					Controlla
+				</button>
+			</div>
 		{/if}
 	</div>
 </main>
@@ -145,58 +156,90 @@
 		line-height: 1;
 	}
 
-	.answer-row {
+	.input-row {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		gap: 0.35rem;
-		margin: 0;
-		padding: 0;
+		justify-content: center;
+		padding: 0.6em 1em;
+		border-radius: 0.5em;
+		background: var(--color-white);
+		border: 2px solid var(--color-border);
+		width: 100%;
+		box-sizing: border-box;
+		margin-bottom: 1rem;
+		transition:
+			background 0.2s,
+			border-color 0.2s;
+	}
+
+	.input-row--wrong {
+		background: var(--color-error-bg);
+		border-color: var(--color-error-border);
+	}
+
+	.input-row-solved {
+		background: var(--color-success-bg);
+		border-color: var(--color-success-border);
 	}
 
 	.answer-input {
 		width: 100%;
-		max-width: 14rem;
 		box-sizing: border-box;
-		padding: 0.45rem 0;
+		padding: 0.6em 0.25em;
 		border: none;
-		border-bottom: 2px solid rgba(255, 255, 255, 0.75);
-		background: transparent;
-		font-size: 1.15rem;
+		border-radius: 0;
+		font-size: 1.05em;
 		text-align: center;
-		color: var(--color-white);
+		color: var(--color-text);
+		background: transparent;
 		outline: none;
-		transition: border-color 0.2s;
 	}
 
 	.answer-input::placeholder {
-		color: rgba(255, 255, 255, 0.5);
+		color: #999;
 	}
 
-	.answer-input:focus {
-		border-bottom-color: var(--color-white);
+	.input-row-solved .answer-input {
+		color: var(--color-success-text);
+		font-weight: 600;
 	}
 
-	.answer-row--wrong .answer-input {
-		border-bottom-color: var(--color-chili-pepper);
+	.check-row {
+		text-align: center;
+		margin-bottom: 0.5rem;
+	}
+
+	.check-btn {
+		font-size: 1.05em;
+		padding: 0.55em 1.5em;
+		border-radius: 0.5em;
+		border: none;
+		background: var(--color-theme-1);
+		color: var(--color-white);
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.check-btn:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
 	}
 
 	.wrong-hint {
-		margin: 0;
-		font-size: 0.85rem;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.85);
+		margin: 0 0 0.75rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: var(--color-error-bg);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 	}
 
 	.success {
 		margin: 0;
-		padding: 0.75rem 0;
-		color: var(--color-white);
-		font-size: 1.1rem;
+		font-size: 0.95rem;
 		font-weight: 600;
 		text-align: center;
-		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+		color: var(--color-success-bg-strong);
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 
 	@media (max-width: 380px) {
