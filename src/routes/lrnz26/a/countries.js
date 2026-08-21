@@ -7,14 +7,14 @@ export const CLUES = Object.freeze([
 	{ id: 'nauru', name: 'Nauru', letter: 'N', kind: 'shape' },
 	{ id: 'angola', name: 'Angola', letter: 'A', kind: 'flag' },
 	{ id: 'drenthe', name: 'Drenthe', letter: 'D', kind: 'shape' },
-	{ id: 'andorra', name: 'Andorra', letter: 'A', kind: 'flag' }
+	{ id: 'amsterdam', name: 'Amsterdam', letter: 'A', kind: 'flag' }
 ]);
 
 /** @type {Readonly<Record<string, string>>} */
 export const FLAG_FILES = Object.freeze({
 	afghanistan: 'Flag_of_Afghanistan.svg',
 	angola: 'Flag_of_Angola.svg',
-	andorra: 'Flag_of_Andorra.svg'
+	amsterdam: 'Flag_of_Amsterdam.svg'
 });
 
 /** @type {Readonly<Record<string, string>>} */
