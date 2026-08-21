@@ -9,6 +9,7 @@ export const LRNZ26_STORAGE_PREFIX = 'lrnz26_';
 export const lrnz26Keys = Object.freeze({
 	gameADone: 'lrnz26_game_a_done',
 	gameBDone: 'lrnz26_game_b_done',
+	gameBStep1Done: 'lrnz26_game_b_step1_done',
 	gameCDone: 'lrnz26_game_c_done',
 	gameDDone: 'lrnz26_game_d_done',
 	codeDone: 'lrnz26_game_code_done'
