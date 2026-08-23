@@ -12,15 +12,15 @@ export const CLUES = Object.freeze([
 
 /** @type {Readonly<Record<string, string>>} */
 export const FLAG_FILES = Object.freeze({
-	afghanistan: 'Flag_of_Afghanistan.svg',
-	angola: 'Flag_of_Angola.svg',
-	amsterdam: 'Flag_of_Amsterdam.svg'
+	afghanistan: 'Flag_of_Afghanistan.jpg',
+	angola: 'Flag_of_Angola.jpg',
+	amsterdam: 'Flag_of_Amsterdam.jpg'
 });
 
 /** @type {Readonly<Record<string, string>>} */
 export const SHAPE_FILES = Object.freeze({
-	cambodia: 'Shape_of_Cambodia.svg',
-	nauru: 'Shape_of_Nauru.svg',
+	cambodia: 'Shape_of_Cambodia.jpg',
+	nauru: 'Shape_of_Nauru.jpg',
 	drenthe: 'Shape_of_Drenthe.jpg'
 });
 
