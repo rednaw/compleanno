@@ -2,15 +2,7 @@
 	"clips": [
 		{
 			"id": "clip-1",
-			"label": "Clip 1 (option 1)",
-			"band": "Rage Against the Machine",
-			"url": "https://www.youtube.com/watch?v=bWXazVhlyxQ",
-			"start": "0:13",
-			"end": "0:15"
-		},
-		{
-			"id": "clip-1-alt",
-			"label": "Clip 1 (option 2)",
+			"label": "Clip 1",
 			"band": "Rage Against the Machine",
 			"url": "https://www.youtube.com/watch?v=bWXazVhlyxQ",
 			"start": "0:38",
@@ -21,8 +13,8 @@
 			"label": "Clip 2",
 			"band": "System Of a Down",
 			"url": "https://www.youtube.com/watch?v=iywaBOMvYLI",
-			"start": "0:12",
-			"end": "0:14"
+			"start": "0:13",
+			"end": "0:15"
 		},
 		{
 			"id": "clip-3",
