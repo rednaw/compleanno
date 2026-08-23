@@ -1,7 +1,7 @@
 <script>
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { clips, bandNameMatches } from './clips.js';
+	import { clips, bandNameMatchesClip } from './clips.js';
 	import { saveClipProgress, loadClipProgress } from './persistence.js';
 
 	/** @type {{ done: boolean }} */
@@ -110,13 +110,13 @@
 	/** @param {number} idx */
 	function checkGuess(idx) {
 		const st = clipStates[idx];
-		const band = clips[idx].band;
+		const clip = clips[idx];
 		if (!st.guess.trim()) return;
 
-		if (bandNameMatches(st.guess, band)) {
+		if (bandNameMatchesClip(st.guess, clip)) {
 			st.feedback = 'correct';
 			st.status = 'correct';
-			st.guess = band;
+			st.guess = clip.band;
 		} else {
 			st.feedback = 'wrong';
 			st.status = 'wrong';

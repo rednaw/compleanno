@@ -11,6 +11,7 @@ export const lrnz26Keys = Object.freeze({
 	gameBDone: 'lrnz26_game_b_done',
 	gameBStep1Done: 'lrnz26_game_b_step1_done',
 	gameCDone: 'lrnz26_game_c_done',
+	gameCFinal: 'lrnz26_game_c_final',
 	gameDDone: 'lrnz26_game_d_done',
 	codeDone: 'lrnz26_game_code_done'
 });

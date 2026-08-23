@@ -5,12 +5,14 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import MusicClips from './MusicClips.svelte';
+	import FinalPuzzle from './FinalPuzzle.svelte';
 	import '../../gcm26/quiz-shared.css';
 
 	let clipsDone = $state(false);
+	let finalDone = $state(false);
 	let previouslyDone = $state(false);
 
-	const allCompleted = $derived(previouslyDone || clipsDone);
+	const allCompleted = $derived(previouslyDone || (clipsDone && finalDone));
 
 	$effect(() => {
 		if (allCompleted) savePuzzleState(lrnz26Keys.gameCDone, '1');
@@ -21,6 +23,7 @@
 			if (loadPuzzleState(lrnz26Keys.gameCDone)) {
 				previouslyDone = true;
 				clipsDone = true;
+				finalDone = true;
 			}
 		} catch { /* localStorage may be unavailable */ }
 	});
@@ -35,6 +38,9 @@
 <main>
 	<div class="content-wrap">
 		<MusicClips bind:done={clipsDone} />
+		{#if clipsDone}
+			<FinalPuzzle bind:done={finalDone} />
+		{/if}
 	</div>
 </main>
 

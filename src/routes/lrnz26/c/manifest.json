@@ -4,6 +4,7 @@
 			"id": "clip-1",
 			"label": "Clip 1",
 			"band": "Rage Against the Machine",
+			"aliases": ["RATM"],
 			"url": "https://www.youtube.com/watch?v=bWXazVhlyxQ",
 			"start": "0:38.2",
 			"end": "0:40.2"
@@ -12,6 +13,7 @@
 			"id": "clip-2",
 			"label": "Clip 2",
 			"band": "System Of a Down",
+			"aliases": ["SOAD"],
 			"url": "https://www.youtube.com/watch?v=iywaBOMvYLI",
 			"start": "0:13.1",
 			"end": "0:15.1"
