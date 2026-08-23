@@ -23,6 +23,14 @@
 			"url": "https://www.youtube.com/watch?v=HZnNt9nnEhw",
 			"start": "2:18",
 			"end": "2:20"
+		},
+		{
+			"id": "clip-4",
+			"label": "Clip 4",
+			"band": "Eluveitie",
+			"url": "https://www.youtube.com/watch?v=iijKLHCQw5o",
+			"start": "1:55",
+			"end": "1:57"
 		}
 	]
 }
