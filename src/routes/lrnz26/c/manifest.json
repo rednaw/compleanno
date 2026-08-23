@@ -5,16 +5,16 @@
 			"label": "Clip 1",
 			"band": "Rage Against the Machine",
 			"url": "https://www.youtube.com/watch?v=bWXazVhlyxQ",
-			"start": "0:38",
-			"end": "0:40"
+			"start": "0:38.2",
+			"end": "0:40.2"
 		},
 		{
 			"id": "clip-2",
 			"label": "Clip 2",
 			"band": "System Of a Down",
 			"url": "https://www.youtube.com/watch?v=iywaBOMvYLI",
-			"start": "0:13",
-			"end": "0:15"
+			"start": "0:13.1",
+			"end": "0:15.1"
 		},
 		{
 			"id": "clip-3",
@@ -29,8 +29,8 @@
 			"label": "Clip 4",
 			"band": "Eluveitie",
 			"url": "https://www.youtube.com/watch?v=iijKLHCQw5o",
-			"start": "1:55",
-			"end": "1:57"
+			"start": "1:55.5",
+			"end": "1:57.5"
 		}
 	]
 }

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Download YouTube music-video sources and cut 2s [start, end) segments (lrnz26 game C).
+Download YouTube music-video sources and cut [start, end) segments (lrnz26 game C).
+
+Timestamps in the manifest accept whole or fractional seconds, e.g.:
+  115.5 | 1:55.5 | 0:01:55.500  (M:SS, MM:SS, H:MM:SS; ms precision)
 
 Requires on PATH: yt-dlp, ffmpeg
 
@@ -19,18 +22,31 @@ from pathlib import Path
 
 
 def parse_timestamp(raw: str) -> float:
-	"""Parse M:SS, MM:SS, or H:MM:SS into seconds."""
+	"""Parse seconds, M:SS, MM:SS, or H:MM:SS (fractional seconds allowed)."""
 	s = raw.strip()
 	if not s:
 		raise ValueError("empty timestamp")
+	if ":" not in s:
+		return float(s)
 	parts = s.split(":")
-	nums = [int(p, 10) for p in parts]
+	if len(parts) > 3:
+		raise ValueError(f"invalid timestamp: {raw!r}")
+	try:
+		nums = [float(p) for p in parts]
+	except ValueError as e:
+		raise ValueError(f"invalid timestamp: {raw!r}") from e
 	if len(nums) == 1:
-		return float(nums[0])
+		return nums[0]
 	if len(nums) == 2:
-		return nums[0] * 60 + nums[1]
+		minutes, seconds = nums
+		if seconds < 0 or seconds >= 60:
+			raise ValueError(f"invalid timestamp (seconds 0–59): {raw!r}")
+		return minutes * 60 + seconds
 	if len(nums) == 3:
-		return nums[0] * 3600 + nums[1] * 60 + nums[2]
+		hours, minutes, seconds = nums
+		if minutes < 0 or minutes >= 60 or seconds < 0 or seconds >= 60:
+			raise ValueError(f"invalid timestamp (minutes/seconds 0–59): {raw!r}")
+		return hours * 3600 + minutes * 60 + seconds
 	raise ValueError(f"invalid timestamp: {raw!r}")
 
 
@@ -182,7 +198,7 @@ def main() -> None:
 			sys.exit(1)
 		duration = end - start
 
-		print(f"=== {cid}: {entry.get('band', '')} ({duration:.2f}s) ===")
+		print(f"=== {cid}: {entry.get('band', '')} ({entry['start']}–{entry['end']}, {duration:.3f}s) ===")
 		src = download_video(url, args.cache_dir, args.force_download)
 		out_mp4 = args.out_dir / f"{cid}.mp4"
 		print(f"  source: {src.name}")
