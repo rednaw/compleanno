@@ -14,3 +14,8 @@ export const lrnz26Keys = Object.freeze({
 	gameDDone: 'lrnz26_game_d_done',
 	codeDone: 'lrnz26_game_code_done'
 });
+
+/** @param {number} clipIndex */
+export function lrnz26ClipProgressKey(clipIndex) {
+	return `lrnz26_c_clip_${clipIndex}`;
+}
