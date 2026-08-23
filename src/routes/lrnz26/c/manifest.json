@@ -4,6 +4,8 @@
 			"id": "clip-1",
 			"label": "Clip 1 (option 1)",
 			"band": "Rage Against the Machine",
+			"url": "https://www.youtube.com/watch?v=bWXazVhlyxQ",
+			"start": "0:13",
 			"end": "0:15"
 		},
 		{
@@ -18,8 +20,17 @@
 			"id": "clip-2",
 			"label": "Clip 2",
 			"band": "System Of a Down",
+			"url": "https://www.youtube.com/watch?v=iywaBOMvYLI",
 			"start": "0:12",
 			"end": "0:14"
+		},
+		{
+			"id": "clip-3",
+			"label": "Clip 3",
+			"band": "Måneskin",
+			"url": "https://www.youtube.com/watch?v=HZnNt9nnEhw",
+			"start": "2:18",
+			"end": "2:20"
 		}
 	]
 }
