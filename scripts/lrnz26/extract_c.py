@@ -142,6 +142,27 @@ def extract_segment(
 	)
 
 
+def extract_poster(out_mp4: Path, poster_file: Path) -> None:
+	"""First-frame JPEG for level-1 still (iOS Safari won't paint a paused video)."""
+	poster_file.parent.mkdir(parents=True, exist_ok=True)
+	run(
+		[
+			"ffmpeg",
+			"-hide_banner",
+			"-loglevel",
+			"warning",
+			"-y",
+			"-i",
+			str(out_mp4),
+			"-vframes",
+			"1",
+			"-q:v",
+			"2",
+			str(poster_file),
+		]
+	)
+
+
 def main() -> None:
 	root = Path(__file__).resolve().parents[2]
 	default_manifest = root / "src" / "routes" / "lrnz26" / "c" / "manifest.json"
@@ -204,6 +225,9 @@ def main() -> None:
 		print(f"  source: {src.name}")
 		print(f"  -> {out_mp4.relative_to(root)}")
 		extract_segment(src, out_mp4, start, duration)
+		poster = args.out_dir / f"{cid}-poster.jpg"
+		print(f"  -> {poster.relative_to(root)}")
+		extract_poster(out_mp4, poster)
 
 	print("Done.")
 

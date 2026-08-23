@@ -9,7 +9,7 @@
 
 	/** @typedef {1 | 2 | 3} ClipLevel */
 
-	/** @type {{ guess: string; feedback: string; status: string; level: ClipLevel; playing: boolean; video: HTMLVideoElement | null; videoError: boolean }[]} */
+	/** @type {{ guess: string; feedback: string; status: string; level: ClipLevel; playing: boolean; videoError: boolean }[]} */
 	let clipStates = $state(
 		clips.map(() => ({
 			guess: '',
@@ -17,31 +17,55 @@
 			status: 'not-started',
 			level: /** @type {ClipLevel} */ (1),
 			playing: false,
-			video: null,
 			videoError: false
 		}))
 	);
 
+	/** @type {(HTMLVideoElement | null)[]} */
+	let videoEls = $state(clips.map(() => null));
+
+	/** @param {string} id */
 	function clipSrc(id) {
 		return `${base}/lrnz26/c/${id}.mp4`;
+	}
+
+	/** @param {string} id */
+	function posterSrc(id) {
+		return `${base}/lrnz26/c/${id}-poster.jpg`;
+	}
+
+	/** @param {HTMLVideoElement} video */
+	async function primeVideoFrame(video) {
+		video.muted = true;
+		try {
+			await video.play();
+			video.pause();
+			if (video.currentTime > 0.05) {
+				video.currentTime = 0;
+			}
+		} catch {
+			/* iOS may defer decode until the user taps Play */
+		}
 	}
 
 	/** @param {number} idx */
 	function applyClipLevel(idx) {
 		const st = clipStates[idx];
-		const video = st.video;
+		const video = videoEls[idx];
 		if (!video || st.videoError) return;
 
 		video.pause();
-		video.currentTime = 0;
 		st.playing = false;
+		video.muted = true;
 
 		if (st.level >= 3) {
-			video.muted = false;
 			video.volume = 1;
 		} else {
-			video.muted = true;
 			video.volume = 0;
+		}
+
+		if (st.level >= 2 && video.readyState >= 1 && video.currentTime > 0.01) {
+			video.currentTime = 0;
 		}
 	}
 
@@ -59,31 +83,48 @@
 	/** @param {number} idx */
 	function onVideoReady(idx) {
 		applyClipLevel(idx);
+		if (clipStates[idx].level >= 2) {
+			const video = videoEls[idx];
+			if (video) primeVideoFrame(video);
+		}
 	}
 
 	/** @param {number} idx */
 	function playClip(idx) {
 		const st = clipStates[idx];
 		if (st.level < 2) return;
-		const video = st.video;
+		const video = videoEls[idx];
 		if (!video || st.videoError) return;
 
 		st.playing = true;
-		video.pause();
-		video.currentTime = 0;
 
-		if (st.level >= 3) {
-			video.muted = false;
-			video.volume = 1;
-		} else {
-			video.muted = true;
-			video.volume = 0;
+		const startPlayback = () => {
+			if (st.level >= 3) {
+				video.muted = false;
+				video.volume = 1;
+			} else {
+				video.muted = true;
+				video.volume = 0;
+			}
+
+			video.play().catch(() => {
+				st.playing = false;
+			});
+		};
+
+		video.pause();
+		if (video.currentTime < 0.01) {
+			startPlayback();
+			return;
 		}
 
-		video.play().catch(() => {
-			st.videoError = true;
-			st.playing = false;
-		});
+		/** @param {Event} e */
+		const onSeeked = () => {
+			video.removeEventListener('seeked', onSeeked);
+			startPlayback();
+		};
+		video.addEventListener('seeked', onSeeked);
+		video.currentTime = 0;
 	}
 
 	/** @param {number} idx */
@@ -105,6 +146,10 @@
 		st.status = st.status === 'wrong' ? 'not-started' : st.status;
 		applyClipLevel(idx);
 		persistClip(idx);
+		if (st.level >= 2) {
+			const video = videoEls[idx];
+			if (video) primeVideoFrame(video);
+		}
 	}
 
 	/** @param {number} idx */
@@ -152,15 +197,20 @@
 	{#each clips as clip, i (clip.id)}
 		<div class="clip-container">
 			<div class="clip-preview" class:clip-preview-still={clipStates[i].level === 1}>
+				{#if clipStates[i].level === 1}
+					<img src={posterSrc(clip.id)} alt="" class="clip-poster" />
+				{/if}
 				<!-- svelte-ignore a11y_media_has_caption -->
 				<video
 					class="clip-video"
-					bind:this={clipStates[i].video}
+					class:clip-video-hidden={clipStates[i].level === 1}
+					bind:this={videoEls[i]}
 					src={clipSrc(clip.id)}
 					playsinline
-					preload="auto"
+					muted
+					preload="metadata"
 					aria-label={clip.label ?? `Clip ${i + 1}`}
-					onloadeddata={() => onVideoReady(i)}
+					onloadedmetadata={() => onVideoReady(i)}
 					onended={() => onClipEnded(i)}
 					onerror={() => onClipError(i)}
 				></video>
@@ -230,6 +280,7 @@
 	}
 
 	.clip-preview {
+		position: relative;
 		width: 100%;
 		margin-bottom: 0.65rem;
 		border-radius: 0.5rem;
@@ -244,7 +295,21 @@
 		justify-content: center;
 	}
 
-	.clip-preview-still .clip-video {
+	.clip-poster {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		max-height: min(52vh, 280px);
+		object-fit: contain;
+		display: block;
+	}
+
+	.clip-video-hidden {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		opacity: 0;
 		pointer-events: none;
 	}
 
