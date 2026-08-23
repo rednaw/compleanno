@@ -35,10 +35,6 @@
 <main>
 	<div class="content-wrap">
 		<MusicClips bind:done={clipsDone} />
-
-		{#if allCompleted}
-			<p class="success" aria-live="polite">All bands identified!</p>
-		{/if}
 	</div>
 </main>
 
@@ -65,13 +61,5 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-	}
-
-	.success {
-		margin: 1rem 0 0;
-		font-size: 0.95rem;
-		font-weight: 600;
-		color: var(--color-success-bg-strong);
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 </style>
