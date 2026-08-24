@@ -1,9 +1,10 @@
 <script>
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import { LRNZ26_STORAGE_PREFIX, lrnz26Keys } from './storage-keys.js';
+	import { lrnz26FinalImage, lrnz26HubImage } from './coordinates.js';
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
@@ -44,22 +45,24 @@
 	<div class="content">
 		<div class="games-grid">
 			<a href={resolve('/lrnz26/a')} class="game-button" class:game-button-solved={gameADone}>
-				{gameADone ? 'A' : '?'}
+				{#if gameADone}<img src="{base}/lrnz26/code/{lrnz26HubImage.a}" alt="" class="hub-img" />{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/b')} class="game-button" class:game-button-solved={gameBDone}>
-				{gameBDone ? 'B' : '?'}
+				{#if gameBDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.b}" alt="" class="hub-img" />{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/c')} class="game-button" class:game-button-solved={gameCDone}>
-				{gameCDone ? 'C' : '?'}
+				{#if gameCDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.c}" alt="" class="hub-img" />{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/d')} class="game-button" class:game-button-solved={gameDDone}>
-				{gameDDone ? 'D' : '?'}
+				{#if gameDDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.d}" alt="" class="hub-img" />{:else}?{/if}
 			</a>
 		</div>
 		<div class="arrow">↓</div>
 		<div class="code-section">
 			{#if codeDone}
-				<a href={resolve('/lrnz26/code')} class="code-button code-button-solved">✓</a>
+				<a href={resolve('/lrnz26/code')} class="code-button code-button-solved">
+					<img src="{base}/lrnz26/code/{lrnz26FinalImage}" alt="" class="hub-img" />
+				</a>
 			{:else if allPuzzlesDone}
 				<a href={resolve('/lrnz26/code')} class="code-button">?</a>
 			{:else}
@@ -116,7 +119,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		overflow: hidden;
 		box-sizing: border-box;
+	}
+
+	.hub-img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		display: block;
 	}
 
 	.code-button {

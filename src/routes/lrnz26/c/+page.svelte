@@ -1,11 +1,13 @@
 <script>
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
+	import { lrnz26HubImage } from '../coordinates.js';
 	import MusicClips from './MusicClips.svelte';
 	import FinalPuzzle from './FinalPuzzle.svelte';
+	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
 	import '../../gcm26/quiz-shared.css';
 
 	let clipsDone = $state(false);
@@ -34,6 +36,10 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+
+{#if allCompleted}
+	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.c}" />
+{/if}
 
 <main>
 	<div class="content-wrap">

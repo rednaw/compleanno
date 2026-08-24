@@ -1,9 +1,10 @@
 <script>
-	import { asset, resolve } from '$app/paths';
+	import { asset, base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
+	import { lrnz26HubImage } from '../coordinates.js';
 	import { answerMatches } from '../normalize.js';
 	import {
 		EXERCISE_1_IMAGE,
@@ -13,6 +14,7 @@
 		HINT_2,
 		matchesAnswer1
 	} from './exercises.js';
+	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
 
 	let guess = $state('');
 	let step1Done = $state(false);
@@ -65,6 +67,10 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+
+{#if completed}
+	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.b}" />
+{/if}
 
 <main>
 	<div class="quiz-wrap">

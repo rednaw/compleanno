@@ -1,0 +1,39 @@
+{
+	"tracks": [
+		{
+			"id": "barbie-ken",
+			"title": "Barbie & Ken",
+			"band": "Scene Queen",
+			"aliases": ["Set It Off"],
+			"url": "https://www.youtube.com/watch?v=gGKZqDyGWYs",
+			"start": "1:15",
+			"end": "1:45"
+		},
+		{
+			"id": "hood",
+			"title": "H.O.O.D",
+			"band": "KNEECAP",
+			"url": "https://www.youtube.com/watch?v=h1J_DVutL-w",
+			"start": "0:30",
+			"end": "1:00"
+		},
+		{
+			"id": "gimme-chocolate",
+			"title": "Gimme chocolate!!",
+			"band": "BABYMETAL",
+			"aliases": ["Gimme Chocolate"],
+			"url": "https://www.youtube.com/watch?v=WIKqgE4BwAY",
+			"start": "0:44",
+			"end": "1:09"
+		},
+		{
+			"id": "shell-prima-bedrijf",
+			"title": "Shell is een prima bedrijf",
+			"band": "Hang Youth",
+			"aliases": ["SHELL IS EEN PRIMA BEDRIJF"],
+			"url": "https://www.youtube.com/watch?v=MAkYbHEQWhk",
+			"start": "0:00",
+			"end": "0:49"
+		}
+	]
+}

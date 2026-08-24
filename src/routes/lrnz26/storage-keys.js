@@ -13,10 +13,17 @@ export const lrnz26Keys = Object.freeze({
 	gameCDone: 'lrnz26_game_c_done',
 	gameCFinal: 'lrnz26_game_c_final',
 	gameDDone: 'lrnz26_game_d_done',
-	codeDone: 'lrnz26_game_code_done'
+	gameDNormalCount: 'lrnz26_game_d_normal_count',
+	codeDone: 'lrnz26_game_code_done',
+	codeOrder: 'lrnz26_game_code_order'
 });
 
 /** @param {number} clipIndex */
 export function lrnz26ClipProgressKey(clipIndex) {
 	return `lrnz26_c_clip_${clipIndex}`;
+}
+
+/** @param {string} trackId */
+export function lrnz26DTrackSolvedKey(trackId) {
+	return `lrnz26_d_solved_${trackId}`;
 }
