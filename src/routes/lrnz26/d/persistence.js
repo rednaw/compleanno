@@ -1,4 +1,8 @@
 import { lrnz26DTrackSolvedKey, lrnz26Keys } from '../storage-keys.js';
+import { tracks } from './tracks.js';
+
+const TRACK_IDS = tracks.map((t) => t.id);
+const TRACK_IDS_KEY = [...TRACK_IDS].sort().join('\0');
 
 /** @param {string} trackId */
 export function saveTrackSolved(trackId) {
@@ -18,32 +22,38 @@ export function loadTrackSolved(trackId) {
 	}
 }
 
-/** @param {0 | 1 | 2} level */
-export function saveSplitLevel(level) {
+/** @param {unknown} value */
+function isValidGroups(value) {
+	if (!Array.isArray(value) || value.length === 0) return false;
+	/** @type {string[]} */
+	const flat = [];
+	for (const group of value) {
+		if (!Array.isArray(group) || group.length === 0) return false;
+		if (!group.every((id) => typeof id === 'string' && TRACK_IDS.includes(id))) return false;
+		flat.push(...group);
+	}
+	return flat.length === TRACK_IDS.length && [...flat].sort().join('\0') === TRACK_IDS_KEY;
+}
+
+/** @param {string[][]} groups */
+export function saveGroups(groups) {
 	try {
-		localStorage.setItem(lrnz26Keys.gameDSplitLevel, String(level));
+		localStorage.setItem(lrnz26Keys.gameDGroups, JSON.stringify(groups));
 	} catch {
 		// localStorage may be unavailable
 	}
 }
 
-/** @returns {0 | 1 | 2} */
-export function loadSplitLevel() {
+/** @returns {string[][]} */
+export function loadGroups() {
 	try {
-		const raw = localStorage.getItem(lrnz26Keys.gameDSplitLevel);
-		if (raw == null) {
-			// migrate legacy normal-count (0–4) → split level (0–2)
-			const legacy = localStorage.getItem(lrnz26Keys.gameDNormalCount);
-			if (legacy != null) {
-				const n = Number.parseInt(legacy, 10);
-				if (Number.isFinite(n)) return /** @type {0 | 1 | 2} */ (Math.min(2, Math.max(0, n)));
-			}
-			return 0;
+		const raw = localStorage.getItem(lrnz26Keys.gameDGroups);
+		if (raw) {
+			const parsed = JSON.parse(raw);
+			if (isValidGroups(parsed)) return parsed;
 		}
-		const n = Number.parseInt(raw, 10);
-		if (n === 1 || n === 2) return n;
-		return 0;
 	} catch {
-		return 0;
+		// ignore corrupt JSON
 	}
+	return [TRACK_IDS.slice()];
 }

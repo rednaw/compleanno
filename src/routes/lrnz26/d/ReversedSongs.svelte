@@ -2,12 +2,7 @@
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { tracks, guessMatchesTrack, trackDisplayTitle } from './tracks.js';
-	import {
-		saveTrackSolved,
-		loadTrackSolved,
-		saveSplitLevel,
-		loadSplitLevel
-	} from './persistence.js';
+	import { saveTrackSolved, loadTrackSolved, saveGroups, loadGroups } from './persistence.js';
 
 	/** @type {{ done: boolean }} */
 	let { done = $bindable(false) } = $props();
@@ -15,17 +10,16 @@
 	/** @type {Record<string, boolean>} */
 	let solved = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
 
-	/** 0 = one field (4 songs), 1 = two fields (2 each), 2 = four fields (1 each). */
-	/** @type {0 | 1 | 2} */
-	let splitLevel = $state(0);
+	/** @type {string[][]} */
+	let groupTrackIds = $state([tracks.map((t) => t.id)]);
 
-	/** @type {Record<number, string>} */
+	/** @type {Record<string, string>} */
 	let guesses = $state({});
 
-	/** @type {Record<number, 'idle' | 'wrong'>} */
+	/** @type {Record<string, 'idle' | 'wrong'>} */
 	let guessStatus = $state({});
 
-	/** @type {Record<number, boolean>} */
+	/** @type {Record<string, boolean>} */
 	let groupPlaying = $state({});
 
 	/** @type {Record<string, boolean>} */
@@ -38,19 +32,26 @@
 
 	const solvedTracksOrdered = $derived(tracks.filter((t) => solved[t.id]));
 
-	/** @type {{ index: number; tracks: typeof tracks }[]} */
-	const groups = $derived.by(() => {
-		const numGroups = 2 ** splitLevel;
-		const size = tracks.length / numGroups;
-		return Array.from({ length: numGroups }, (_, i) => ({
-			index: i,
-			tracks: tracks.slice(i * size, (i + 1) * size)
-		}));
-	});
+	const trackById = Object.fromEntries(tracks.map((t) => [t.id, t]));
 
-	const activeGroups = $derived(
-		groups.filter((g) => g.tracks.some((t) => !solved[t.id]))
+	/** @param {string[]} ids */
+	function groupIdFor(ids) {
+		return ids.join('|');
+	}
+
+	/** @type {{ id: string; tracks: typeof tracks; unsolved: typeof tracks }[]} */
+	const groups = $derived(
+		groupTrackIds.map((ids) => {
+			const groupTracks = ids.map((id) => trackById[id]);
+			return {
+				id: groupIdFor(ids),
+				tracks: groupTracks,
+				unsolved: groupTracks.filter((t) => !solved[t.id])
+			};
+		})
 	);
+
+	const activeGroups = $derived(groups.filter((g) => g.unsolved.length > 0));
 
 	const DEFAULT_LOOP_SEC = 20;
 
@@ -80,14 +81,9 @@
 		return (trackIndex / count) * loopSec;
 	}
 
-	/** @param {typeof tracks} groupTracks */
-	function unsolvedInGroup(groupTracks) {
-		return groupTracks.filter((t) => !solved[t.id] && !audioLoadError[t.id]);
-	}
-
-	/** @param {number} groupIndex */
-	function groupAt(groupIndex) {
-		return groups.find((g) => g.index === groupIndex);
+	/** @param {string} groupId */
+	function groupById(groupId) {
+		return groups.find((g) => g.id === groupId);
 	}
 
 	function pauseAll() {
@@ -107,29 +103,27 @@
 		}
 	}
 
-	/** @param {number} groupIndex */
-	function pauseGroup(groupIndex) {
-		const group = groupAt(groupIndex);
+	/** @param {string} groupId */
+	function pauseGroup(groupId) {
+		const group = groupById(groupId);
 		if (!group) return;
 		for (const t of group.tracks) {
 			reversedAudioById[t.id]?.pause();
 		}
-		groupPlaying = { ...groupPlaying, [groupIndex]: false };
+		groupPlaying = { ...groupPlaying, [groupId]: false };
 	}
 
-	/** @param {number} groupIndex */
-	function playGroup(groupIndex) {
-		const group = groupAt(groupIndex);
+	/** @param {string} groupId */
+	function playGroup(groupId) {
+		const group = groupById(groupId);
 		if (!group || allCompleted) return;
 
-		for (const g of groups) {
-			if (g.index !== groupIndex) pauseGroup(g.index);
-		}
+		pauseAll();
 
-		const playing = unsolvedInGroup(group.tracks);
+		const playing = group.unsolved.filter((t) => !audioLoadError[t.id]);
 		if (playing.length === 0) return;
 
-		groupPlaying = { ...groupPlaying, [groupIndex]: true };
+		groupPlaying = { [groupId]: true };
 
 		for (let i = 0; i < playing.length; i++) {
 			const t = playing[i];
@@ -145,7 +139,7 @@
 				a.volume = 1;
 				a.play().catch((err) => {
 					if (err instanceof DOMException && err.name === 'NotAllowedError') {
-						groupPlaying = { ...groupPlaying, [groupIndex]: false };
+						groupPlaying = { ...groupPlaying, [groupId]: false };
 						return;
 					}
 					audioLoadError[t.id] = true;
@@ -157,21 +151,21 @@
 		}
 	}
 
-	/** @param {number} groupIndex */
-	function togglePlay(groupIndex) {
-		if (groupPlaying[groupIndex]) pauseGroup(groupIndex);
-		else playGroup(groupIndex);
+	/** @param {string} groupId */
+	function togglePlay(groupId) {
+		if (groupPlaying[groupId]) pauseGroup(groupId);
+		else playGroup(groupId);
 	}
 
-	/** @param {number} groupIndex */
-	function checkGuess(groupIndex) {
-		const group = groupAt(groupIndex);
+	/** @param {string} groupId */
+	function checkGuess(groupId) {
+		const group = groupById(groupId);
 		if (!group || allCompleted) return;
 
-		const guess = (guesses[groupIndex] ?? '').trim();
+		const guess = (guesses[groupId] ?? '').trim();
 		if (!guess) return;
 
-		const unsolved = group.tracks.filter((t) => !solved[t.id]);
+		const unsolved = group.unsolved;
 		const matches = unsolved.filter((t) => guessMatchesTrack(guess, t));
 
 		if (matches.length === 1) {
@@ -179,37 +173,51 @@
 			solved[t.id] = true;
 			saveTrackSolved(t.id);
 			stopTrack(t.id);
-			guessStatus[groupIndex] = 'idle';
-			guesses = { ...guesses, [groupIndex]: '' };
+			guessStatus[groupId] = 'idle';
+			guesses = { ...guesses, [groupId]: '' };
 			done = allCompleted;
 
-			if (unsolvedInGroup(group.tracks).length === 0) {
-				pauseGroup(groupIndex);
-			} else if (groupPlaying[groupIndex]) {
-				playGroup(groupIndex);
+			if (unsolved.length === 1) {
+				pauseGroup(groupId);
+			} else if (groupPlaying[groupId]) {
+				playGroup(groupId);
 			}
 		} else {
-			guessStatus[groupIndex] = 'wrong';
-			guesses = { ...guesses, [groupIndex]: '' };
+			guessStatus[groupId] = 'wrong';
+			guesses = { ...guesses, [groupId]: '' };
 			clearTimeout(wrongTimer);
 			wrongTimer = window.setTimeout(() => {
-				guessStatus[groupIndex] = 'idle';
+				guessStatus[groupId] = 'idle';
 			}, 1200);
 		}
 	}
 
-	function chickenOut() {
-		if (allCompleted || splitLevel >= 2) return;
-		splitLevel = /** @type {0 | 1 | 2} */ (splitLevel + 1);
-		saveSplitLevel(splitLevel);
+	/** @param {string} groupId */
+	function chickenOut(groupId) {
+		const index = groupTrackIds.findIndex((ids) => groupIdFor(ids) === groupId);
+		if (index < 0 || allCompleted) return;
+
+		const ids = groupTrackIds[index];
+		if (ids.filter((id) => !solved[id]).length < 2) return;
+
 		pauseAll();
+		const mid = Math.floor(ids.length / 2);
+		groupTrackIds = [
+			...groupTrackIds.slice(0, index),
+			ids.slice(0, mid),
+			ids.slice(mid),
+			...groupTrackIds.slice(index + 1)
+		];
+		saveGroups(groupTrackIds);
+		guesses = { ...guesses, [groupId]: '' };
+		guessStatus = { ...guessStatus, [groupId]: 'idle' };
 	}
 
 	onMount(() => {
 		for (const t of tracks) {
 			if (loadTrackSolved(t.id)) solved[t.id] = true;
 		}
-		splitLevel = loadSplitLevel();
+		groupTrackIds = loadGroups();
 		done = allCompleted;
 
 		return () => {
@@ -244,27 +252,22 @@
 
 	{#if !allCompleted}
 		<div class="groups-stack">
-			{#each activeGroups as group (group.index)}
-				{@const unsolved = group.tracks.filter((t) => !solved[t.id])}
-				<section class="song-group" aria-label="Song group {group.index + 1}">
-					{#if splitLevel > 0 && unsolved.length > 1}
-						<p class="group-hint">{unsolved.length} songs</p>
-					{/if}
-
+			{#each activeGroups as group (group.id)}
+				<section class="song-group">
 					<div
 						class="input-row"
-						class:input-row-wrong={guessStatus[group.index] === 'wrong'}
+						class:input-row-wrong={guessStatus[group.id] === 'wrong'}
 					>
 						<input
 							type="text"
 							placeholder="Song or band"
-							value={guesses[group.index] ?? ''}
+							value={guesses[group.id] ?? ''}
 							oninput={(e) => {
-								guesses = { ...guesses, [group.index]: e.currentTarget.value };
+								guesses = { ...guesses, [group.id]: e.currentTarget.value };
 							}}
 							autocomplete="off"
-							aria-invalid={guessStatus[group.index] === 'wrong'}
-							onkeydown={(e) => e.key === 'Enter' && checkGuess(group.index)}
+							aria-invalid={guessStatus[group.id] === 'wrong'}
+							onkeydown={(e) => e.key === 'Enter' && checkGuess(group.id)}
 						/>
 					</div>
 
@@ -272,21 +275,21 @@
 						<button
 							type="button"
 							class="play-btn"
-							onclick={() => togglePlay(group.index)}
-							aria-pressed={groupPlaying[group.index] ?? false}
+							onclick={() => togglePlay(group.id)}
+							aria-pressed={groupPlaying[group.id] ?? false}
 						>
-							{groupPlaying[group.index] ? 'Pause' : 'Play'}
+							{groupPlaying[group.id] ? 'Pause' : 'Play'}
 						</button>
 						<button
 							type="button"
 							class="check-btn"
-							onclick={() => checkGuess(group.index)}
-							disabled={!(guesses[group.index] ?? '').trim()}
+							onclick={() => checkGuess(group.id)}
+							disabled={!(guesses[group.id] ?? '').trim()}
 						>
 							Check
 						</button>
-						{#if splitLevel < 2}
-							<button type="button" class="chicken-btn" onclick={() => chickenOut()}>
+						{#if group.unsolved.length > 1}
+							<button type="button" class="chicken-btn" onclick={() => chickenOut(group.id)}>
 								Chicken out
 							</button>
 						{/if}
@@ -353,13 +356,6 @@
 	.song-group:last-child {
 		border-bottom: none;
 		padding-bottom: 0;
-	}
-
-	.group-hint {
-		margin: 0 0 0.5rem;
-		font-size: 0.8rem;
-		opacity: 0.65;
-		text-align: center;
 	}
 
 	.input-row {

@@ -13,8 +13,7 @@ export const lrnz26Keys = Object.freeze({
 	gameCDone: 'lrnz26_game_c_done',
 	gameCFinal: 'lrnz26_game_c_final',
 	gameDDone: 'lrnz26_game_d_done',
-	gameDNormalCount: 'lrnz26_game_d_normal_count',
-	gameDSplitLevel: 'lrnz26_game_d_split_level',
+	gameDGroups: 'lrnz26_game_d_groups',
 	codeDone: 'lrnz26_game_code_done',
 	codeOrder: 'lrnz26_game_code_order',
 	codeNoteDone: 'lrnz26_game_code_note_done'

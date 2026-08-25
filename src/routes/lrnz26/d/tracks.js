@@ -5,7 +5,7 @@ import { answerMatches } from '../normalize.js';
 export const tracks = manifest.tracks;
 
 if (!Array.isArray(tracks) || tracks.length !== 4) {
-	throw new Error('lrnz26/d manifest.json: require exactly 4 tracks (chicken-out splits 4 → 2 → 1)');
+	throw new Error('lrnz26/d manifest.json: require exactly 4 tracks');
 }
 
 for (const track of tracks) {
