@@ -25,12 +25,20 @@ export function mapsUrl(lat, lng) {
 	return `https://www.google.com/maps/search/?api=1&query=${lat.toFixed(6)},${lng.toFixed(6)}`;
 }
 
+/** Puzzle letter → location id (filename is `{id}.webp` in `static/lrnz26/code/`). */
+const PUZZLE_LOCATION = Object.freeze({
+	a: 'van-ostade',
+	b: 'darlingstraat',
+	c: 'castillejos',
+	d: 'termini'
+});
+
 /** @type {Readonly<Record<'a' | 'b' | 'c' | 'd', string>>} */
 export const lrnz26HubImage = Object.freeze({
-	a: 'van-ostade.webp',
-	b: 'darlingstraat.webp',
-	c: 'castillejos.webp',
-	d: 'termini.webp'
+	a: `${PUZZLE_LOCATION.a}.webp`,
+	b: `${PUZZLE_LOCATION.b}.webp`,
+	c: `${PUZZLE_LOCATION.c}.webp`,
+	d: `${PUZZLE_LOCATION.d}.webp`
 });
 
 export const lrnz26FinalImage = 'kachel-moshpit.jpg';

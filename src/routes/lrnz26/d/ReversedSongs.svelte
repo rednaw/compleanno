@@ -54,6 +54,9 @@
 
 	const DEFAULT_LOOP_SEC = 20;
 
+	/** @type {ReturnType<typeof setTimeout> | undefined} */
+	let wrongTimer;
+
 	/** @param {string} id */
 	function trackSrc(id) {
 		return `${base}/lrnz26/d/${id}-reversed.mp3`;
@@ -82,6 +85,11 @@
 		return groupTracks.filter((t) => !solved[t.id] && !audioLoadError[t.id]);
 	}
 
+	/** @param {number} groupIndex */
+	function groupAt(groupIndex) {
+		return groups.find((g) => g.index === groupIndex);
+	}
+
 	function pauseAll() {
 		for (const t of tracks) {
 			reversedAudioById[t.id]?.pause();
@@ -101,7 +109,7 @@
 
 	/** @param {number} groupIndex */
 	function pauseGroup(groupIndex) {
-		const group = groups.find((g) => g.index === groupIndex);
+		const group = groupAt(groupIndex);
 		if (!group) return;
 		for (const t of group.tracks) {
 			reversedAudioById[t.id]?.pause();
@@ -111,7 +119,7 @@
 
 	/** @param {number} groupIndex */
 	function playGroup(groupIndex) {
-		const group = groups.find((g) => g.index === groupIndex);
+		const group = groupAt(groupIndex);
 		if (!group || allCompleted) return;
 
 		for (const g of groups) {
@@ -121,11 +129,7 @@
 		const playing = unsolvedInGroup(group.tracks);
 		if (playing.length === 0) return;
 
-		for (const t of group.tracks) {
-			if (!playing.some((p) => p.id === t.id)) {
-				reversedAudioById[t.id]?.pause();
-			}
-		}
+		groupPlaying = { ...groupPlaying, [groupIndex]: true };
 
 		for (let i = 0; i < playing.length; i++) {
 			const t = playing[i];
@@ -139,16 +143,13 @@
 				a.currentTime = Math.min(offset, Math.max(0, loopSec - 0.05));
 				a.muted = false;
 				a.volume = 1;
-				a.play()
-					.then(() => {
-						groupPlaying = { ...groupPlaying, [groupIndex]: true };
-					})
-					.catch((err) => {
-						if (!(err instanceof DOMException && err.name === 'NotAllowedError')) {
-							audioLoadError[t.id] = true;
-						}
+				a.play().catch((err) => {
+					if (err instanceof DOMException && err.name === 'NotAllowedError') {
 						groupPlaying = { ...groupPlaying, [groupIndex]: false };
-					});
+						return;
+					}
+					audioLoadError[t.id] = true;
+				});
 			};
 
 			if (a.readyState >= 1) seekAndPlay();
@@ -164,7 +165,7 @@
 
 	/** @param {number} groupIndex */
 	function checkGuess(groupIndex) {
-		const group = groups.find((g) => g.index === groupIndex);
+		const group = groupAt(groupIndex);
 		if (!group || allCompleted) return;
 
 		const guess = (guesses[groupIndex] ?? '').trim();
@@ -180,10 +181,9 @@
 			stopTrack(t.id);
 			guessStatus[groupIndex] = 'idle';
 			guesses = { ...guesses, [groupIndex]: '' };
-			done = tracks.every((tr) => solved[tr.id]);
+			done = allCompleted;
 
-			const stillPlaying = unsolvedInGroup(group.tracks);
-			if (stillPlaying.length === 0) {
+			if (unsolvedInGroup(group.tracks).length === 0) {
 				pauseGroup(groupIndex);
 			} else if (groupPlaying[groupIndex]) {
 				playGroup(groupIndex);
@@ -191,7 +191,8 @@
 		} else {
 			guessStatus[groupIndex] = 'wrong';
 			guesses = { ...guesses, [groupIndex]: '' };
-			window.setTimeout(() => {
+			clearTimeout(wrongTimer);
+			wrongTimer = window.setTimeout(() => {
 				guessStatus[groupIndex] = 'idle';
 			}, 1200);
 		}
@@ -205,19 +206,20 @@
 	}
 
 	onMount(() => {
-		try {
-			tracks.forEach((t) => {
-				if (loadTrackSolved(t.id)) solved[t.id] = true;
-			});
-			splitLevel = loadSplitLevel();
-			done = tracks.every((t) => solved[t.id]);
-		} catch { /* localStorage may be unavailable */ }
+		for (const t of tracks) {
+			if (loadTrackSolved(t.id)) solved[t.id] = true;
+		}
+		splitLevel = loadSplitLevel();
+		done = allCompleted;
 
-		return () => pauseAll();
+		return () => {
+			clearTimeout(wrongTimer);
+			pauseAll();
+		};
 	});
 </script>
 
-<div class="reversed-songs" data-phase-complete={done}>
+<div class="reversed-songs">
 	<div class="audio-layer" aria-hidden="true">
 		{#each tracks as track (track.id)}
 			<audio
@@ -295,7 +297,7 @@
 	{/if}
 
 	{#if tracks.some((t) => audioLoadError[t.id])}
-		<p class="audio-hint">Some audio failed to load — run <code>scripts/lrnz26/extract_d.py</code></p>
+		<p class="audio-hint">Some audio failed to load.</p>
 	{/if}
 </div>
 
@@ -450,9 +452,5 @@
 		color: var(--color-text);
 		opacity: 0.85;
 		text-align: center;
-	}
-
-	.audio-hint code {
-		font-size: 0.68rem;
 	}
 </style>

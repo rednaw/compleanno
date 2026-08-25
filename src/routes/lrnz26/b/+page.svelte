@@ -50,15 +50,11 @@
 	}
 
 	onMount(() => {
-		try {
-			if (loadPuzzleState(lrnz26Keys.gameBDone)) {
-				step1Done = true;
-				completed = true;
-				guess = ANSWER_2;
-			} else if (loadPuzzleState(lrnz26Keys.gameBStep1Done)) {
-				step1Done = true;
-			}
-		} catch { /* localStorage may be unavailable */ }
+		if (loadPuzzleState(lrnz26Keys.gameBDone)) {
+			completed = true;
+		} else if (loadPuzzleState(lrnz26Keys.gameBStep1Done)) {
+			step1Done = true;
+		}
 	});
 </script>
 
@@ -70,8 +66,7 @@
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.b}" />
-{/if}
-
+{:else}
 <main>
 	<div class="quiz-wrap">
 		<div class="exercise-block">
@@ -89,12 +84,6 @@
 			</div>
 		{/if}
 
-		{#if completed}
-			<div class="input-row input-row-solved">
-				<input type="text" class="answer-input" value={ANSWER_2} readonly aria-label="Answer 2" />
-			</div>
-			<p class="success" aria-live="polite">Correct!</p>
-		{:else}
 			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
 					type="text"
@@ -131,9 +120,9 @@
 					<p class="hint-text" aria-live="polite">{HINT_2}</p>
 				{/if}
 			</div>
-		{/if}
 	</div>
 </main>
+{/if}
 
 <style>
 	main {
@@ -217,11 +206,6 @@
 		color: #999;
 	}
 
-	.input-row-solved .answer-input {
-		color: var(--color-success-text);
-		font-weight: 600;
-	}
-
 	.check-row {
 		text-align: center;
 		margin-bottom: 0.5rem;
@@ -278,14 +262,5 @@
 		font-weight: 700;
 		color: var(--color-error-bg);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-	}
-
-	.success {
-		margin: 0;
-		font-size: 0.95rem;
-		font-weight: 600;
-		text-align: center;
-		color: var(--color-success-bg-strong);
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 </style>

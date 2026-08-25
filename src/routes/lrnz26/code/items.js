@@ -1,4 +1,5 @@
 import manifest from './manifest.json';
+import { locationByLineId } from '../coordinates.js';
 
 const { lines, correctOrder, startOrder, heading } = manifest;
 
@@ -27,6 +28,7 @@ if (!Array.isArray(startOrder) || sortedFingerprint(startOrder) !== idsKey) {
 }
 
 for (const l of lines) {
+	locationByLineId(l.id);
 	if (l.image === undefined) continue;
 	if (typeof l.image !== 'string' || !l.image || l.image.includes('/') || l.image.includes('..')) {
 		throw new Error('lrnz26/code manifest: image must be a basename only (e.g. castillejos.webp)');

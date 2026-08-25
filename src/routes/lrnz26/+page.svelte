@@ -15,13 +15,11 @@
 	const allPuzzlesDone = $derived(gameADone && gameBDone && gameCDone && gameDDone);
 
 	onMount(() => {
-		try {
-			gameADone = loadPuzzleState(lrnz26Keys.gameADone);
-			gameBDone = loadPuzzleState(lrnz26Keys.gameBDone);
-			gameCDone = loadPuzzleState(lrnz26Keys.gameCDone);
-			gameDDone = loadPuzzleState(lrnz26Keys.gameDDone);
-			codeDone = loadPuzzleState(lrnz26Keys.codeDone);
-		} catch { /* localStorage may be unavailable */ }
+		gameADone = loadPuzzleState(lrnz26Keys.gameADone);
+		gameBDone = loadPuzzleState(lrnz26Keys.gameBDone);
+		gameCDone = loadPuzzleState(lrnz26Keys.gameCDone);
+		gameDDone = loadPuzzleState(lrnz26Keys.gameDDone);
+		codeDone = loadPuzzleState(lrnz26Keys.codeDone);
 	});
 
 	function clearGlobalState() {
@@ -164,6 +162,7 @@
 		background: none;
 		border: none;
 		box-shadow: none;
+		transform: none;
 	}
 
 	.game-button:hover,

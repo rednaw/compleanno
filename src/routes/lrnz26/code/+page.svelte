@@ -131,7 +131,7 @@
 									class="move-btn"
 									onclick={() => swapRows(i, i - 1)}
 									disabled={i === 0}
-									aria-label="Sposta su: {lineById[id].text}"
+									aria-label="Sposta su: {formatCoords(point.lat, point.lng)}"
 								>
 									Su
 								</button>
@@ -140,7 +140,7 @@
 									class="move-btn"
 									onclick={() => swapRows(i, i + 1)}
 									disabled={i === orderIds.length - 1}
-									aria-label="Sposta giù: {lineById[id].text}"
+									aria-label="Sposta giù: {formatCoords(point.lat, point.lng)}"
 								>
 									Giù
 								</button>

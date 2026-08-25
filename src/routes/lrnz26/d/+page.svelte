@@ -19,12 +19,9 @@
 	});
 
 	onMount(() => {
-		try {
-			if (loadPuzzleState(lrnz26Keys.gameDDone)) {
-				previouslyDone = true;
-				songsDone = true;
-			}
-		} catch { /* localStorage may be unavailable */ }
+		if (loadPuzzleState(lrnz26Keys.gameDDone)) {
+			previouslyDone = true;
+		}
 	});
 </script>
 
@@ -36,13 +33,13 @@
 
 {#if allCompleted}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.d}" />
-{/if}
-
+{:else}
 <main>
 	<div class="content-wrap">
 		<ReversedSongs bind:done={songsDone} />
 	</div>
 </main>
+{/if}
 
 <style>
 	main {

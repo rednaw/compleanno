@@ -31,11 +31,9 @@
 	}
 
 	onMount(() => {
-		try {
-			if (loadPuzzleState(lrnz26Keys.gameADone)) {
-				completed = true;
-			}
-		} catch { /* localStorage may be unavailable */ }
+		if (loadPuzzleState(lrnz26Keys.gameADone)) {
+			completed = true;
+		}
 	});
 </script>
 
@@ -47,8 +45,7 @@
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.a}" />
-{/if}
-
+{:else}
 <main>
 	<div class="quiz-wrap">
 		<h2 class="intro">{INTRO}</h2>
@@ -62,18 +59,6 @@
 			{/each}
 		</ol>
 
-		{#if completed}
-			<div class="input-row input-row-solved">
-				<input
-					type="text"
-					class="answer-input"
-					value={ANSWER.charAt(0).toUpperCase() + ANSWER.slice(1)}
-					readonly
-					aria-label="Paese"
-				/>
-			</div>
-			<p class="success" aria-live="polite">Corretto!</p>
-		{:else}
 			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
 					id="country-guess"
@@ -101,9 +86,9 @@
 					Controlla
 				</button>
 			</div>
-		{/if}
 	</div>
 </main>
+{/if}
 
 <style>
 	main {
@@ -183,11 +168,6 @@
 		border-color: var(--color-error-border);
 	}
 
-	.input-row-solved {
-		background: var(--color-success-bg);
-		border-color: var(--color-success-border);
-	}
-
 	.answer-input {
 		width: 100%;
 		box-sizing: border-box;
@@ -203,11 +183,6 @@
 
 	.answer-input::placeholder {
 		color: #999;
-	}
-
-	.input-row-solved .answer-input {
-		color: var(--color-success-text);
-		font-weight: 600;
 	}
 
 	.check-row {
@@ -237,15 +212,6 @@
 		font-weight: 700;
 		color: var(--color-error-bg);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-	}
-
-	.success {
-		margin: 0;
-		font-size: 0.95rem;
-		font-weight: 600;
-		text-align: center;
-		color: var(--color-success-bg-strong);
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 
 	@media (max-width: 380px) {

@@ -21,13 +21,9 @@
 	});
 
 	onMount(() => {
-		try {
-			if (loadPuzzleState(lrnz26Keys.gameCDone)) {
-				previouslyDone = true;
-				clipsDone = true;
-				finalDone = true;
-			}
-		} catch { /* localStorage may be unavailable */ }
+		if (loadPuzzleState(lrnz26Keys.gameCDone)) {
+			previouslyDone = true;
+		}
 	});
 </script>
 
@@ -39,8 +35,7 @@
 
 {#if allCompleted}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.c}" />
-{/if}
-
+{:else}
 <main>
 	<div class="content-wrap">
 		<MusicClips bind:done={clipsDone} />
@@ -49,6 +44,7 @@
 		{/if}
 	</div>
 </main>
+{/if}
 
 <style>
 	main {

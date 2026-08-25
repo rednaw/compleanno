@@ -123,8 +123,8 @@ def extract_forward_mp3(
 	)
 
 
-def reverse_mp3(forward_mp3: Path, out_mp3: Path) -> None:
-	"""Build reversed clip from the forward MP3 so both are guaranteed to match."""
+	def reverse_mp3(forward_mp3: Path, out_mp3: Path) -> None:
+	"""Time-reverse a loudnormed clip. Forward file is a temp input, not shipped."""
 	out_mp3.parent.mkdir(parents=True, exist_ok=True)
 	run(
 		[
