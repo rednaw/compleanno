@@ -18,22 +18,31 @@ export function loadTrackSolved(trackId) {
 	}
 }
 
-/** @param {number} count */
-export function saveNormalCount(count) {
+/** @param {0 | 1 | 2} level */
+export function saveSplitLevel(level) {
 	try {
-		localStorage.setItem(lrnz26Keys.gameDNormalCount, String(count));
+		localStorage.setItem(lrnz26Keys.gameDSplitLevel, String(level));
 	} catch {
 		// localStorage may be unavailable
 	}
 }
 
-/** @returns {number} */
-export function loadNormalCount() {
+/** @returns {0 | 1 | 2} */
+export function loadSplitLevel() {
 	try {
-		const raw = localStorage.getItem(lrnz26Keys.gameDNormalCount);
-		if (raw == null) return 0;
+		const raw = localStorage.getItem(lrnz26Keys.gameDSplitLevel);
+		if (raw == null) {
+			// migrate legacy normal-count (0–4) → split level (0–2)
+			const legacy = localStorage.getItem(lrnz26Keys.gameDNormalCount);
+			if (legacy != null) {
+				const n = Number.parseInt(legacy, 10);
+				if (Number.isFinite(n)) return /** @type {0 | 1 | 2} */ (Math.min(2, Math.max(0, n)));
+			}
+			return 0;
+		}
 		const n = Number.parseInt(raw, 10);
-		return Number.isFinite(n) && n >= 0 ? n : 0;
+		if (n === 1 || n === 2) return n;
+		return 0;
 	} catch {
 		return 0;
 	}

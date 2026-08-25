@@ -1,14 +1,13 @@
 <script>
 	import { base } from '$app/paths';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { tracks, guessMatchesTrack, trackDisplayTitle } from './tracks.js';
 	import {
 		saveTrackSolved,
 		loadTrackSolved,
-		saveNormalCount,
-		loadNormalCount
+		saveSplitLevel,
+		loadSplitLevel
 	} from './persistence.js';
-	import CheatTuner from './CheatTuner.svelte';
 
 	/** @type {{ done: boolean }} */
 	let { done = $bindable(false) } = $props();
@@ -16,48 +15,58 @@
 	/** @type {Record<string, boolean>} */
 	let solved = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
 
-	let guess = $state('');
-	/** @type {'not-started' | 'wrong'} */
-	let guessStatus = $state('not-started');
+	/** 0 = one field (4 songs), 1 = two fields (2 each), 2 = four fields (1 each). */
+	/** @type {0 | 1 | 2} */
+	let splitLevel = $state(0);
 
-	/** How many tracks (in manifest order) play forward instead of reversed. */
-	let normalCount = $state(0);
+	/** @type {Record<number, string>} */
+	let guesses = $state({});
+
+	/** @type {Record<number, 'idle' | 'wrong'>} */
+	let guessStatus = $state({});
+
+	/** @type {Record<number, boolean>} */
+	let groupPlaying = $state({});
 
 	/** @type {Record<string, boolean>} */
 	let audioLoadError = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
-
-	/** @type {Record<string, HTMLAudioElement | undefined>} */
-	const forwardAudioById = {};
 
 	/** @type {Record<string, HTMLAudioElement | undefined>} */
 	const reversedAudioById = {};
 
 	const allCompleted = $derived(tracks.every((t) => solved[t.id]));
 
-	const unsolvedTracks = $derived(tracks.filter((t) => !solved[t.id]));
-
 	const solvedTracksOrdered = $derived(tracks.filter((t) => solved[t.id]));
 
-	/** Nominal loop length (s) when metadata not ready yet; clips are ~20s from extract_d. */
+	/** @type {{ index: number; tracks: typeof tracks }[]} */
+	const groups = $derived.by(() => {
+		const numGroups = 2 ** splitLevel;
+		const size = tracks.length / numGroups;
+		return Array.from({ length: numGroups }, (_, i) => ({
+			index: i,
+			tracks: tracks.slice(i * size, (i + 1) * size)
+		}));
+	});
+
+	const activeGroups = $derived(
+		groups.filter((g) => g.tracks.some((t) => !solved[t.id]))
+	);
+
 	const DEFAULT_LOOP_SEC = 20;
 
-	/** @param {string} id @param {'forward' | 'reversed'} kind */
-	function trackSrc(id, kind) {
-		return kind === 'forward'
-			? `${base}/lrnz26/d/${id}.mp3`
-			: `${base}/lrnz26/d/${id}-reversed.mp3`;
+	/** @param {string} id */
+	function trackSrc(id) {
+		return `${base}/lrnz26/d/${id}-reversed.mp3`;
 	}
 
-	/** @param {HTMLElement} node @param {{ id: string; kind: 'forward' | 'reversed' }} opts */
+	/** @param {HTMLElement} node @param {{ id: string }} opts */
 	function audioEl(node, opts) {
-		const { id, kind } = opts;
+		const { id } = opts;
 		const el = /** @type {HTMLAudioElement} */ (node);
-		if (kind === 'forward') forwardAudioById[id] = el;
-		else reversedAudioById[id] = el;
+		reversedAudioById[id] = el;
 		return {
 			destroy() {
-				if (kind === 'forward' && forwardAudioById[id] === el) delete forwardAudioById[id];
-				if (kind === 'reversed' && reversedAudioById[id] === el) delete reversedAudioById[id];
+				if (reversedAudioById[id] === el) delete reversedAudioById[id];
 			}
 		};
 	}
@@ -68,52 +77,59 @@
 		return (trackIndex / count) * loopSec;
 	}
 
-	/** @param {number} trackIndex */
-	function trackPlaysNormal(trackIndex) {
-		return trackIndex < normalCount;
-	}
-
-	/** @param {string} id */
-	function activeAudio(id) {
-		const trackIndex = tracks.findIndex((t) => t.id === id);
-		return trackPlaysNormal(trackIndex) ? forwardAudioById[id] : reversedAudioById[id];
+	/** @param {typeof tracks} groupTracks */
+	function unsolvedInGroup(groupTracks) {
+		return groupTracks.filter((t) => !solved[t.id] && !audioLoadError[t.id]);
 	}
 
 	function pauseAll() {
 		for (const t of tracks) {
-			forwardAudioById[t.id]?.pause();
 			reversedAudioById[t.id]?.pause();
 		}
+		groupPlaying = {};
 	}
 
 	/** @param {string} id */
 	function stopTrack(id) {
-		forwardAudioById[id]?.pause();
-		reversedAudioById[id]?.pause();
-		const fwd = forwardAudioById[id];
 		const rev = reversedAudioById[id];
-		if (fwd) {
-			fwd.muted = true;
-			fwd.volume = 0;
-		}
 		if (rev) {
+			rev.pause();
 			rev.muted = true;
 			rev.volume = 0;
 		}
 	}
 
-	function startMix() {
-		if (allCompleted || unsolvedTracks.length === 0) return;
+	/** @param {number} groupIndex */
+	function pauseGroup(groupIndex) {
+		const group = groups.find((g) => g.index === groupIndex);
+		if (!group) return;
+		for (const t of group.tracks) {
+			reversedAudioById[t.id]?.pause();
+		}
+		groupPlaying = { ...groupPlaying, [groupIndex]: false };
+	}
 
-		pauseAll();
-		for (const t of tracks) stopTrack(t.id);
+	/** @param {number} groupIndex */
+	function playGroup(groupIndex) {
+		const group = groups.find((g) => g.index === groupIndex);
+		if (!group || allCompleted) return;
 
-		const playing = unsolvedTracks.filter((t) => !audioLoadError[t.id]);
+		for (const g of groups) {
+			if (g.index !== groupIndex) pauseGroup(g.index);
+		}
+
+		const playing = unsolvedInGroup(group.tracks);
 		if (playing.length === 0) return;
+
+		for (const t of group.tracks) {
+			if (!playing.some((p) => p.id === t.id)) {
+				reversedAudioById[t.id]?.pause();
+			}
+		}
 
 		for (let i = 0; i < playing.length; i++) {
 			const t = playing[i];
-			const a = activeAudio(t.id);
+			const a = reversedAudioById[t.id];
 			if (!a) continue;
 
 			const seekAndPlay = () => {
@@ -123,9 +139,16 @@
 				a.currentTime = Math.min(offset, Math.max(0, loopSec - 0.05));
 				a.muted = false;
 				a.volume = 1;
-				a.play().catch(() => {
-					audioLoadError[t.id] = true;
-				});
+				a.play()
+					.then(() => {
+						groupPlaying = { ...groupPlaying, [groupIndex]: true };
+					})
+					.catch((err) => {
+						if (!(err instanceof DOMException && err.name === 'NotAllowedError')) {
+							audioLoadError[t.id] = true;
+						}
+						groupPlaying = { ...groupPlaying, [groupIndex]: false };
+					});
 			};
 
 			if (a.readyState >= 1) seekAndPlay();
@@ -133,34 +156,52 @@
 		}
 	}
 
-	function checkGuess() {
-		if (allCompleted || !guess.trim()) return;
+	/** @param {number} groupIndex */
+	function togglePlay(groupIndex) {
+		if (groupPlaying[groupIndex]) pauseGroup(groupIndex);
+		else playGroup(groupIndex);
+	}
 
-		const matches = unsolvedTracks.filter((t) => guessMatchesTrack(guess, t));
+	/** @param {number} groupIndex */
+	function checkGuess(groupIndex) {
+		const group = groups.find((g) => g.index === groupIndex);
+		if (!group || allCompleted) return;
+
+		const guess = (guesses[groupIndex] ?? '').trim();
+		if (!guess) return;
+
+		const unsolved = group.tracks.filter((t) => !solved[t.id]);
+		const matches = unsolved.filter((t) => guessMatchesTrack(guess, t));
 
 		if (matches.length === 1) {
 			const t = matches[0];
 			solved[t.id] = true;
 			saveTrackSolved(t.id);
 			stopTrack(t.id);
-			guessStatus = 'not-started';
-			guess = '';
+			guessStatus[groupIndex] = 'idle';
+			guesses = { ...guesses, [groupIndex]: '' };
 			done = tracks.every((tr) => solved[tr.id]);
-			if (!done) startMix();
+
+			const stillPlaying = unsolvedInGroup(group.tracks);
+			if (stillPlaying.length === 0) {
+				pauseGroup(groupIndex);
+			} else if (groupPlaying[groupIndex]) {
+				playGroup(groupIndex);
+			}
 		} else {
-			guessStatus = 'wrong';
-			guess = '';
+			guessStatus[groupIndex] = 'wrong';
+			guesses = { ...guesses, [groupIndex]: '' };
 			window.setTimeout(() => {
-				guessStatus = 'not-started';
+				guessStatus[groupIndex] = 'idle';
 			}, 1200);
 		}
 	}
 
 	function chickenOut() {
-		if (allCompleted || normalCount >= tracks.length) return;
-		normalCount += 1;
-		saveNormalCount(normalCount);
-		startMix();
+		if (allCompleted || splitLevel >= 2) return;
+		splitLevel = /** @type {0 | 1 | 2} */ (splitLevel + 1);
+		saveSplitLevel(splitLevel);
+		pauseAll();
 	}
 
 	onMount(() => {
@@ -168,13 +209,9 @@
 			tracks.forEach((t) => {
 				if (loadTrackSolved(t.id)) solved[t.id] = true;
 			});
-			normalCount = loadNormalCount();
+			splitLevel = loadSplitLevel();
 			done = tracks.every((t) => solved[t.id]);
 		} catch { /* localStorage may be unavailable */ }
-
-		void tick().then(() => {
-			if (!done) startMix();
-		});
 
 		return () => pauseAll();
 	});
@@ -184,19 +221,10 @@
 	<div class="audio-layer" aria-hidden="true">
 		{#each tracks as track (track.id)}
 			<audio
-				use:audioEl={{ id: track.id, kind: 'forward' }}
-				src={trackSrc(track.id, 'forward')}
+				use:audioEl={{ id: track.id }}
+				src={trackSrc(track.id)}
 				loop
-				preload="metadata"
-				onerror={() => {
-					audioLoadError[track.id] = true;
-				}}
-			></audio>
-			<audio
-				use:audioEl={{ id: track.id, kind: 'reversed' }}
-				src={trackSrc(track.id, 'reversed')}
-				loop
-				preload="metadata"
+				preload="auto"
 				onerror={() => {
 					audioLoadError[track.id] = true;
 				}}
@@ -213,32 +241,62 @@
 	{/if}
 
 	{#if !allCompleted}
-		<div class="input-row" class:input-row-wrong={guessStatus === 'wrong'}>
-			<input
-				type="text"
-				placeholder="Song or band"
-				bind:value={guess}
-				autocomplete="off"
-				aria-invalid={guessStatus === 'wrong'}
-				onkeydown={(e) => e.key === 'Enter' && checkGuess()}
-			/>
-		</div>
+		<div class="groups-stack">
+			{#each activeGroups as group (group.index)}
+				{@const unsolved = group.tracks.filter((t) => !solved[t.id])}
+				<section class="song-group" aria-label="Song group {group.index + 1}">
+					{#if splitLevel > 0 && unsolved.length > 1}
+						<p class="group-hint">{unsolved.length} songs</p>
+					{/if}
 
-		<div class="actions-row">
-			<button type="button" class="check-btn" onclick={() => checkGuess()} disabled={!guess.trim()}>
-				Check
-			</button>
-			{#if normalCount < tracks.length}
-				<button type="button" class="chicken-btn" onclick={() => chickenOut()}>Chicken out</button>
-			{/if}
+					<div
+						class="input-row"
+						class:input-row-wrong={guessStatus[group.index] === 'wrong'}
+					>
+						<input
+							type="text"
+							placeholder="Song or band"
+							value={guesses[group.index] ?? ''}
+							oninput={(e) => {
+								guesses = { ...guesses, [group.index]: e.currentTarget.value };
+							}}
+							autocomplete="off"
+							aria-invalid={guessStatus[group.index] === 'wrong'}
+							onkeydown={(e) => e.key === 'Enter' && checkGuess(group.index)}
+						/>
+					</div>
+
+					<div class="actions-row">
+						<button
+							type="button"
+							class="play-btn"
+							onclick={() => togglePlay(group.index)}
+							aria-pressed={groupPlaying[group.index] ?? false}
+						>
+							{groupPlaying[group.index] ? 'Pause' : 'Play'}
+						</button>
+						<button
+							type="button"
+							class="check-btn"
+							onclick={() => checkGuess(group.index)}
+							disabled={!(guesses[group.index] ?? '').trim()}
+						>
+							Check
+						</button>
+						{#if splitLevel < 2}
+							<button type="button" class="chicken-btn" onclick={() => chickenOut()}>
+								Chicken out
+							</button>
+						{/if}
+					</div>
+				</section>
+			{/each}
 		</div>
 	{/if}
 
 	{#if tracks.some((t) => audioLoadError[t.id])}
 		<p class="audio-hint">Some audio failed to load — run <code>scripts/lrnz26/extract_d.py</code></p>
 	{/if}
-
-	<CheatTuner onPauseAll={pauseAll} />
 </div>
 
 <style>
@@ -274,6 +332,31 @@
 		font-size: 0.95em;
 		font-weight: 600;
 		line-height: 1.3;
+		text-align: center;
+	}
+
+	.groups-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		width: 100%;
+	}
+
+	.song-group {
+		width: 100%;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.song-group:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.group-hint {
+		margin: 0 0 0.5rem;
+		font-size: 0.8rem;
+		opacity: 0.65;
 		text-align: center;
 	}
 
@@ -316,19 +399,29 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.75rem;
+		gap: 0.65rem;
 		flex-wrap: wrap;
 	}
 
+	.play-btn,
 	.check-btn {
 		font-size: 1.05em;
-		padding: 0.55em 1.5em;
+		padding: 0.55em 1.25em;
 		border-radius: 0.5em;
 		border: none;
-		background: var(--color-royal-blue);
-		color: var(--color-white);
 		font-weight: 700;
 		cursor: pointer;
+	}
+
+	.play-btn {
+		background: var(--color-white);
+		border: 2px solid var(--color-border);
+		color: var(--color-text);
+	}
+
+	.check-btn {
+		background: var(--color-royal-blue);
+		color: var(--color-white);
 	}
 
 	.check-btn:disabled {

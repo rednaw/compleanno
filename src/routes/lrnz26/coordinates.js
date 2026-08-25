@@ -8,19 +8,6 @@ export const lrnz26LocationById = Object.freeze({
 	termini: { lat: 52.4022761, lng: 4.9316743 }
 });
 
-/** @type {Readonly<Record<'a' | 'b' | 'c' | 'd', keyof typeof lrnz26LocationById>>} */
-export const lrnz26PuzzleLocationId = Object.freeze({
-	a: 'van-ostade',
-	b: 'darlingstraat',
-	c: 'castillejos',
-	d: 'termini'
-});
-
-/** @param {'a' | 'b' | 'c' | 'd'} puzzle */
-export function locationForPuzzle(puzzle) {
-	return lrnz26LocationById[lrnz26PuzzleLocationId[puzzle]];
-}
-
 /** @param {string} id */
 export function locationByLineId(id) {
 	const point = lrnz26LocationById[id];
@@ -46,4 +33,4 @@ export const lrnz26HubImage = Object.freeze({
 	d: 'termini.webp'
 });
 
-export const lrnz26FinalImage = 'all-homes.webp';
+export const lrnz26FinalImage = 'kachel-moshpit.jpg';

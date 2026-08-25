@@ -142,6 +142,30 @@
 		pointer-events: none;
 	}
 
+	/* Solved: the reward image stands alone, no button chrome around it. */
+	.code-button.code-button-solved {
+		max-width: 400px;
+		width: 100%;
+		aspect-ratio: auto;
+		padding: 0;
+		background: none;
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.code-button.code-button-solved .hub-img {
+		height: auto;
+		border-radius: 0.5rem;
+	}
+
+	.code-button.code-button-solved:hover {
+		background: none;
+		border: none;
+		box-shadow: none;
+	}
+
 	.game-button:hover,
 	.code-button:not(.code-button-disabled):hover {
 		background: var(--color-hover-bg);

@@ -8,8 +8,8 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
-	import CodeSolved from '../CodeSolved.svelte';
-	import { formatCoords, locationByLineId, mapsUrl } from '../coordinates.js';
+	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import { formatCoords, locationByLineId, lrnz26FinalImage, mapsUrl } from '../coordinates.js';
 	import {
 		CODE_HEADING,
 		lineById,
@@ -90,7 +90,7 @@
 <BackButton href={resolve('/lrnz26')} />
 
 {#if solved}
-	<CodeSolved orderedIds={CODE_CORRECT_ORDER} />
+	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26FinalImage}" />
 {:else}
 	<main>
 		<div class="quiz-wrap">
@@ -99,7 +99,6 @@
 			<div
 				class="order-list"
 				role="list"
-				aria-describedby="order-hint"
 				class:order-list-wrong={checkStatus === 'wrong'}
 			>
 				{#each orderIds as id, i (id)}

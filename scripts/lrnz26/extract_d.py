@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Game D (lrnz26): download YouTube audio, cut [start, end), loudnorm, write forward + reversed MP3.
+Game D (lrnz26): download YouTube audio, cut [start, end), loudnorm, write reversed MP3.
 
-  {id}.mp3           — forward (normal) clip
-  {id}-reversed.mp3  — reversed clip
+  {id}-reversed.mp3  — reversed clip (game audio)
 
 Requires on PATH: yt-dlp, ffmpeg (with libmp3lame)
 
@@ -17,6 +16,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 CACHE_MEDIA_SUFFIXES = frozenset(
@@ -150,7 +150,7 @@ def reverse_mp3(forward_mp3: Path, out_mp3: Path) -> None:
 def main() -> None:
 	root = Path(__file__).resolve().parents[2]
 	default_manifest = root / "src" / "routes" / "lrnz26" / "d" / "manifest.json"
-	parser = argparse.ArgumentParser(description="Cut forward + reversed MP3 loops for lrnz26 game D.")
+	parser = argparse.ArgumentParser(description="Cut reversed MP3 loops for lrnz26 game D.")
 	parser.add_argument("--manifest", type=Path, default=default_manifest)
 	parser.add_argument("--out-dir", type=Path, default=root / "static" / "lrnz26" / "d")
 	parser.add_argument("--cache-dir", type=Path, default=root / ".cache" / "gcm26" / "b")
@@ -180,12 +180,15 @@ def main() -> None:
 		src = download_best_audio(url, args.cache_dir, args.force_download)
 		print(f"  source: {src.name}")
 
-		forward = args.out_dir / f"{tid}.mp3"
 		reversed_mp3 = args.out_dir / f"{tid}-reversed.mp3"
-		print(f"  -> {forward.relative_to(root)}")
-		extract_forward_mp3(src, forward, start, duration)
 		print(f"  -> {reversed_mp3.relative_to(root)}")
-		reverse_mp3(forward, reversed_mp3)
+		with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+			tmp_path = Path(tmp.name)
+		try:
+			extract_forward_mp3(src, tmp_path, start, duration)
+			reverse_mp3(tmp_path, reversed_mp3)
+		finally:
+			tmp_path.unlink(missing_ok=True)
 
 	print("Done.")
 

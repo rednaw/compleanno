@@ -1,13 +1,13 @@
-/** @typedef {{ id: string, name: string, letter: string, kind: 'flag' | 'shape' }} Clue */
+/** @typedef {{ id: string, kind: 'flag' | 'shape' }} Clue */
 
 /** @type {readonly Clue[]} */
 export const CLUES = Object.freeze([
-	{ id: 'cambodia', name: 'Cambodia', letter: 'C', kind: 'shape' },
-	{ id: 'afghanistan', name: 'Afghanistan', letter: 'A', kind: 'flag' },
-	{ id: 'nauru', name: 'Nauru', letter: 'N', kind: 'shape' },
-	{ id: 'angola', name: 'Angola', letter: 'A', kind: 'flag' },
-	{ id: 'drenthe', name: 'Drenthe', letter: 'D', kind: 'shape' },
-	{ id: 'amsterdam', name: 'Amsterdam', letter: 'A', kind: 'flag' }
+	{ id: 'cambodia', kind: 'shape' },
+	{ id: 'afghanistan', kind: 'flag' },
+	{ id: 'nauru', kind: 'shape' },
+	{ id: 'angola', kind: 'flag' },
+	{ id: 'drenthe', kind: 'shape' },
+	{ id: 'amsterdam', kind: 'flag' }
 ]);
 
 /** @type {Readonly<Record<string, string>>} */
