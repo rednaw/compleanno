@@ -1,7 +1,8 @@
 import manifest from './manifest.json';
 import { locationByLineId } from '../coordinates.js';
+import { answerMatches } from '../normalize.js';
 
-const { lines, correctOrder, startOrder, heading } = manifest;
+const { lines, correctOrder, startOrder, heading, note } = manifest;
 
 if (!Array.isArray(lines) || lines.length === 0) {
 	throw new Error('lrnz26/code manifest.json: non-empty lines[] required');
@@ -45,6 +46,42 @@ export const CODE_CORRECT_ORDER = correctOrder;
 
 /** @readonly */
 export const CODE_START_ORDER = startOrder;
+
+const noteAccepted = Array.isArray(note?.accepted)
+	? note.accepted.filter((a) => typeof a === 'string' && a.trim())
+	: [];
+if (noteAccepted.length === 0) {
+	throw new Error('lrnz26/code manifest: note.accepted must list the physical note text');
+}
+
+/** @readonly */
+export const NOTE_ACCEPTED = noteAccepted;
+
+export const NOTE_DISPLAY =
+	typeof note?.display === 'string' && note.display.trim() ? note.display.trim() : noteAccepted[0];
+
+/** @param {string} guess */
+export function noteMatches(guess) {
+	return NOTE_ACCEPTED.some((accepted) => answerMatches(guess, accepted));
+}
+
+const presentUrlRaw = typeof note?.presentUrl === 'string' ? note.presentUrl.trim() : '';
+try {
+	const present = new URL(presentUrlRaw);
+	if (present.protocol !== 'https:') {
+		throw new Error('not https');
+	}
+} catch {
+	throw new Error('lrnz26/code manifest: note.presentUrl must be an https URL');
+}
+
+/** @readonly */
+export const PRESENT_URL = presentUrlRaw;
+
+export const PRESENT_TITLE =
+	typeof note?.presentTitle === 'string' && note.presentTitle.trim()
+		? note.presentTitle.trim()
+		: 'Il tuo regalo';
 
 const correctKey = sortedFingerprint(CODE_CORRECT_ORDER);
 

@@ -8,8 +8,9 @@
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
-	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import { formatCoords, locationByLineId, lrnz26FinalImage, mapsUrl } from '../coordinates.js';
+	import { formatCoords, locationByLineId, mapsUrl } from '../coordinates.js';
+	import CodeFinale from './CodeFinale.svelte';
+	import DevSkipButton from '../DevSkipButton.svelte';
 	import {
 		CODE_HEADING,
 		lineById,
@@ -58,13 +59,19 @@
 		persistOrder();
 	}
 
+	function completeOrder() {
+		if (solved) return;
+		orderIds = [...CODE_CORRECT_ORDER];
+		solved = true;
+		checkStatus = 'idle';
+		savePuzzleState(lrnz26Keys.codeDone, '1');
+		clearPuzzleState(lrnz26Keys.codeOrder);
+	}
+
 	function checkOrder() {
 		if (solved) return;
 		if (CODE_CORRECT_ORDER.every((id, i) => orderIds[i] === id)) {
-			solved = true;
-			checkStatus = 'idle';
-			savePuzzleState(lrnz26Keys.codeDone, '1');
-			clearPuzzleState(lrnz26Keys.codeOrder);
+			completeOrder();
 		} else {
 			checkStatus = 'wrong';
 		}
@@ -88,9 +95,12 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+{#if !solved}
+	<DevSkipButton onSkip={completeOrder} />
+{/if}
 
 {#if solved}
-	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26FinalImage}" />
+	<CodeFinale />
 {:else}
 	<main>
 		<div class="quiz-wrap">

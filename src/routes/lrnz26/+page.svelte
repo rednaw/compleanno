@@ -1,8 +1,9 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
+	import { loadPuzzleState, savePuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+	import DevSkipButton from './DevSkipButton.svelte';
 	import { LRNZ26_STORAGE_PREFIX, lrnz26Keys } from './storage-keys.js';
 	import { lrnz26FinalImage, lrnz26HubImage } from './coordinates.js';
 
@@ -22,6 +23,17 @@
 		codeDone = loadPuzzleState(lrnz26Keys.codeDone);
 	});
 
+	function skipPuzzles() {
+		savePuzzleState(lrnz26Keys.gameADone, '1');
+		savePuzzleState(lrnz26Keys.gameBDone, '1');
+		savePuzzleState(lrnz26Keys.gameCDone, '1');
+		savePuzzleState(lrnz26Keys.gameDDone, '1');
+		gameADone = true;
+		gameBDone = true;
+		gameCDone = true;
+		gameDDone = true;
+	}
+
 	function clearGlobalState() {
 		try {
 			clearPuzzleKeyPrefix(LRNZ26_STORAGE_PREFIX);
@@ -40,6 +52,7 @@
 
 <main>
 	<ClearProgressButton onClear={clearGlobalState} />
+	<DevSkipButton onSkip={skipPuzzles} />
 	<div class="content">
 		<div class="games-grid">
 			<a href={resolve('/lrnz26/a')} class="game-button" class:game-button-solved={gameADone}>

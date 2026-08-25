@@ -8,6 +8,10 @@
 	import MusicClips from './MusicClips.svelte';
 	import FinalPuzzle from './FinalPuzzle.svelte';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import DevSkipButton from '../DevSkipButton.svelte';
+	import { clips } from './clips.js';
+	import { FINAL_ANSWERS } from './final.js';
+	import { saveClipProgress, saveFinalProgress } from './persistence.js';
 	import '../../gcm26/quiz-shared.css';
 
 	let clipsDone = $state(false);
@@ -25,6 +29,24 @@
 			previouslyDone = true;
 		}
 	});
+
+	function skipPuzzle() {
+		if (allCompleted) return;
+		clips.forEach((clip, i) => {
+			saveClipProgress(i, {
+				status: 'correct',
+				feedback: 'correct',
+				guess: clip.band,
+				level: 3
+			});
+		});
+		saveFinalProgress({
+			guesses: FINAL_ANSWERS.map((item) => item.display),
+			statuses: FINAL_ANSWERS.map(() => 'correct')
+		});
+		clipsDone = true;
+		finalDone = true;
+	}
 </script>
 
 <svelte:head>
@@ -32,6 +54,7 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+<DevSkipButton onSkip={skipPuzzle} />
 
 {#if allCompleted}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.c}" />

@@ -9,18 +9,24 @@
 	import { CLUES, ANSWER, INTRO } from './countries.js';
 	import CountryClue from './CountryClue.svelte';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
 	let completed = $state(false);
 	let showWrong = $state(false);
 
+	function completePuzzle() {
+		if (completed) return;
+		completed = true;
+		showWrong = false;
+		savePuzzleState(lrnz26Keys.gameADone, '1');
+	}
+
 	function checkAnswer() {
 		if (completed || !guess.trim()) return;
 
 		if (answerMatches(guess, ANSWER)) {
-			completed = true;
-			showWrong = false;
-			savePuzzleState(lrnz26Keys.gameADone, '1');
+			completePuzzle();
 		} else {
 			showWrong = true;
 			guess = '';
@@ -42,6 +48,7 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+<DevSkipButton onSkip={completePuzzle} />
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.a}" />

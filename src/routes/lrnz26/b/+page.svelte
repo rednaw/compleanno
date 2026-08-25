@@ -15,6 +15,7 @@
 		matchesAnswer1
 	} from './exercises.js';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
 	let step1Done = $state(false);
@@ -24,22 +25,27 @@
 
 	const onStep2 = $derived(step1Done && !completed);
 
+	function completeCurrent() {
+		if (completed) return;
+		showWrong = false;
+		if (onStep2) {
+			completed = true;
+			guess = ANSWER_2;
+			savePuzzleState(lrnz26Keys.gameBDone, '1');
+		} else {
+			step1Done = true;
+			guess = '';
+			savePuzzleState(lrnz26Keys.gameBStep1Done, '1');
+		}
+	}
+
 	function checkAnswer() {
 		if (completed || !guess.trim()) return;
 
 		const correct = onStep2 ? answerMatches(guess, ANSWER_2) : matchesAnswer1(guess);
 
 		if (correct) {
-			showWrong = false;
-			if (onStep2) {
-				completed = true;
-				guess = ANSWER_2;
-				savePuzzleState(lrnz26Keys.gameBDone, '1');
-			} else {
-				step1Done = true;
-				guess = '';
-				savePuzzleState(lrnz26Keys.gameBStep1Done, '1');
-			}
+			completeCurrent();
 		} else {
 			showWrong = true;
 			guess = '';
@@ -63,6 +69,7 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
+<DevSkipButton onSkip={completeCurrent} />
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.b}" />

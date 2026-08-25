@@ -7,5 +7,10 @@
 		{ "id": "van-ostade", "text": "52.3521, 4.8906", "image": "van-ostade.webp" }
 	],
 	"correctOrder": ["castillejos", "termini", "darlingstraat", "van-ostade"],
-	"startOrder": ["darlingstraat", "van-ostade", "termini", "castillejos"]
+	"startOrder": ["darlingstraat", "van-ostade", "termini", "castillejos"],
+	"note": {
+		"accepted": ["changeme"],
+		"presentUrl": "https://feverup.com/m/632414",
+		"presentTitle": "The Jury Experience: Dood Door AI"
+	}
 }

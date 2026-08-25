@@ -16,7 +16,8 @@ export const lrnz26Keys = Object.freeze({
 	gameDNormalCount: 'lrnz26_game_d_normal_count',
 	gameDSplitLevel: 'lrnz26_game_d_split_level',
 	codeDone: 'lrnz26_game_code_done',
-	codeOrder: 'lrnz26_game_code_order'
+	codeOrder: 'lrnz26_game_code_order',
+	codeNoteDone: 'lrnz26_game_code_note_done'
 });
 
 /** @param {number} clipIndex */
