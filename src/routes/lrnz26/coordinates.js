@@ -41,4 +41,5 @@ export const lrnz26HubImage = Object.freeze({
 	d: `${PUZZLE_LOCATION.d}.webp`
 });
 
-export const lrnz26FinalImage = 'kachel-moshpit.jpg';
+export const lrnz26MoshpitImage = 'kachel-moshpit.jpg';
+export const lrnz26PresentImage = 'finale.avif';

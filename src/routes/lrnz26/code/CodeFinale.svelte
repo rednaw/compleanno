@@ -3,9 +3,10 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { confetti } from '@neoconfetti/svelte';
 	import { loadPuzzleState, savePuzzleState } from '$lib/puzzle-utils.js';
-	import { lrnz26FinalImage } from '../coordinates.js';
+	import { lrnz26MoshpitImage, lrnz26PresentImage } from '../coordinates.js';
 	import { lrnz26Keys } from '../storage-keys.js';
-	import { NOTE_DISPLAY, PRESENT_TITLE, PRESENT_URL, noteMatches } from './items.js';
+	import { NOTE_PROMPT, PRESENT_TITLE, PRESENT_URL, noteMatches } from './items.js';
+	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
 	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
@@ -67,7 +68,6 @@
 		if (noteDone) return;
 		noteDone = true;
 		showWrong = false;
-		guess = NOTE_DISPLAY;
 		savePuzzleState(lrnz26Keys.codeNoteDone, '1');
 		if (wrongTimer) clearTimeout(wrongTimer);
 		startCelebrate();
@@ -91,8 +91,6 @@
 	onMount(() => {
 		if (loadPuzzleState(lrnz26Keys.codeNoteDone)) {
 			noteDone = true;
-			guess = NOTE_DISPLAY;
-			startCelebrate();
 		}
 	});
 
@@ -106,60 +104,54 @@
 	<DevSkipButton onSkip={completeNote} />
 {/if}
 
+{#if noteDone}
+	<ResultFullscreen
+		src="{base}/lrnz26/code/{lrnz26PresentImage}"
+		alt={PRESENT_TITLE}
+		href={PRESENT_URL}
+		cover
+	/>
+{:else}
 <main>
 	<div class="finale-wrap">
 		<img
-			src="{base}/lrnz26/code/{lrnz26FinalImage}"
+			src="{base}/lrnz26/code/{lrnz26MoshpitImage}"
 			alt=""
 			class="moshpit"
 		/>
 
-		<div
-			class="input-row"
-			class:input-row--wrong={showWrong}
-			class:input-row--solved={noteDone}
-		>
+		<p class="note-prompt">{NOTE_PROMPT}</p>
+
+		<div class="input-row" class:input-row--wrong={showWrong}>
 			<input
 				type="text"
 				class="note-input"
-				placeholder="Nota"
-				aria-label="Nota"
+				aria-label={NOTE_PROMPT}
 				autocomplete="off"
 				spellcheck="false"
 				bind:value={guess}
-				readonly={noteDone}
 				disabled={showWrong}
 				aria-invalid={showWrong}
-				onkeydown={(e) => !noteDone && e.key === 'Enter' && checkNote()}
+				onkeydown={(e) => !showWrong && e.key === 'Enter' && checkNote()}
 			/>
 		</div>
 
-		{#if !noteDone}
-			<div class="check-row">
-				{#if showWrong}
-					<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
-				{/if}
-				<button
-					type="button"
-					class="check-btn"
-					disabled={!guess.trim() || showWrong}
-					onclick={checkNote}
-				>
-					Controlla
-				</button>
-			</div>
-		{:else}
-			<a
-				class="present"
-				href={PRESENT_URL}
-				target="_blank"
-				rel="noopener noreferrer"
+		<div class="check-row">
+			{#if showWrong}
+				<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
+			{/if}
+			<button
+				type="button"
+				class="check-btn"
+				disabled={!guess.trim() || showWrong}
+				onclick={checkNote}
 			>
-				{PRESENT_TITLE}
-			</a>
-		{/if}
+				Controlla
+			</button>
+		</div>
 	</div>
 </main>
+{/if}
 
 <style>
 	main {
@@ -187,7 +179,15 @@
 		border-radius: 0.5rem;
 		border: 2px solid var(--color-border);
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-		margin-bottom: 0.85rem;
+		margin-bottom: 0.65rem;
+	}
+
+	.note-prompt {
+		margin: 0 0 0.75rem;
+		font-size: clamp(1.15rem, 3.8vw, 1.4rem);
+		font-weight: 700;
+		color: var(--color-white);
+		line-height: 1.3;
 	}
 
 	.input-row {
@@ -211,11 +211,6 @@
 		border-color: var(--color-error-border);
 	}
 
-	.input-row--solved {
-		background: var(--color-success-bg);
-		border-color: var(--color-success-border);
-	}
-
 	.note-input {
 		width: 100%;
 		box-sizing: border-box;
@@ -227,15 +222,6 @@
 		color: var(--color-text);
 		background: transparent;
 		outline: none;
-	}
-
-	.note-input::placeholder {
-		color: #999;
-	}
-
-	.input-row--solved .note-input {
-		color: var(--color-success-text);
-		font-weight: 600;
 	}
 
 	.check-row {
@@ -264,28 +250,5 @@
 		font-size: 0.95rem;
 		font-weight: 700;
 		color: var(--color-error-text);
-	}
-
-	.present {
-		display: block;
-		width: 100%;
-		box-sizing: border-box;
-		margin-top: 0.25rem;
-		padding: 1rem 1.1rem 1.15rem;
-		border-radius: 0.5rem;
-		background: var(--color-white);
-		border: 2px solid var(--color-border);
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-		font-size: clamp(1.05rem, 4vw, 1.25rem);
-		font-weight: 800;
-		line-height: 1.3;
-		text-wrap: pretty;
-		color: var(--color-royal-blue);
-		text-decoration: underline;
-		text-underline-offset: 0.15em;
-	}
-
-	.present:active {
-		opacity: 0.85;
 	}
 </style>

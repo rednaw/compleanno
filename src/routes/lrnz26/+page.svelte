@@ -5,13 +5,15 @@
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import DevSkipButton from './DevSkipButton.svelte';
 	import { LRNZ26_STORAGE_PREFIX, lrnz26Keys } from './storage-keys.js';
-	import { lrnz26FinalImage, lrnz26HubImage } from './coordinates.js';
+	import { lrnz26MoshpitImage, lrnz26HubImage, lrnz26PresentImage } from './coordinates.js';
+	import { PRESENT_TITLE, PRESENT_URL } from './code/items.js';
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
 	let gameCDone = $state(false);
 	let gameDDone = $state(false);
 	let codeDone = $state(false);
+	let codeNoteDone = $state(false);
 
 	const allPuzzlesDone = $derived(gameADone && gameBDone && gameCDone && gameDDone);
 
@@ -21,6 +23,7 @@
 		gameCDone = loadPuzzleState(lrnz26Keys.gameCDone);
 		gameDDone = loadPuzzleState(lrnz26Keys.gameDDone);
 		codeDone = loadPuzzleState(lrnz26Keys.codeDone);
+		codeNoteDone = loadPuzzleState(lrnz26Keys.codeNoteDone);
 	});
 
 	function skipPuzzles() {
@@ -42,6 +45,7 @@
 			gameCDone = false;
 			gameDDone = false;
 			codeDone = false;
+			codeNoteDone = false;
 		} catch { /* localStorage may be unavailable */ }
 	}
 </script>
@@ -70,9 +74,19 @@
 		</div>
 		<div class="arrow">↓</div>
 		<div class="code-section">
-			{#if codeDone}
-				<a href={resolve('/lrnz26/code')} class="code-button code-button-solved">
-					<img src="{base}/lrnz26/code/{lrnz26FinalImage}" alt="" class="hub-img" />
+			{#if codeNoteDone || codeDone}
+				<a
+					href={codeNoteDone ? PRESENT_URL : resolve('/lrnz26/code')}
+					class="code-button code-button-solved"
+					target={codeNoteDone ? '_blank' : undefined}
+					rel={codeNoteDone ? 'noopener noreferrer' : undefined}
+					aria-label={codeNoteDone ? PRESENT_TITLE : undefined}
+				>
+					<img
+						src="{base}/lrnz26/code/{codeNoteDone ? lrnz26PresentImage : lrnz26MoshpitImage}"
+						alt=""
+						class="hub-img"
+					/>
 				</a>
 			{:else if allPuzzlesDone}
 				<a href={resolve('/lrnz26/code')} class="code-button">?</a>

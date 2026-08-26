@@ -36,7 +36,7 @@ for (const l of lines) {
 	}
 }
 
-/** @type {Readonly<Record<string, { id: string; text: string; image?: string }>>} */
+/** @type {Readonly<Record<string, { id: string; image?: string }>>} */
 export const lineById = Object.freeze(Object.fromEntries(lines.map((l) => [l.id, l])));
 
 export const CODE_HEADING = typeof heading === 'string' ? heading : 'Metti in ordine';
@@ -54,15 +54,15 @@ if (noteAccepted.length === 0) {
 	throw new Error('lrnz26/code manifest: note.accepted must list the physical note text');
 }
 
-/** @readonly */
-export const NOTE_ACCEPTED = noteAccepted;
-
-export const NOTE_DISPLAY =
-	typeof note?.display === 'string' && note.display.trim() ? note.display.trim() : noteAccepted[0];
+export const NOTE_PROMPT =
+	typeof note?.prompt === 'string' && note.prompt.trim() ? note.prompt.trim() : '';
+if (!NOTE_PROMPT) {
+	throw new Error('lrnz26/code manifest: note.prompt is required');
+}
 
 /** @param {string} guess */
 export function noteMatches(guess) {
-	return NOTE_ACCEPTED.some((accepted) => answerMatches(guess, accepted));
+	return noteAccepted.some((accepted) => answerMatches(guess, accepted));
 }
 
 const presentUrlRaw = typeof note?.presentUrl === 'string' ? note.presentUrl.trim() : '';
@@ -78,10 +78,14 @@ try {
 /** @readonly */
 export const PRESENT_URL = presentUrlRaw;
 
-export const PRESENT_TITLE =
-	typeof note?.presentTitle === 'string' && note.presentTitle.trim()
-		? note.presentTitle.trim()
-		: 'Il tuo regalo';
+const presentTitle =
+	typeof note?.presentTitle === 'string' && note.presentTitle.trim() ? note.presentTitle.trim() : '';
+if (!presentTitle) {
+	throw new Error('lrnz26/code manifest: note.presentTitle is required');
+}
+
+/** @readonly */
+export const PRESENT_TITLE = presentTitle;
 
 const correctKey = sortedFingerprint(CODE_CORRECT_ORDER);
 
