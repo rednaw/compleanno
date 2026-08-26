@@ -15,7 +15,6 @@
 		matchesAnswer1
 	} from './exercises.js';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
 	let step1Done = $state(false);
@@ -69,7 +68,6 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
-<DevSkipButton onSkip={completeCurrent} />
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.b}" />

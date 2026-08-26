@@ -7,7 +7,6 @@
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { NOTE_PROMPT, PRESENT_TITLE, PRESENT_URL, noteMatches } from './items.js';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
 	let noteDone = $state(false);
@@ -99,10 +98,6 @@
 		if (wrongTimer) clearTimeout(wrongTimer);
 	});
 </script>
-
-{#if !noteDone}
-	<DevSkipButton onSkip={completeNote} />
-{/if}
 
 {#if noteDone}
 	<ResultFullscreen

@@ -10,7 +10,6 @@
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { formatCoords, locationByLineId, mapsUrl } from '../coordinates.js';
 	import CodeFinale from './CodeFinale.svelte';
-	import DevSkipButton from '../DevSkipButton.svelte';
 	import {
 		CODE_HEADING,
 		lineById,
@@ -95,9 +94,6 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
-{#if !solved}
-	<DevSkipButton onSkip={completeOrder} />
-{/if}
 
 {#if solved}
 	<CodeFinale />

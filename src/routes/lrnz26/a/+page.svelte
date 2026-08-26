@@ -9,7 +9,6 @@
 	import { CLUES, ANSWER, INTRO } from './countries.js';
 	import CountryClue from './CountryClue.svelte';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import DevSkipButton from '../DevSkipButton.svelte';
 
 	let guess = $state('');
 	let completed = $state(false);
@@ -48,7 +47,6 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
-<DevSkipButton onSkip={completePuzzle} />
 
 {#if completed}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.a}" />

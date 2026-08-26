@@ -7,9 +7,6 @@
 	import { lrnz26HubImage } from '../coordinates.js';
 	import ReversedSongs from './ReversedSongs.svelte';
 	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import DevSkipButton from '../DevSkipButton.svelte';
-	import { tracks } from './tracks.js';
-	import { saveTrackSolved } from './persistence.js';
 	import '../../gcm26/quiz-shared.css';
 
 	let songsDone = $state(false);
@@ -26,12 +23,6 @@
 			previouslyDone = true;
 		}
 	});
-
-	function skipPuzzle() {
-		if (allCompleted) return;
-		for (const t of tracks) saveTrackSolved(t.id);
-		songsDone = true;
-	}
 </script>
 
 <svelte:head>
@@ -39,7 +30,6 @@
 </svelte:head>
 
 <BackButton href={resolve('/lrnz26')} />
-<DevSkipButton onSkip={skipPuzzle} />
 
 {#if allCompleted}
 	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.d}" />
