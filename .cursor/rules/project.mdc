@@ -1,0 +1,10 @@
+---
+description: Compleanno identity — static birthday puzzle trails
+alwaysApply: true
+---
+
+# Compleanno
+
+SvelteKit **adapter-static** mini-sites for birthday puzzle trails (Wordle-style, word search, finales). Each person/year is a route (`/maria25/`, `/lrnz26/`, …). GH Pages under `/compleanno`.
+
+Open **this folder** → Reopen in Container. Host needs Docker + Cursor, not Node. ffmpeg and yt-dlp live in the container for asset work.
