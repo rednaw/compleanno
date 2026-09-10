@@ -9,7 +9,10 @@
 		"source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"
 	],
 	"containerEnv": {
-		"DEVCONTAINER": "1"
+		"DEVCONTAINER": "1",
+		"GIT_CONFIG_COUNT": "1",
+		"GIT_CONFIG_KEY_0": "safe.directory",
+		"GIT_CONFIG_VALUE_0": "*"
 	},
 	"forwardPorts": [5173],
 	"portsAttributes": {
