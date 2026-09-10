@@ -28,3 +28,6 @@ vite.config.ts.timestamp-*
 # Python
 __pycache__/
 *.py[cod]
+
+# Host skills bind-mounted in the Dev Container
+.cursor/skills/
