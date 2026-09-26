@@ -15,6 +15,7 @@
 			<a class="route-card" href="{base}/lrnz25/">Lrnz 25</a>
 			<a class="route-card" href="{base}/lrnz26/">Lrnz 26</a>
 			<a class="route-card" href="{base}/gcm26/">Gcm 26</a>
+			<a class="route-card" href="{base}/grt26/">Grt 26</a>
 			<a class="route-card" href="{base}/jan26/">Jan 26</a>
 		</nav>
 	</div>

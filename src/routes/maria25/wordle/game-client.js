@@ -1,4 +1,4 @@
-import { words, allowed } from './words.js';
+import { allowed } from '$lib/words-it.js';
 
 export class Game {
   /**

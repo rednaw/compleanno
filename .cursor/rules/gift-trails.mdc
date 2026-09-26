@@ -1,0 +1,22 @@
+---
+description: Private gifts, shared practice — isolation vs $lib for puzzle trails
+globs:
+  - src/routes/**
+  - src/lib/**
+---
+
+# Gift trails
+
+Each person/year route is a **gift**: puzzle content, assets, and storage keys stay in that trail.
+
+**Shared practice** (helpers, UI shells, fix patterns) graduates to `$lib` when a second gift needs them — not by importing another trail’s internals.
+
+| | Do | Don’t |
+|--|--|--|
+| Puzzle data, media, keys, trail-only UI | Keep under `src/routes/<gift>/` | |
+| Fixes / patterns reused by a second gift | Move to `$lib` with a stable import | Import from `../otherGift/` or `../../otherGift/` |
+| Older gifts | Leave alone unless a deliberate migrate | Patch “while you’re here” or break them via shared churn |
+
+Copying a prior gift as a starting point is fine. Sibling imports (e.g. `lrnz26` → `gcm26/ResultFullscreen`) are not — they couple without an API.
+
+New gifts should be technically at least as careful as the previous one (runes, safe storage, no prerender/hydration entropy). Improvements that only live in the newest trail are the cost of isolating old gifts; they are not a substitute for `$lib` when the pattern is shared.

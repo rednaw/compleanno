@@ -1,0 +1,24 @@
+{
+	"tracks": [
+		{
+			"id": "non-e-francesca",
+			"title": "Non è Francesca",
+			"url": "https://www.youtube.com/watch?v=5Hg1m9m50r4"
+		},
+		{
+			"id": "zitti-e-buoni",
+			"title": "Zitti e buoni",
+			"url": "https://www.youtube.com/watch?v=QN1odfjtMoo"
+		},
+		{
+			"id": "la-canzone-di-marinella",
+			"title": "La canzone di Marinella",
+			"url": "https://www.youtube.com/watch?v=-Y3_m_85rKs"
+		},
+		{
+			"id": "soldi",
+			"title": "Soldi",
+			"url": "https://www.youtube.com/watch?v=22lISUXgSUw"
+		}
+	]
+}

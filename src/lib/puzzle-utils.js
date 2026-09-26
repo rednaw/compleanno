@@ -89,6 +89,19 @@ export function loadPuzzleState(key) {
 }
 
 /**
+ * Read a raw puzzle value from localStorage (serialized game state, JSON, …)
+ * @param {string} key - localStorage key
+ * @returns {string | null} null when absent or storage is unavailable
+ */
+export function loadPuzzleValue(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Clear puzzle state from localStorage
  * @param {string} key - localStorage key
  */
