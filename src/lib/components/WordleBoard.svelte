@@ -65,7 +65,7 @@
 
 	/** @param {string} key */
 	function handleKey(key) {
-		if (gameOver) return;
+		if (won || answers.length >= 6) return;
 		if (key === 'backspace') {
 			currentGuess = currentGuess.slice(0, -1);
 			badGuess = false;
@@ -134,7 +134,7 @@
 							class:close={answers[row][col] === 'c'}
 							class:missing={answers[row][col] === '_'}
 						>
-							{guesses[row][col] || ''}
+							{guesses[row]?.[col] || ''}
 						</div>
 					{:else if row === answers.length && !gameOver}
 						<div class="letter">{currentGuess[col] || ''}</div>
@@ -149,8 +149,15 @@
 	{#if gameOver}
 		{#if result}
 			{@render result({ won, restart })}
-		{:else if restartable}
+		{:else if won}
+			{#if restartable}
+				<div class="result">
+					<button type="button" onclick={restart}>Riprova</button>
+				</div>
+			{/if}
+		{:else}
 			<div class="result">
+				<p class="lose-msg">Era <strong>{answer}</strong></p>
 				<button type="button" onclick={restart}>Riprova</button>
 			</div>
 		{/if}
@@ -302,6 +309,12 @@
 	.result {
 		margin-top: 1em;
 		text-align: center;
+	}
+
+	.lose-msg {
+		margin: 0 0 0.75rem;
+		font-size: 1.1rem;
+		color: var(--color-text);
 	}
 
 	@media (max-width: 500px) {

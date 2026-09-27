@@ -13,10 +13,15 @@ export class Game {
 	constructor({ answer, serialized = null, dictionary = defaultDictionary } = {}) {
 		this.dictionary = dictionary;
 		if (serialized) {
-			const [savedAnswer, guesses, answers] = serialized.split('-');
+			const [savedAnswer, guessesPart, answersPart] = serialized.split('-');
 			this.answer = savedAnswer;
-			this.guesses = guesses ? guesses.split(' ') : [];
-			this.answers = answers ? answers.split(' ') : [];
+			const restored = guessesPart ? guessesPart.split(' ') : [];
+			// Always keep 6 slots so the board never indexes past the array
+			this.guesses = ['', '', '', '', '', ''];
+			for (let i = 0; i < Math.min(6, restored.length); i++) {
+				this.guesses[i] = restored[i];
+			}
+			this.answers = answersPart ? answersPart.split(' ').filter(Boolean).slice(0, 6) : [];
 		} else {
 			if (!answer) throw new Error('Game requires answer when not restoring from serialized');
 			this.answer = answer;
@@ -38,6 +43,7 @@ export class Game {
 	 * @returns {boolean} true if the guess was valid
 	 */
 	enter(letters) {
+		if (this.answers.length >= 6) return false;
 		const word = letters.join('');
 		const normalizedWord = this.normalizeWord(word);
 		const valid = this.dictionary.has(word) || this.dictionary.has(normalizedWord);
