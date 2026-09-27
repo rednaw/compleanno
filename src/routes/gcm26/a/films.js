@@ -27,7 +27,10 @@ if (import.meta.env.DEV) {
 	}
 }
 
-export { normalizeAnswer as normalizeFilmTitle, answerMatches as filmTitleMatches } from '../normalize.js';
+export {
+	normalizeAnswer as normalizeFilmTitle,
+	answerMatches as filmTitleMatches
+} from '$lib/normalize.js';
 
 /** @type {{ id: string; title: string; url?: string }[]} */
 export const films = manifest.clips;

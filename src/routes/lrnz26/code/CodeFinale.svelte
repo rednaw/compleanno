@@ -6,7 +6,7 @@
 	import { lrnz26MoshpitImage, lrnz26PresentImage } from '../coordinates.js';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { NOTE_PROMPT, PRESENT_TITLE, PRESENT_URL, noteMatches } from './items.js';
-	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 
 	let guess = $state('');
 	let noteDone = $state(false);
@@ -23,8 +23,7 @@
 
 		const layer = document.createElement('div');
 		layer.setAttribute('aria-hidden', 'true');
-		layer.style.cssText =
-			'position:fixed;inset:0;z-index:150;pointer-events:none;overflow:visible';
+		layer.style.cssText = 'position:fixed;inset:0;z-index:150;pointer-events:none;overflow:visible';
 
 		/** @param {string} top @param {string} left */
 		function burstAt(top, left) {
@@ -100,52 +99,48 @@
 </script>
 
 {#if noteDone}
-	<ResultFullscreen
+	<ResultOverlay
 		src="{base}/lrnz26/code/{lrnz26PresentImage}"
 		alt={PRESENT_TITLE}
 		href={PRESENT_URL}
 		cover
 	/>
 {:else}
-<main>
-	<div class="finale-wrap">
-		<img
-			src="{base}/lrnz26/code/{lrnz26MoshpitImage}"
-			alt=""
-			class="moshpit"
-		/>
+	<main>
+		<div class="finale-wrap">
+			<img src="{base}/lrnz26/code/{lrnz26MoshpitImage}" alt="" class="moshpit" />
 
-		<p class="note-prompt">{NOTE_PROMPT}</p>
+			<p class="note-prompt">{NOTE_PROMPT}</p>
 
-		<div class="input-row" class:input-row--wrong={showWrong}>
-			<input
-				type="text"
-				class="note-input"
-				aria-label={NOTE_PROMPT}
-				autocomplete="off"
-				spellcheck="false"
-				bind:value={guess}
-				disabled={showWrong}
-				aria-invalid={showWrong}
-				onkeydown={(e) => !showWrong && e.key === 'Enter' && checkNote()}
-			/>
+			<div class="input-row" class:input-row--wrong={showWrong}>
+				<input
+					type="text"
+					class="note-input"
+					aria-label={NOTE_PROMPT}
+					autocomplete="off"
+					spellcheck="false"
+					bind:value={guess}
+					disabled={showWrong}
+					aria-invalid={showWrong}
+					onkeydown={(e) => !showWrong && e.key === 'Enter' && checkNote()}
+				/>
+			</div>
+
+			<div class="check-row">
+				{#if showWrong}
+					<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
+				{/if}
+				<button
+					type="button"
+					class="check-btn"
+					disabled={!guess.trim() || showWrong}
+					onclick={checkNote}
+				>
+					Controlla
+				</button>
+			</div>
 		</div>
-
-		<div class="check-row">
-			{#if showWrong}
-				<p class="wrong-hint" aria-live="polite">Risposta non corretta. Riprova.</p>
-			{/if}
-			<button
-				type="button"
-				class="check-btn"
-				disabled={!guess.trim() || showWrong}
-				onclick={checkNote}
-			>
-				Controlla
-			</button>
-		</div>
-	</div>
-</main>
+	</main>
 {/if}
 
 <style>

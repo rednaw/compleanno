@@ -1,11 +1,7 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import {
-		savePuzzleState,
-		loadPuzzleState,
-		clearPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { formatCoords, locationByLineId, mapsUrl } from '../coordinates.js';
@@ -34,7 +30,9 @@
 		if (solved) return;
 		try {
 			localStorage.setItem(lrnz26Keys.codeOrder, JSON.stringify(orderIds));
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	}
 
 	function loadSavedOrder() {
@@ -85,7 +83,9 @@
 				const saved = loadSavedOrder();
 				if (saved) orderIds = saved;
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
@@ -93,7 +93,7 @@
 	<title>Lrnz 26 — Code</title>
 </svelte:head>
 
-<BackButton href={resolve('/lrnz26')} />
+<BackButton href="/lrnz26" />
 
 {#if solved}
 	<CodeFinale />
@@ -102,15 +102,12 @@
 		<div class="quiz-wrap">
 			<h1 class="game-heading">{CODE_HEADING}</h1>
 
-			<div
-				class="order-list"
-				role="list"
-				class:order-list-wrong={checkStatus === 'wrong'}
-			>
+			<div class="order-list" role="list" class:order-list-wrong={checkStatus === 'wrong'}>
 				{#each orderIds as id, i (id)}
 					{@const imgSrc = lineImageSrc(id)}
 					{@const point = locationByLineId(id)}
 					<div class="order-row" role="listitem">
+						<!-- eslint-disable svelte/no-navigation-without-resolve -- external Google Maps URL -->
 						<a
 							class="line-link"
 							href={mapsUrl(point.lat, point.lng)}
@@ -119,6 +116,7 @@
 						>
 							{formatCoords(point.lat, point.lng)}
 						</a>
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						<div class="order-row-controls">
 							{#if imgSrc}
 								<img

@@ -1,11 +1,11 @@
 <script>
-	import { asset, base, resolve } from '$app/paths';
+	import { asset, base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { lrnz26HubImage } from '../coordinates.js';
-	import { answerMatches } from '../normalize.js';
+	import { answerMatches } from '$lib/normalize.js';
 	import {
 		EXERCISE_1_IMAGE,
 		EXERCISE_2_IMAGE,
@@ -14,7 +14,7 @@
 		HINT_2,
 		matchesAnswer1
 	} from './exercises.js';
-	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 
 	let guess = $state('');
 	let step1Done = $state(false);
@@ -67,27 +67,33 @@
 	<title>Lrnz 26 — B</title>
 </svelte:head>
 
-<BackButton href={resolve('/lrnz26')} />
+<BackButton href="/lrnz26" />
 
 {#if completed}
-	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.b}" />
+	<ResultOverlay src="{base}/lrnz26/code/{lrnz26HubImage.b}" />
 {:else}
-<main>
-	<div class="quiz-wrap">
-		<div class="exercise-block">
-			<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_1_IMAGE}`)} alt="Exercise 1" />
+	<main>
+		<div class="quiz-wrap">
+			<div class="exercise-block">
+				<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_1_IMAGE}`)} alt="Exercise 1" />
+				{#if step1Done}
+					<div class="input-row input-row-solved">
+						<input
+							type="text"
+							class="answer-input"
+							value={ANSWER_1}
+							readonly
+							aria-label="Answer 1"
+						/>
+					</div>
+				{/if}
+			</div>
+
 			{#if step1Done}
-				<div class="input-row input-row-solved">
-					<input type="text" class="answer-input" value={ANSWER_1} readonly aria-label="Answer 1" />
+				<div class="exercise-block">
+					<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_2_IMAGE}`)} alt="Exercise 2" />
 				</div>
 			{/if}
-		</div>
-
-		{#if step1Done}
-			<div class="exercise-block">
-				<img class="exercise-img" src={asset(`/lrnz26/b/${EXERCISE_2_IMAGE}`)} alt="Exercise 2" />
-			</div>
-		{/if}
 
 			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
@@ -125,8 +131,8 @@
 					<p class="hint-text" aria-live="polite">{HINT_2}</p>
 				{/if}
 			</div>
-	</div>
-</main>
+		</div>
+	</main>
 {/if}
 
 <style>

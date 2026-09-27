@@ -1,13 +1,13 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
 	import { INTRO_TEXT, QUESTION_STEM, PARTIES, CLUES } from './clues.js';
-	import ResultFullscreen from '../ResultFullscreen.svelte';
-	import '../quiz-shared.css';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import '$lib/quiz-form.css';
 
 	/** @type {string[]} */
 	let answers = $state(CLUES.map(() => ''));
@@ -26,7 +26,9 @@
 		} else {
 			showWrong = true;
 			answers = CLUES.map(() => '');
-			setTimeout(() => { showWrong = false; }, 1200);
+			setTimeout(() => {
+				showWrong = false;
+			}, 1200);
 		}
 	}
 
@@ -35,7 +37,9 @@
 			if (loadPuzzleState(gcm26Keys.gameDDone)) {
 				allCompleted = true;
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
@@ -43,7 +47,7 @@
 	<title>GCM 26 — D</title>
 </svelte:head>
 
-<BackButton href={resolve('/gcm26')} />
+<BackButton href="/gcm26" />
 
 <main>
 	<div class="quiz-wrap">
@@ -57,11 +61,7 @@
 			{#each CLUES as clue, i (clue.id)}
 				<div class="clue-row">
 					<p class="clue-text">{clue.text}</p>
-					<select
-						class="clue-select"
-						bind:value={answers[i]}
-						disabled={allCompleted}
-					>
+					<select class="clue-select" bind:value={answers[i]} disabled={allCompleted}>
 						<option value="">—</option>
 						{#each PARTIES as party (party)}
 							<option value={party}>{party}</option>
@@ -89,7 +89,7 @@
 	</div>
 
 	{#if allCompleted}
-		<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.d}" />
+		<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.d}" />
 	{/if}
 </main>
 

@@ -1,18 +1,14 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import {
-		savePuzzleState,
-		loadPuzzleState,
-		clearPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26CItemKey, gcm26Keys } from '../storage-keys.js';
-	import { answerMatches } from '../normalize.js';
+	import { answerMatches } from '$lib/normalize.js';
 	import { ITEMS } from './items.js';
-	import ResultFullscreen from '../ResultFullscreen.svelte';
-	import '../quiz-shared.css';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import '$lib/quiz-form.css';
 
 	/** @type {string[]} */
 	let guesses = $state(ITEMS.map(() => ''));
@@ -63,7 +59,9 @@
 			} else {
 				checkAllCompleted();
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
@@ -71,47 +69,47 @@
 	<title>Certamen Stormlight</title>
 </svelte:head>
 
-<BackButton href={resolve('/gcm26')} />
+<BackButton href="/gcm26" />
 
 <main>
-		<div class="quiz-wrap">
-			<p class="progress-hint" aria-live="polite">
-				Recte solutae: {solvedCount} / {ITEMS.length}
-			</p>
+	<div class="quiz-wrap">
+		<p class="progress-hint" aria-live="polite">
+			Recte solutae: {solvedCount} / {ITEMS.length}
+		</p>
 
-			{#each ITEMS as item, i (item.id)}
-				<div class="quiz-item">
-					<div class="card-row question-row">
-						<p class="quiz-question">{item.question}</p>
-					</div>
-					<div
-						class="input-row answer-row"
-						class:input-row-solved={rowStatus[i] === 'correct'}
-						class:answer-row-wrong={rowStatus[i] === 'wrong'}
-					>
-						<input
-							type="text"
-							placeholder="Responsum"
-							bind:value={guesses[i]}
-							autocomplete="off"
-							readonly={rowStatus[i] === 'correct'}
-							onkeydown={(e) => rowStatus[i] !== 'correct' && e.key === 'Enter' && checkItem(i)}
-						/>
-						{#if rowStatus[i] !== 'correct'}
-							<button type="button" onclick={() => checkItem(i)} disabled={!guesses[i].trim()}>
-								Conproba
-							</button>
-						{:else}
-							<span class="feedback correct" aria-hidden="true">✅</span>
-						{/if}
-					</div>
+		{#each ITEMS as item, i (item.id)}
+			<div class="quiz-item">
+				<div class="card-row question-row">
+					<p class="quiz-question">{item.question}</p>
 				</div>
-			{/each}
+				<div
+					class="input-row answer-row"
+					class:input-row-solved={rowStatus[i] === 'correct'}
+					class:answer-row-wrong={rowStatus[i] === 'wrong'}
+				>
+					<input
+						type="text"
+						placeholder="Responsum"
+						bind:value={guesses[i]}
+						autocomplete="off"
+						readonly={rowStatus[i] === 'correct'}
+						onkeydown={(e) => rowStatus[i] !== 'correct' && e.key === 'Enter' && checkItem(i)}
+					/>
+					{#if rowStatus[i] !== 'correct'}
+						<button type="button" onclick={() => checkItem(i)} disabled={!guesses[i].trim()}>
+							Conproba
+						</button>
+					{:else}
+						<span class="feedback correct" aria-hidden="true">✅</span>
+					{/if}
+				</div>
+			</div>
+		{/each}
 
 		{#if allCompleted}
-			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.c}" />
+			<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.c}" />
 		{/if}
-		</div>
+	</div>
 </main>
 
 <style>

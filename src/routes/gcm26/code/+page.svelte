@@ -1,11 +1,7 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import {
-		savePuzzleState,
-		loadPuzzleState,
-		clearPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26Keys } from '../storage-keys.js';
 	import {
@@ -15,7 +11,7 @@
 		CODE_START_ORDER,
 		isValidSavedOrder
 	} from './items.js';
-	import ResultFullscreen from '../ResultFullscreen.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 
 	let solved = $state(false);
 	/** @type {string[]} */
@@ -33,7 +29,9 @@
 		if (solved) return;
 		try {
 			localStorage.setItem(gcm26Keys.codeOrder, JSON.stringify(orderIds));
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	}
 
 	function loadSavedOrder() {
@@ -78,7 +76,9 @@
 				const saved = loadSavedOrder();
 				if (saved) orderIds = saved;
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
@@ -86,70 +86,70 @@
 	<title>GCM 26 — Code</title>
 </svelte:head>
 
-<BackButton href={resolve('/gcm26')} />
+<BackButton href="/gcm26" />
 
 {#if solved}
-		<ResultFullscreen src="{base}/gcm26/code/madagascar.webp" />
-	{:else}
-		<main>
-			<div class="quiz-wrap">
-				<h1 class="game-heading">{CODE_HEADING}</h1>
+	<ResultOverlay src="{base}/gcm26/code/madagascar.webp" />
+{:else}
+	<main>
+		<div class="quiz-wrap">
+			<h1 class="game-heading">{CODE_HEADING}</h1>
 
-				<div
-					class="order-list"
-					role="list"
-					aria-describedby="order-hint"
-					class:order-list-wrong={checkStatus === 'wrong'}
-				>
-					{#each orderIds as id, i (id)}
-						{@const imgSrc = lineImageSrc(id)}
-						<div class="order-row" role="listitem">
-							<p class="line-text">{lineById[id].text}</p>
-							<div class="order-row-controls">
-								{#if imgSrc}
-									<img
-										class="row-thumb"
-										src={imgSrc}
-										alt=""
-										loading="lazy"
-										decoding="async"
-										width="72"
-										height="72"
-									/>
-								{/if}
-								<span class="move-btns">
-									<button
-										type="button"
-										class="move-btn"
-										onclick={() => swapRows(i, i - 1)}
-										disabled={i === 0}
-										aria-label="Sposta su: {lineById[id].text}"
-									>
-										Su
-									</button>
-									<button
-										type="button"
-										class="move-btn"
-										onclick={() => swapRows(i, i + 1)}
-										disabled={i === orderIds.length - 1}
-										aria-label="Sposta giù: {lineById[id].text}"
-									>
-										Giù
-									</button>
-								</span>
-							</div>
+			<div
+				class="order-list"
+				role="list"
+				aria-describedby="order-hint"
+				class:order-list-wrong={checkStatus === 'wrong'}
+			>
+				{#each orderIds as id, i (id)}
+					{@const imgSrc = lineImageSrc(id)}
+					<div class="order-row" role="listitem">
+						<p class="line-text">{lineById[id].text}</p>
+						<div class="order-row-controls">
+							{#if imgSrc}
+								<img
+									class="row-thumb"
+									src={imgSrc}
+									alt=""
+									loading="lazy"
+									decoding="async"
+									width="72"
+									height="72"
+								/>
+							{/if}
+							<span class="move-btns">
+								<button
+									type="button"
+									class="move-btn"
+									onclick={() => swapRows(i, i - 1)}
+									disabled={i === 0}
+									aria-label="Sposta su: {lineById[id].text}"
+								>
+									Su
+								</button>
+								<button
+									type="button"
+									class="move-btn"
+									onclick={() => swapRows(i, i + 1)}
+									disabled={i === orderIds.length - 1}
+									aria-label="Sposta giù: {lineById[id].text}"
+								>
+									Giù
+								</button>
+							</span>
 						</div>
-					{/each}
-				</div>
-
-				<div class="check-row">
-					<button type="button" class="check-btn" onclick={() => checkOrder()}> Controlla </button>
-				</div>
-				{#if checkStatus === 'wrong'}
-					<p class="wrong-msg" role="status">Ordine errato. Continua a riordinare.</p>
-				{/if}
+					</div>
+				{/each}
 			</div>
-		</main>
+
+			<div class="check-row">
+				<button type="button" class="check-btn" onclick={() => checkOrder()}> Controlla </button>
+			</div>
+			{#if checkStatus === 'wrong'}
+				<p class="wrong-msg" role="status">Ordine errato. Continua a riordinare.</p>
+			{/if}
+		</div>
+	</main>
 {/if}
 
 <style>

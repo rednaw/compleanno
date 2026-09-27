@@ -1,34 +1,29 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import manifest from './manifest.json';
-	import {
-		savePuzzleState,
-		loadPuzzleState,
-		clearPuzzleState
-	} from '$lib/puzzle-utils.js';
+	import { savePuzzleState, loadPuzzleState, clearPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import {
+		createAudioRegistry,
+		applySolvedToAudios,
+		startAudioMix,
+		stopAllAudio
+	} from '$lib/audio-mix.js';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26BSolvedKey, gcm26Keys } from '../storage-keys.js';
-	import { answerMatches } from '../normalize.js';
-	import ResultFullscreen from '../ResultFullscreen.svelte';
-	import '../quiz-shared.css';
+	import { answerMatches } from '$lib/normalize.js';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import '$lib/quiz-form.css';
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks;
 
-	/** @type {Record<string, HTMLAudioElement | undefined>} */
-	const audioById = {};
+	const registry = createAudioRegistry();
 
-	/** @param {string} id */
+	/** @param {HTMLAudioElement} node @param {string} id */
 	function audioEl(node, id) {
-		const el = /** @type {HTMLAudioElement} */ (node);
-		audioById[id] = el;
-		return {
-			destroy() {
-				if (audioById[id] === el) delete audioById[id];
-			}
-		};
+		return registry.register(node, id);
 	}
 
 	/** @type {Record<string, boolean>} */
@@ -47,57 +42,19 @@
 	/** Solved tracks in manifest order (for display under the guess field). */
 	const solvedTracksOrdered = $derived(tracks.filter((t) => solved[t.id]));
 
-	function trackSrc(id) {
-		return `${base}/gcm26/b/${id}.mp3`;
-	}
-
-	function applySolvedToAudios() {
-		tracks.forEach((t) => {
-			const a = audioById[t.id];
-			if (!a) return;
-			if (solved[t.id]) {
-				a.pause();
-				a.muted = true;
-				a.volume = 0;
-			} else {
-				a.muted = false;
-				a.volume = 1;
-			}
-		});
-	}
-
-	/** Nominal loop length (s) when metadata not ready yet; clips are ~20s from extract_b. */
-	const DEFAULT_LOOP_SEC = 20;
-
-	/** Evenly space playheads over one loop so layers don't all align at t=0 (same wall-clock start). */
-	function phaseOffsetSec(trackIndex, loopSec) {
-		const n = tracks.length;
-		if (n <= 1) return 0;
-		return (trackIndex / n) * loopSec;
-	}
+	const mixTracks = tracks.map((t) => ({ id: t.id, src: `${base}/gcm26/b/${t.id}.mp3` }));
 
 	function startMix() {
-		for (let i = 0; i < tracks.length; i++) {
-			const t = tracks[i];
-			const a = audioById[t.id];
-			if (!a || audioLoadError[t.id] || solved[t.id]) continue;
-
-			const seekAndPlay = () => {
-				const loopSec =
-					Number.isFinite(a.duration) && a.duration > 0.1 ? a.duration : DEFAULT_LOOP_SEC;
-				const offset = phaseOffsetSec(i, loopSec);
-				a.currentTime = Math.min(offset, Math.max(0, loopSec - 0.05));
-				a.muted = false;
-				a.volume = 1;
-			a.play().catch(() => {
-				audioLoadError[t.id] = true;
-			});
-			};
-
-			// HAVE_METADATA: duration/currentTime seek is reliable before play.
-			if (a.readyState >= 1) seekAndPlay();
-			else a.addEventListener('loadedmetadata', seekAndPlay, { once: true });
-		}
+		startAudioMix({
+			tracks: mixTracks,
+			solved,
+			loadError: audioLoadError,
+			audioById: registry.byId,
+			seekMode: 'phased',
+			onLoadError: (id) => {
+				audioLoadError[id] = true;
+			}
+		});
 	}
 
 	function submitGuess() {
@@ -113,7 +70,7 @@
 			solved[t.id] = true;
 			guessRowStatus = 'not-started';
 			guessInput = '';
-			const a = audioById[t.id];
+			const a = registry.get(t.id);
 			if (a) {
 				a.pause();
 				a.muted = true;
@@ -149,18 +106,16 @@
 			} else {
 				checkAllCompleted();
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 
 		void tick().then(() => {
-			applySolvedToAudios();
+			applySolvedToAudios(mixTracks, solved, registry.byId);
 			if (!allCompleted) startMix();
 		});
 
-		return () => {
-			for (const a of Object.values(audioById)) {
-				if (a) { a.pause(); a.currentTime = 0; }
-			}
-		};
+		return () => stopAllAudio(registry.byId);
 	});
 </script>
 
@@ -168,29 +123,29 @@
 	<title>Cacophony</title>
 </svelte:head>
 
-<BackButton href={resolve('/gcm26')} />
+<BackButton href="/gcm26" />
 
 <main>
-		<div class="clip-list">
-			<p class="progress-hint" aria-live="polite">
-				{solvedTally} / {tracks.length} songs identified
-			</p>
+	<div class="clip-list">
+		<p class="progress-hint" aria-live="polite">
+			{solvedTally} / {tracks.length} songs identified
+		</p>
 
-			<div class="audio-layer" aria-hidden="true">
-				{#each tracks as track (track.id)}
-					<audio
-						use:audioEl={track.id}
-						src={trackSrc(track.id)}
-						loop
-						preload="metadata"
+		<div class="audio-layer" aria-hidden="true">
+			{#each tracks as track (track.id)}
+				<audio
+					use:audioEl={track.id}
+					src={`${base}/gcm26/b/${track.id}.mp3`}
+					loop
+					preload="metadata"
 					onerror={() => {
 						audioLoadError[track.id] = true;
 					}}
-					></audio>
-				{/each}
-			</div>
+				></audio>
+			{/each}
+		</div>
 
-			{#if !allCompleted}
+		{#if !allCompleted}
 			<div class="card-row {guessRowStatus === 'wrong' ? 'wrong' : ''}">
 				<button type="button" onclick={() => submitGuess()} disabled={!guessInput.trim()}>
 					Submit
@@ -215,27 +170,27 @@
 			</p>
 		{/if}
 
-			{#if solvedTracksOrdered.length > 0}
-				<div class="solved-titles">
-					<p class="solved-titles-label">Identified</p>
-					<ul class="solved-titles-list" aria-live="polite">
-						{#each solvedTracksOrdered as t (t.id)}
-							<li>{t.title}</li>
-						{/each}
-					</ul>
-				</div>
-			{/if}
+		{#if solvedTracksOrdered.length > 0}
+			<div class="solved-titles">
+				<p class="solved-titles-label">Identified</p>
+				<ul class="solved-titles-list" aria-live="polite">
+					{#each solvedTracksOrdered as t (t.id)}
+						<li>{t.title}</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
 
-			{#if tracks.some((t) => audioLoadError[t.id])}
-				<p class="clip-hint">
-					Some audio failed to load — run <code>scripts/gcm26/extract_b.py</code>
-				</p>
-			{/if}
+		{#if tracks.some((t) => audioLoadError[t.id])}
+			<p class="clip-hint">
+				Some audio failed to load — run <code>scripts/gcm26/extract_b.py</code>
+			</p>
+		{/if}
 
 		{#if allCompleted}
-			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.b}" />
+			<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.b}" />
 		{/if}
-		</div>
+	</div>
 </main>
 
 <style>
@@ -360,5 +315,4 @@
 	.clip-hint code {
 		font-size: 0.68rem;
 	}
-
 </style>

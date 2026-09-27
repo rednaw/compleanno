@@ -7,7 +7,6 @@
   import RotateMessage from '$lib/components/RotateMessage.svelte';
 
   let showRotateMessage = false;
-  let isPortrait = false;
 
   let songStates = songs.map(() => ({
     guess: '',
@@ -83,7 +82,9 @@
         fragmentLevel: state.fragmentLevel,
         attempts: state.attempts
       }));
-    } catch {}
+    } catch {
+      /* localStorage may be unavailable */
+    }
     
     // Force immediate UI update
     songStates = [...songStates];
@@ -123,13 +124,14 @@
         // Check if all songs are now completed based on loaded states
         checkAllSongsCompleted();
       }
-    } catch {}
+    } catch {
+      /* localStorage may be unavailable */
+    }
     
     // Check orientation on mount
     const updateOrientation = () => {
       const isPortraitMode = checkOrientation(true); // Encourage portrait for music puzzle
       showRotateMessage = !isPortraitMode;
-      isPortrait = isPortraitMode;
     };
     
     updateOrientation();
@@ -148,7 +150,7 @@
 {#if !showRotateMessage}
   <main>
     <div class="song-list">
-          {#each songs as song, i}
+          {#each songs as song, i (song.number)}
         <div class="song-container">
           <div class="song-row {songStates[i].status}">
             <button type="button" class="play-btn" on:click={() => playFragment(i)} disabled={songStates[i].playing || songStates[i].audioError}>

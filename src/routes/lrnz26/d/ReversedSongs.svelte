@@ -5,6 +5,7 @@
 	import { saveTrackSolved, loadTrackSolved, saveGroups, loadGroups } from './persistence.js';
 
 	/** @type {{ done: boolean }} */
+	// eslint-disable-next-line no-useless-assignment -- $bindable; parent reads via bind:done
 	let { done = $bindable(false) } = $props();
 
 	/** @type {Record<string, boolean>} */

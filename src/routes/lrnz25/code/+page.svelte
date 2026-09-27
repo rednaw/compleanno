@@ -162,7 +162,7 @@
 <main class="main-container {transitionPhase !== 'none' ? `transition-phase-${transitionPhase}` : ''}" class:shake={error} class:hidden={showFinalImage}>
   <div class="code-display">{code.padEnd(4, '•')}</div>
   <div class="keypad">
-    {#each [1,2,3,4,5,6,7,8,9] as digit}
+    {#each [1,2,3,4,5,6,7,8,9] as digit (digit)}
       <button onclick={() => handleDigit(digit)}>{digit}</button>
     {/each}
     <button onclick={handleBackspace}>←</button>

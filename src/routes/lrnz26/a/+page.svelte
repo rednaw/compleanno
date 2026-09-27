@@ -1,14 +1,14 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { lrnz26HubImage } from '../coordinates.js';
-	import { answerMatches } from '../normalize.js';
+	import { answerMatches } from '$lib/normalize.js';
 	import { CLUES, ANSWER, INTRO } from './countries.js';
 	import CountryClue from './CountryClue.svelte';
-	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 
 	let guess = $state('');
 	let completed = $state(false);
@@ -46,23 +46,23 @@
 	<title>Lrnz 26 — A</title>
 </svelte:head>
 
-<BackButton href={resolve('/lrnz26')} />
+<BackButton href="/lrnz26" />
 
 {#if completed}
-	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.a}" />
+	<ResultOverlay src="{base}/lrnz26/code/{lrnz26HubImage.a}" />
 {:else}
-<main>
-	<div class="quiz-wrap">
-		<h2 class="intro">{INTRO}</h2>
+	<main>
+		<div class="quiz-wrap">
+			<h2 class="intro">{INTRO}</h2>
 
-		<ol class="clues-grid">
-			{#each CLUES as clue, i (clue.id)}
-				<li class="clue-item">
-					<span class="clue-index">{i + 1}</span>
-					<CountryClue id={clue.id} kind={clue.kind} />
-				</li>
-			{/each}
-		</ol>
+			<ol class="clues-grid">
+				{#each CLUES as clue, i (clue.id)}
+					<li class="clue-item">
+						<span class="clue-index">{i + 1}</span>
+						<CountryClue id={clue.id} kind={clue.kind} />
+					</li>
+				{/each}
+			</ol>
 
 			<div class="input-row" class:input-row--wrong={showWrong}>
 				<input
@@ -91,8 +91,8 @@
 					Controlla
 				</button>
 			</div>
-	</div>
-</main>
+		</div>
+	</main>
 {/if}
 
 <style>

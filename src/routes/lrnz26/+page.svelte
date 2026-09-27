@@ -34,7 +34,9 @@
 			gameDDone = false;
 			codeDone = false;
 			codeNoteDone = false;
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	}
 </script>
 
@@ -47,33 +49,51 @@
 	<div class="content">
 		<div class="games-grid">
 			<a href={resolve('/lrnz26/a')} class="game-button" class:game-button-solved={gameADone}>
-				{#if gameADone}<img src="{base}/lrnz26/code/{lrnz26HubImage.a}" alt="" class="hub-img" />{:else}?{/if}
+				{#if gameADone}<img
+						src="{base}/lrnz26/code/{lrnz26HubImage.a}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/b')} class="game-button" class:game-button-solved={gameBDone}>
-				{#if gameBDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.b}" alt="" class="hub-img" />{:else}?{/if}
+				{#if gameBDone}<img
+						src="{base}/lrnz26/code/{lrnz26HubImage.b}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/c')} class="game-button" class:game-button-solved={gameCDone}>
-				{#if gameCDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.c}" alt="" class="hub-img" />{:else}?{/if}
+				{#if gameCDone}<img
+						src="{base}/lrnz26/code/{lrnz26HubImage.c}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/lrnz26/d')} class="game-button" class:game-button-solved={gameDDone}>
-				{#if gameDDone}<img src="{base}/lrnz26/code/{lrnz26HubImage.d}" alt="" class="hub-img" />{:else}?{/if}
+				{#if gameDDone}<img
+						src="{base}/lrnz26/code/{lrnz26HubImage.d}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 		</div>
 		<div class="arrow">↓</div>
 		<div class="code-section">
-			{#if codeNoteDone || codeDone}
+			{#if codeNoteDone}
+				<!-- eslint-disable svelte/no-navigation-without-resolve -- external https present URL -->
 				<a
-					href={codeNoteDone ? PRESENT_URL : resolve('/lrnz26/code')}
+					href={PRESENT_URL}
 					class="code-button code-button-solved"
-					target={codeNoteDone ? '_blank' : undefined}
-					rel={codeNoteDone ? 'noopener noreferrer' : undefined}
-					aria-label={codeNoteDone ? PRESENT_TITLE : undefined}
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label={PRESENT_TITLE}
 				>
-					<img
-						src="{base}/lrnz26/code/{codeNoteDone ? lrnz26PresentImage : lrnz26MoshpitImage}"
-						alt=""
-						class="hub-img"
-					/>
+					<img src="{base}/lrnz26/code/{lrnz26PresentImage}" alt="" class="hub-img" />
+				</a>
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
+			{:else if codeDone}
+				<a href={resolve('/lrnz26/code')} class="code-button code-button-solved">
+					<img src="{base}/lrnz26/code/{lrnz26MoshpitImage}" alt="" class="hub-img" />
 				</a>
 			{:else if allPuzzlesDone}
 				<a href={resolve('/lrnz26/code')} class="code-button">?</a>

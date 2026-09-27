@@ -1,5 +1,5 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 </script>
 
 <svelte:head>
@@ -10,13 +10,13 @@
 	<div class="text-column">
 		<h1>Compleanno</h1>
 		<nav class="routes" aria-label="Puzzle sections">
-			<a class="route-card" href="{base}/maria25/">Maria 25</a>
-			<a class="route-card" href="{base}/jan25/">Jan 25</a>
-			<a class="route-card" href="{base}/lrnz25/">Lrnz 25</a>
-			<a class="route-card" href="{base}/lrnz26/">Lrnz 26</a>
-			<a class="route-card" href="{base}/gcm26/">Gcm 26</a>
-			<a class="route-card" href="{base}/grt26/">Grt 26</a>
-			<a class="route-card" href="{base}/jan26/">Jan 26</a>
+			<a class="route-card" href={resolve('/maria25')}>Maria 25</a>
+			<a class="route-card" href={resolve('/jan25')}>Jan 25</a>
+			<a class="route-card" href={resolve('/lrnz25')}>Lrnz 25</a>
+			<a class="route-card" href={resolve('/lrnz26')}>Lrnz 26</a>
+			<a class="route-card" href={resolve('/gcm26')}>Gcm 26</a>
+			<a class="route-card" href={resolve('/grt26')}>Grt 26</a>
+			<a class="route-card" href={resolve('/jan26')}>Jan 26</a>
 		</nav>
 	</div>
 </main>

@@ -200,7 +200,6 @@
 				{#if clipStates[i].level === 1}
 					<img src={posterSrc(clip.id)} alt="" class="clip-poster" />
 				{/if}
-				<!-- svelte-ignore a11y_media_has_caption -->
 				<video
 					class="clip-video"
 					class:clip-video-hidden={clipStates[i].level === 1}

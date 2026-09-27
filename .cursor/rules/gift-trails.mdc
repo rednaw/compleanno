@@ -20,3 +20,18 @@ Each person/year route is a **gift**: puzzle content, assets, and storage keys s
 Copying a prior gift as a starting point is fine. Sibling imports (e.g. `lrnz26` → `gcm26/ResultFullscreen`) are not — they couple without an API.
 
 New gifts should be technically at least as careful as the previous one (runes, safe storage, no prerender/hydration entropy). Improvements that only live in the newest trail are the cost of isolating old gifts; they are not a substitute for `$lib` when the pattern is shared.
+
+## Kit (`$lib`)
+
+| Path | Use |
+|--|--|
+| `normalize.js` | Accent/punct-safe `answerMatches` |
+| `components/ResultOverlay.svelte` | Fullscreen win (`text` and/or `src`) |
+| `components/PhotoGuessGrid.svelte` | 2×2 photo + solved marks |
+| `storage-keys.js` | `makeTrailKeys(prefix, suffixes)` |
+| `components/CodeKeypad.svelte` | 4-digit pad |
+| `wordle/Game.js` | Five-letter engine (inject answer) |
+| `components/ConnectionsBoard.svelte` | Connections grid + seeded board |
+| `components/GuessRow.svelte` / `quiz-form.css` | Guess+OK / card-row styles |
+| `audio-mix.js` | Layered tracks helpers |
+| `puzzle-utils.js` | Storage + `seededRandom` / `seededShuffle` (no `Math.random` at init) |

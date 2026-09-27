@@ -1,13 +1,13 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { lrnz26HubImage } from '../coordinates.js';
 	import ReversedSongs from './ReversedSongs.svelte';
-	import ResultFullscreen from '../../gcm26/ResultFullscreen.svelte';
-	import '../../gcm26/quiz-shared.css';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import '$lib/quiz-form.css';
 
 	let songsDone = $state(false);
 	let previouslyDone = $state(false);
@@ -29,16 +29,16 @@
 	<title>Lrnz 26 — D</title>
 </svelte:head>
 
-<BackButton href={resolve('/lrnz26')} />
+<BackButton href="/lrnz26" />
 
 {#if allCompleted}
-	<ResultFullscreen src="{base}/lrnz26/code/{lrnz26HubImage.d}" />
+	<ResultOverlay src="{base}/lrnz26/code/{lrnz26HubImage.d}" />
 {:else}
-<main>
-	<div class="content-wrap">
-		<ReversedSongs bind:done={songsDone} />
-	</div>
-</main>
+	<main>
+		<div class="content-wrap">
+			<ReversedSongs bind:done={songsDone} />
+		</div>
+	</main>
 {/if}
 
 <style>

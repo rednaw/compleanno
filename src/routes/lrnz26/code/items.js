@@ -1,6 +1,6 @@
 import manifest from './manifest.json';
 import { locationByLineId } from '../coordinates.js';
-import { answerMatches } from '../normalize.js';
+import { answerMatches } from '$lib/normalize.js';
 
 const { lines, correctOrder, startOrder, heading, note } = manifest;
 
@@ -79,7 +79,9 @@ try {
 export const PRESENT_URL = presentUrlRaw;
 
 const presentTitle =
-	typeof note?.presentTitle === 'string' && note.presentTitle.trim() ? note.presentTitle.trim() : '';
+	typeof note?.presentTitle === 'string' && note.presentTitle.trim()
+		? note.presentTitle.trim()
+		: '';
 if (!presentTitle) {
 	throw new Error('lrnz26/code manifest: note.presentTitle is required');
 }

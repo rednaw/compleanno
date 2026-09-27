@@ -1,19 +1,19 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-	import { Game } from './game-client.js';
+	import { Game } from '$lib/wordle/Game.js';
 	import { browser } from '$app/environment';
-	import { resolve } from '$app/paths';
-	import { savePuzzleState, loadPuzzleState, loadPuzzleValue } from '$lib/puzzle-utils.js';
+		import { savePuzzleState, loadPuzzleState, loadPuzzleValue } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { grt26Keys } from '../storage-keys.js';
 	import { grt26Prizes } from '../prizes.js';
-	import PrizeOverlay from '../PrizeOverlay.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 
+	const ANSWER = 'sofia';
 	const ROWS = [0, 1, 2, 3, 4, 5];
 	const COLS = [0, 1, 2, 3, 4];
 	const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 
-	let game = new Game();
+	let game = new Game({ answer: ANSWER });
 	let guesses = $state([...game.guesses]);
 	let answers = $state([...game.answers]);
 	let currentGuess = $state('');
@@ -26,7 +26,7 @@
 	let onKeyDown;
 
 	function loadGame() {
-		game = new Game(loadPuzzleValue(grt26Keys.wordle));
+		game = new Game({ answer: ANSWER, serialized: loadPuzzleValue(grt26Keys.wordle) });
 		guesses = [...game.guesses];
 		answers = [...game.answers];
 		currentGuess = guesses[answers.length] || '';
@@ -86,7 +86,7 @@
 	<title>Indovina la parola</title>
 </svelte:head>
 
-<BackButton href={resolve('/grt26')} />
+<BackButton href="/grt26" />
 
 <main class="main-container">
 	<h1>Indovina la parola</h1>
@@ -141,7 +141,7 @@
 </main>
 
 {#if won}
-	<PrizeOverlay text={grt26Prizes.a} />
+	<ResultOverlay text={grt26Prizes.a} />
 {/if}
 
 <style>

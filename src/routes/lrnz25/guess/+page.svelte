@@ -16,11 +16,6 @@
   let isCorrect = false;
   let helpClicks = 0;
   let showRotateMessage = false;
-  let isPortrait = false;
-
-
-
-
 
   function submitGuess() {
     if (!guess.trim()) return;
@@ -72,24 +67,9 @@
     // Save help button state to localStorage
     try {
       localStorage.setItem('lrnz25_guess_help_clicks', helpClicks.toString());
-    } catch {}
-  }
-
-  function resetGame() {
-    guess = '';
-    submitted = false;
-    isCorrect = false;
-    helpClicks = 0;
-    
-    // Clear help button state from localStorage
-    try {
-      localStorage.removeItem('lrnz25_guess_help_clicks');
-    } catch {}
-    
-    const placeholders = document.querySelectorAll('.placeholder-image');
-    placeholders.forEach(placeholder => {
-      placeholder.innerHTML = '?';
-    });
+    } catch {
+      /* localStorage may be unavailable */
+    }
   }
 
   // Load and check orientation on mount
@@ -122,7 +102,6 @@
     const updateOrientation = () => {
       const isPortraitMode = checkOrientation(true); // Encourage portrait for guess puzzle
       showRotateMessage = !isPortraitMode;
-      isPortrait = isPortraitMode;
     };
     
     updateOrientation();

@@ -6,7 +6,6 @@
   import RotateMessage from '$lib/components/RotateMessage.svelte';
 
   let showRotateMessage = false;
-  let isLandscape = false;
   let guess = '';
   let submitted = false;
   let isCorrect = false;
@@ -40,7 +39,6 @@
     const updateOrientation = () => {
       const isLandscapeMode = checkOrientation(false); // Encourage landscape for picture puzzle
       showRotateMessage = !isLandscapeMode;
-      isLandscape = isLandscapeMode;
     };
     
     updateOrientation();

@@ -1,5 +1,5 @@
 import manifest from './manifest.json';
-import { answerMatches } from '../normalize.js';
+import { answerMatches } from '$lib/normalize.js';
 
 /** @type {{ id: string; title: string; band?: string; aliases?: string[]; url?: string; start?: string; end?: string }[]} */
 export const tracks = manifest.tracks;

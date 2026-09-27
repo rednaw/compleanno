@@ -1,12 +1,12 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
-	import ResultFullscreen from '../ResultFullscreen.svelte';
-	import '../quiz-shared.css';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import '$lib/quiz-form.css';
 
 	import FilmClips from './FilmClips.svelte';
 	import CommonQuestion from './CommonQuestion.svelte';
@@ -28,7 +28,9 @@
 			if (loadPuzzleState(gcm26Keys.gameADone)) {
 				previouslyDone = true;
 			}
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
@@ -36,7 +38,7 @@
 	<title>Indovina il film</title>
 </svelte:head>
 
-<BackButton href={resolve('/gcm26')} />
+<BackButton href="/gcm26" />
 
 <main>
 	<div class="content-wrap">
@@ -49,7 +51,7 @@
 		{/if}
 
 		{#if allCompleted}
-			<ResultFullscreen src="{base}/gcm26/code/{gcm26HubImage.a}" />
+			<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.a}" />
 		{/if}
 	</div>
 </main>

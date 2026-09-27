@@ -1,89 +1,60 @@
 <script>
-	import { base, resolve } from '$app/paths';
+	import { base } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import manifest from './manifest.json';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
+	import {
+		createAudioRegistry,
+		applySolvedToAudios,
+		startAudioMix,
+		stopAllAudio
+	} from '$lib/audio-mix.js';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import GuessRow from '$lib/components/GuessRow.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
+	import { answerMatches } from '$lib/normalize.js';
 	import { grt26DSolvedKey, grt26Keys } from '../storage-keys.js';
-	import { answerMatches } from '../normalize.js';
 	import { grt26Prizes } from '../prizes.js';
-	import PrizeOverlay from '../PrizeOverlay.svelte';
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks;
+	const registry = createAudioRegistry();
 
-	/** @type {Record<string, HTMLAudioElement | undefined>} */
-	const audioById = {};
-
-	/** @param {string} id */
+	/** @param {HTMLAudioElement} node @param {string} id */
 	function audioEl(node, id) {
-		const el = /** @type {HTMLAudioElement} */ (node);
-		audioById[id] = el;
-		return {
-			destroy() {
-				if (audioById[id] === el) delete audioById[id];
-			}
-		};
+		return registry.register(node, id);
 	}
 
 	/** @type {Record<string, boolean>} */
 	let solved = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
-
 	let guessInput = $state('');
 	/** @type {'idle' | 'wrong'} */
 	let status = $state('idle');
-
 	let allCompleted = $state(false);
-
 	/** @type {Record<string, boolean>} */
 	let audioLoadError = $state(Object.fromEntries(tracks.map((t) => [t.id, false])));
-	/** Autoplay refused: a cold load or reload needs a tap before the mix can start. */
 	let needsTap = $state(false);
 
 	const solvedTally = $derived(tracks.filter((t) => solved[t.id]).length);
 	const solvedTracksOrdered = $derived(tracks.filter((t) => solved[t.id]));
 
-	function trackSrc(id) {
-		return `${base}/grt26/d/${id}.mp3`;
-	}
-
-	function applySolvedToAudios() {
-		tracks.forEach((t) => {
-			const a = audioById[t.id];
-			if (!a) return;
-			if (solved[t.id]) {
-				a.pause();
-				a.muted = true;
-				a.volume = 0;
-			} else {
-				a.muted = false;
-				a.volume = 1;
-			}
-		});
-	}
+	const mixTracks = tracks.map((t) => ({ id: t.id, src: `${base}/grt26/d/${t.id}.mp3` }));
 
 	function startMix() {
 		needsTap = false;
-		for (const t of tracks) {
-			const a = audioById[t.id];
-			if (!a || audioLoadError[t.id] || solved[t.id]) continue;
-
-			// Each layer enters at a random point of the full song
-			const seekAndPlay = () => {
-				const loopSec = Number.isFinite(a.duration) ? a.duration : 0;
-				a.currentTime = Math.random() * Math.max(0, loopSec - 0.05);
-				a.muted = false;
-				a.volume = 1;
-				a.play().catch(() => {
-					// A decode/network failure sets `a.error`; anything else is the autoplay policy
-					if (a.error) audioLoadError[t.id] = true;
-					else needsTap = true;
-				});
-			};
-
-			if (a.readyState >= 1) seekAndPlay();
-			else a.addEventListener('loadedmetadata', seekAndPlay, { once: true });
-		}
+		startAudioMix({
+			tracks: mixTracks,
+			solved,
+			loadError: audioLoadError,
+			audioById: registry.byId,
+			seekMode: 'random',
+			onNeedsTap: () => {
+				needsTap = true;
+			},
+			onLoadError: (id) => {
+				audioLoadError[id] = true;
+			}
+		});
 	}
 
 	function submitGuess() {
@@ -99,7 +70,7 @@
 			solved[t.id] = true;
 			status = 'idle';
 			guessInput = '';
-			const a = audioById[t.id];
+			const a = registry.get(t.id);
 			if (a) {
 				a.pause();
 				a.muted = true;
@@ -116,11 +87,9 @@
 		allCompleted = tracks.every((t) => solved[t.id]);
 		if (allCompleted) {
 			savePuzzleState(grt26Keys.gameDDone, '1');
-			for (const a of Object.values(audioById)) {
-				if (a) {
-					a.pause();
-					a.muted = true;
-				}
+			for (const a of registry.all()) {
+				a.pause();
+				a.muted = true;
 			}
 		}
 	}
@@ -143,18 +112,11 @@
 		}
 
 		void tick().then(() => {
-			applySolvedToAudios();
+			applySolvedToAudios(mixTracks, solved, registry.byId);
 			if (!allCompleted) startMix();
 		});
 
-		return () => {
-			for (const a of Object.values(audioById)) {
-				if (a) {
-					a.pause();
-					a.currentTime = 0;
-				}
-			}
-		};
+		return () => stopAllAudio(registry.byId);
 	});
 </script>
 
@@ -162,7 +124,7 @@
 	<title>Che canzone è?</title>
 </svelte:head>
 
-<BackButton href={resolve('/grt26')} />
+<BackButton href="/grt26" />
 
 <main>
 	<div class="clip-list">
@@ -171,10 +133,10 @@
 		</p>
 
 		<div class="audio-layer" aria-hidden="true">
-			{#each tracks as track (track.id)}
+			{#each mixTracks as track (track.id)}
 				<audio
 					use:audioEl={track.id}
-					src={trackSrc(track.id)}
+					src={track.src}
 					loop
 					preload="metadata"
 					onerror={() => {
@@ -189,23 +151,12 @@
 		{/if}
 
 		{#if !allCompleted}
-			<form
-				class="guess-row"
-				class:wrong={status === 'wrong'}
-				onsubmit={(e) => {
-					e.preventDefault();
-					submitGuess();
-				}}
-			>
-				<input
-					type="text"
-					bind:value={guessInput}
-					autocomplete="off"
-					aria-invalid={status === 'wrong'}
-					aria-describedby="grt26d-guess-status"
-				/>
-				<button type="submit" disabled={!guessInput.trim()}>OK</button>
-			</form>
+			<GuessRow
+				bind:value={guessInput}
+				wrong={status === 'wrong'}
+				onSubmit={submitGuess}
+				ariaDescribedby="grt26d-guess-status"
+			/>
 			<p id="grt26d-guess-status" class="field-feedback" role="status" aria-live="polite">
 				{#if status === 'wrong'}
 					Non è questa, riprova.
@@ -230,7 +181,7 @@
 </main>
 
 {#if allCompleted}
-	<PrizeOverlay text={grt26Prizes.d} />
+	<ResultOverlay text={grt26Prizes.d} />
 {/if}
 
 <style>
@@ -284,45 +235,6 @@
 		color: var(--color-white);
 		font-weight: 600;
 		cursor: pointer;
-	}
-
-	.guess-row {
-		display: flex;
-		gap: 0.5rem;
-		width: 100%;
-		max-width: 22rem;
-	}
-
-	.guess-row input {
-		flex: 1;
-		min-width: 0;
-		padding: 0.65rem 0.75rem;
-		border: 2px solid var(--color-border);
-		border-radius: 0.5rem;
-		background: var(--color-white);
-		color: var(--color-text);
-		font-size: 1rem;
-		box-sizing: border-box;
-	}
-
-	.guess-row.wrong input {
-		background: var(--color-error-bg);
-		border-color: var(--color-error-border);
-	}
-
-	.guess-row button {
-		padding: 0.65rem 1rem;
-		border: 2px solid var(--color-border);
-		border-radius: 0.5rem;
-		background: var(--color-white);
-		color: var(--color-text);
-		font-weight: 600;
-		cursor: pointer;
-	}
-
-	.guess-row button:disabled {
-		opacity: 0.45;
-		cursor: not-allowed;
 	}
 
 	.field-feedback {

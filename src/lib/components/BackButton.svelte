@@ -1,12 +1,14 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 
-	export let href = `${base}/lrnz25/`;
-	export let className = '';
-	export let highZIndex = false;
+	/**
+	 * App-relative path (e.g. `/grt26`), resolved with `base` for GH Pages.
+	 * @type {{ href?: string; className?: string; highZIndex?: boolean }}
+	 */
+	let { href = '/lrnz25', className = '', highZIndex = false } = $props();
 </script>
 
-<a href={href} class="back-button {className}" class:high-z-index={highZIndex}>←</a>
+<a href={resolve(href)} class="back-button {className}" class:high-z-index={highZIndex}>←</a>
 
 <style>
 	.back-button {

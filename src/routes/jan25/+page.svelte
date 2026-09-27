@@ -1,6 +1,7 @@
 <script>
   import { words } from './words.js';
   import { onMount } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import { base } from '$app/paths';
 
   function joinBase(path) {
@@ -122,6 +123,7 @@
       diag_anti: 0, // Top-right to bottom-left axis (/)
       backward: 0
     };
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- local helper, not reactive state
     const uniqueVectors = new Set();
 
     for (const p of placements) {
@@ -226,8 +228,8 @@
   }
 
   let foundWords = [];
-  $: foundWordsSet = new Set(foundWords.map(w => w.toUpperCase()));
-  let foundCoords = new Set(); // Use a Set for unique coordinates
+  $: foundWordsSet = new SvelteSet(foundWords.map((w) => w.toUpperCase()));
+  let foundCoords = new SvelteSet(); // unique coordinates
   let shake = false;
   let transitionOut = false;
 
@@ -256,7 +258,6 @@
       
       // Add the new coordinates to our Set
       selected.forEach(([y, x]) => foundCoords.add(`${y}-${x}`));
-      foundCoords = foundCoords; // Trigger Svelte reactivity
 
       // Check for game completion
       if (foundWords.length === words.length) {

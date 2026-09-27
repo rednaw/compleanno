@@ -1,11 +1,12 @@
 <script>
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { answerMatches } from '../normalize.js';
+	import { answerMatches } from '$lib/normalize.js';
 	import { FINAL_ANSWERS } from './final.js';
 	import { saveFinalProgress, loadFinalProgress } from './persistence.js';
 
 	/** @type {{ done: boolean }} */
+	// eslint-disable-next-line no-useless-assignment -- $bindable; parent reads via bind:done
 	let { done = $bindable(false) } = $props();
 
 	let guesses = $state(FINAL_ANSWERS.map(() => ''));
@@ -66,7 +67,9 @@
 				}
 			});
 			syncDone();
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 </script>
 
