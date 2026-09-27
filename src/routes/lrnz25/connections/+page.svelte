@@ -2,15 +2,13 @@
 	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import {
-		checkOrientation,
-		setupOrientationListeners,
 		savePuzzleState,
 		loadPuzzleState,
 		seededShuffle
 	} from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import RotateMessage from '$lib/components/RotateMessage.svelte';
-
+import OrientationGate from '$lib/components/OrientationGate.svelte';
+	
 	const GROUPS = [
 		{
 			name: 'Gite a champoluc troncate a metà',
@@ -37,7 +35,6 @@
 	let solvedGroups = [];
 	let message = '';
 	let shake = false;
-	let showRotateMessage = false;
 	let showWinMessage = false;
 
 	// Initialize tiles from groups — seeded so prerender and client match
@@ -74,19 +71,6 @@
 		} catch (e) {
 			console.error('Error loading saved state:', e);
 		}
-
-		// Check orientation on mount
-		const updateOrientation = () => {
-			const isLandscapeMode = checkOrientation(false); // Encourage landscape for connections puzzle
-			showRotateMessage = !isLandscapeMode;
-		};
-
-		updateOrientation();
-
-		// Listen for orientation changes
-		const cleanup = setupOrientationListeners(updateOrientation);
-
-		return cleanup;
 	});
 
 	// Initialize on first load
@@ -168,9 +152,7 @@
 
 <BackButton />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={false} />
-
-{#if !showRotateMessage}
+<OrientationGate encouragePortrait={false}>
 	<main class="container">
 		<div class="game-layout">
 			<div class="left-panel">
@@ -241,7 +223,7 @@
 			</div>
 		{/if}
 	</main>
-{/if}
+</OrientationGate>
 
 <style>
 	.container {

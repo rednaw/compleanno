@@ -1,35 +1,19 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { loadPuzzleState, savePuzzleState, clearPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
+	import {
+		loadPuzzleState,
+		savePuzzleState,
+		clearPuzzleState,
+		clearPuzzleKeyPrefix
+	} from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+	import HubDevBar from '$lib/components/HubDevBar.svelte';
 	import { gcm26HubImage } from './hub-images.js';
 	import { GCM26_STORAGE_PREFIX, gcm26Keys } from './storage-keys.js';
 
-	// ── DEV_MODE ── set to false (or delete this block) before release ──
+	/** Set true while authoring; leave false for release. */
 	const DEV_MODE = false;
-
-	const devKeys = [
-		{ label: 'A', key: gcm26Keys.gameADone,  get done() { return gameADone; } },
-		{ label: 'B', key: gcm26Keys.gameBDone,  get done() { return gameBDone; } },
-		{ label: 'C', key: gcm26Keys.gameCDone,  get done() { return gameCDone; } },
-		{ label: 'D', key: gcm26Keys.gameDDone,  get done() { return gameDDone; } },
-		{ label: '🔑', key: gcm26Keys.codeDone, get done() { return codeDone; } },
-	];
-
-	function devToggle(idx) {
-		const dk = devKeys[idx];
-		const states = [gameADone, gameBDone, gameCDone, gameDDone, codeDone];
-		const next = !states[idx];
-		if (next) savePuzzleState(dk.key, '1');
-		else clearPuzzleState(dk.key);
-		if (idx === 0) gameADone = next;
-		else if (idx === 1) gameBDone = next;
-		else if (idx === 2) gameCDone = next;
-		else if (idx === 3) gameDDone = next;
-		else codeDone = next;
-	}
-	// ── /DEV_MODE ──
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
@@ -39,6 +23,42 @@
 
 	const allPuzzlesDone = $derived(gameADone && gameBDone && gameCDone && gameDDone);
 
+	/** @param {string} key @param {(v: boolean) => void} set */
+	function toggleDone(key, set, current) {
+		const next = !current;
+		if (next) savePuzzleState(key, '1');
+		else clearPuzzleState(key);
+		set(next);
+	}
+
+	const devKeys = $derived([
+		{
+			label: 'A',
+			done: gameADone,
+			onToggle: () => toggleDone(gcm26Keys.gameADone, (v) => (gameADone = v), gameADone)
+		},
+		{
+			label: 'B',
+			done: gameBDone,
+			onToggle: () => toggleDone(gcm26Keys.gameBDone, (v) => (gameBDone = v), gameBDone)
+		},
+		{
+			label: 'C',
+			done: gameCDone,
+			onToggle: () => toggleDone(gcm26Keys.gameCDone, (v) => (gameCDone = v), gameCDone)
+		},
+		{
+			label: 'D',
+			done: gameDDone,
+			onToggle: () => toggleDone(gcm26Keys.gameDDone, (v) => (gameDDone = v), gameDDone)
+		},
+		{
+			label: '🔑',
+			done: codeDone,
+			onToggle: () => toggleDone(gcm26Keys.codeDone, (v) => (codeDone = v), codeDone)
+		}
+	]);
+
 	onMount(() => {
 		try {
 			gameADone = loadPuzzleState(gcm26Keys.gameADone);
@@ -46,7 +66,9 @@
 			gameCDone = loadPuzzleState(gcm26Keys.gameCDone);
 			gameDDone = loadPuzzleState(gcm26Keys.gameDDone);
 			codeDone = loadPuzzleState(gcm26Keys.codeDone);
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	});
 
 	function clearGlobalState() {
@@ -57,7 +79,9 @@
 			gameCDone = false;
 			gameDDone = false;
 			codeDone = false;
-		} catch { /* localStorage may be unavailable */ }
+		} catch {
+			/* localStorage may be unavailable */
+		}
 	}
 </script>
 
@@ -66,44 +90,52 @@
 </svelte:head>
 
 <main>
-		<ClearProgressButton onClear={clearGlobalState} />
-		{#if DEV_MODE}
-			<div class="dev-bar">
-				{#each devKeys as dk, i (dk.label)}
-					<button class="dev-btn" class:dev-on={dk.done} onclick={() => devToggle(i)}>
-						{dk.label}
-					</button>
-				{/each}
-			</div>
-		{/if}
-		<div class="content">
-			<div class="games-grid">
-				<a href={resolve('/gcm26/a')} class="game-button" class:game-button-solved={gameADone}>
-					{#if gameADone}<img src="{base}/gcm26/code/{gcm26HubImage.a}" alt="" class="hub-img" />{:else}?{/if}
-				</a>
-				<a href={resolve('/gcm26/b')} class="game-button" class:game-button-solved={gameBDone}>
-					{#if gameBDone}<img src="{base}/gcm26/code/{gcm26HubImage.b}" alt="" class="hub-img" />{:else}?{/if}
-				</a>
-				<a href={resolve('/gcm26/c')} class="game-button" class:game-button-solved={gameCDone}>
-					{#if gameCDone}<img src="{base}/gcm26/code/{gcm26HubImage.c}" alt="" class="hub-img" />{:else}?{/if}
-				</a>
-				<a href={resolve('/gcm26/d')} class="game-button" class:game-button-solved={gameDDone}>
-					{#if gameDDone}<img src="{base}/gcm26/code/{gcm26HubImage.d}" alt="" class="hub-img" />{:else}?{/if}
-				</a>
-			</div>
-			<div class="arrow">↓</div>
-			<div class="code-section">
-				{#if codeDone}
-					<a href={resolve('/gcm26/code')} class="code-button code-button-solved">
-						<img src="{base}/gcm26/code/madagascar.webp" alt="" class="hub-img" />
-					</a>
-				{:else if allPuzzlesDone}
-					<a href={resolve('/gcm26/code')} class="code-button">?</a>
-				{:else}
-					<span class="code-button code-button-disabled">?</span>
-				{/if}
-			</div>
+	<ClearProgressButton onClear={clearGlobalState} />
+	<HubDevBar enabled={DEV_MODE} keys={devKeys} />
+	<div class="content">
+		<div class="games-grid">
+			<a href={resolve('/gcm26/a')} class="game-button" class:game-button-solved={gameADone}>
+				{#if gameADone}<img
+						src="{base}/gcm26/code/{gcm26HubImage.a}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
+			</a>
+			<a href={resolve('/gcm26/b')} class="game-button" class:game-button-solved={gameBDone}>
+				{#if gameBDone}<img
+						src="{base}/gcm26/code/{gcm26HubImage.b}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
+			</a>
+			<a href={resolve('/gcm26/c')} class="game-button" class:game-button-solved={gameCDone}>
+				{#if gameCDone}<img
+						src="{base}/gcm26/code/{gcm26HubImage.c}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
+			</a>
+			<a href={resolve('/gcm26/d')} class="game-button" class:game-button-solved={gameDDone}>
+				{#if gameDDone}<img
+						src="{base}/gcm26/code/{gcm26HubImage.d}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
+			</a>
 		</div>
+		<div class="arrow">↓</div>
+		<div class="code-section">
+			{#if codeDone}
+				<a href={resolve('/gcm26/code')} class="code-button code-button-solved">
+					<img src="{base}/gcm26/code/madagascar.webp" alt="" class="hub-img" />
+				</a>
+			{:else if allPuzzlesDone}
+				<a href={resolve('/gcm26/code')} class="code-button">?</a>
+			{:else}
+				<span class="code-button code-button-disabled">?</span>
+			{/if}
+		</div>
+	</div>
 </main>
 
 <style>
@@ -214,36 +246,4 @@
 		color: var(--color-text);
 		margin: 1rem 0;
 	}
-
-	/* ── DEV_MODE styles ── */
-	.dev-bar {
-		position: fixed;
-		top: 0;
-		right: 0;
-		z-index: 999;
-		display: flex;
-		gap: 2px;
-		padding: 4px;
-		background: rgba(0, 0, 0, 0.6);
-		border-bottom-left-radius: 6px;
-	}
-
-	.dev-btn {
-		font-size: 0.7rem;
-		padding: 3px 7px;
-		border: 1px solid #888;
-		border-radius: 3px;
-		background: #333;
-		color: #ccc;
-		cursor: pointer;
-		font-weight: 600;
-		line-height: 1;
-	}
-
-	.dev-btn.dev-on {
-		background: #2e7d32;
-		border-color: #4caf50;
-		color: #fff;
-	}
-	/* ── /DEV_MODE styles ── */
 </style>

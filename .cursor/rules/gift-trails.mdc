@@ -35,3 +35,10 @@ New gifts should be technically at least as careful as the previous one (runes, 
 | `components/GuessRow.svelte` / `quiz-form.css` | Guess+OK / card-row styles |
 | `audio-mix.js` | Layered tracks helpers |
 | `puzzle-utils.js` | Storage + `seededRandom` / `seededShuffle` (no `Math.random` at init) |
+| `components/WordleBoard.svelte` | Board + keyboard (inject answer + storage keys) |
+| `components/CodeOrderList.svelte` | Reorder finale + check; row = snippet |
+| `components/AudioMixGuess.svelte` | Mix + guess + tally on `audio-mix.js` |
+| `components/HubDevBar.svelte` | Hub authoring toggles (`enabled` in release) |
+| `components/OrientationGate.svelte` | Rotate gate around children |
+| `components/PhasedPuzzle.svelte` | Hub done-key sync for multi-phase pages |
+| `components/ClipTitleQuiz.svelte` | Video → title guess list |

@@ -1,15 +1,14 @@
 <script>
   import { resolve, asset } from '$app/paths';
   import { onMount } from 'svelte';
-  import { checkOrientation, setupOrientationListeners, loadPuzzleState, clearPuzzleKeys } from './utils.js';
-  import RotateMessage from '$lib/components/RotateMessage.svelte';
-  import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+  import { loadPuzzleState, clearPuzzleKeys } from './utils.js';
+    import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+import OrientationGate from '$lib/components/OrientationGate.svelte';
   
   let connectionsDone = false;
   let guessDone = false;
   let pictureDone = false;
   let musicDone = false;
-  let showRotateMessage = false;
 
   // Check if all main puzzles are completed (excluding code puzzle)
   $: allPuzzlesCompleted = connectionsDone && guessDone && pictureDone && musicDone;
@@ -22,20 +21,6 @@
       guessDone = loadPuzzleState('lrnz25_guess_done');
       pictureDone = loadPuzzleState('lrnz25_picture_done');
       musicDone = loadPuzzleState('lrnz25_music_done');
-
-    
-    // Check orientation on mount
-    const updateOrientation = () => {
-      const isPortraitMode = checkOrientation(true); // Encourage portrait for home page
-      showRotateMessage = !isPortraitMode;
-    };
-    
-    updateOrientation();
-    
-    // Listen for orientation changes
-    const cleanup = setupOrientationListeners(updateOrientation);
-    
-    return cleanup;
   });
 
   function clearGlobalState() {
@@ -57,9 +42,7 @@
   }
 </script>
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
+<OrientationGate encouragePortrait={true}>
   <main>
     <ClearProgressButton onClear={clearGlobalState} />
     <div class="content">
@@ -81,7 +64,7 @@
       </div>
     </div>
   </main>
-{/if}
+</OrientationGate>
 
 <style>
 

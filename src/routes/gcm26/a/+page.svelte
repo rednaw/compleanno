@@ -1,11 +1,10 @@
 <script>
 	import { base } from '$app/paths';
-	import { onMount } from 'svelte';
-	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import PhasedPuzzle from '$lib/components/PhasedPuzzle.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { gcm26HubImage } from '../hub-images.js';
 	import { gcm26Keys } from '../storage-keys.js';
-	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import '$lib/quiz-form.css';
 
 	import FilmClips from './FilmClips.svelte';
@@ -15,23 +14,8 @@
 	let filmsDone = $state(false);
 	let commonDone = $state(false);
 	let codeDone = $state(false);
-	let previouslyDone = $state(false);
 
-	const allCompleted = $derived(previouslyDone || (filmsDone && commonDone && codeDone));
-
-	$effect(() => {
-		if (allCompleted) savePuzzleState(gcm26Keys.gameADone, '1');
-	});
-
-	onMount(() => {
-		try {
-			if (loadPuzzleState(gcm26Keys.gameADone)) {
-				previouslyDone = true;
-			}
-		} catch {
-			/* localStorage may be unavailable */
-		}
-	});
+	const phasesComplete = $derived(filmsDone && commonDone && codeDone);
 </script>
 
 <svelte:head>
@@ -40,21 +24,27 @@
 
 <BackButton href="/gcm26" />
 
-<main>
-	<div class="content-wrap">
-		<FilmClips bind:done={filmsDone} />
-		{#if filmsDone}
-			<CommonQuestion bind:done={commonDone} />
-		{/if}
-		{#if commonDone}
-			<FinalCode bind:done={codeDone} />
-		{/if}
+<PhasedPuzzle doneKey={gcm26Keys.gameADone} complete={phasesComplete}>
+	{#snippet children({ allCompleted })}
+		<main>
+			<div class="content-wrap">
+				{#if !allCompleted}
+					<FilmClips bind:done={filmsDone} />
+					{#if filmsDone}
+						<CommonQuestion bind:done={commonDone} />
+					{/if}
+					{#if commonDone}
+						<FinalCode bind:done={codeDone} />
+					{/if}
+				{/if}
 
-		{#if allCompleted}
-			<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.a}" />
-		{/if}
-	</div>
-</main>
+				{#if allCompleted}
+					<ResultOverlay src="{base}/gcm26/code/{gcm26HubImage.a}" />
+				{/if}
+			</div>
+		</main>
+	{/snippet}
+</PhasedPuzzle>
 
 <style>
 	main {

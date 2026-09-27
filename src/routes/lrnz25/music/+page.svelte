@@ -2,11 +2,10 @@
   import { songs } from '../songs.js';
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import { savePuzzleState, loadPuzzleState } from '../utils.js';
   import BackButton from '$lib/components/BackButton.svelte';
-  import RotateMessage from '$lib/components/RotateMessage.svelte';
-
-  let showRotateMessage = false;
+import OrientationGate from '$lib/components/OrientationGate.svelte';
+  
 
   let songStates = songs.map(() => ({
     guess: '',
@@ -127,27 +126,12 @@
     } catch {
       /* localStorage may be unavailable */
     }
-    
-    // Check orientation on mount
-    const updateOrientation = () => {
-      const isPortraitMode = checkOrientation(true); // Encourage portrait for music puzzle
-      showRotateMessage = !isPortraitMode;
-    };
-    
-    updateOrientation();
-    
-    // Listen for orientation changes
-    const cleanup = setupOrientationListeners(updateOrientation);
-    
-    return cleanup;
   });
 </script>
 
 <BackButton />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
+<OrientationGate encouragePortrait={true}>
   <main>
     <div class="song-list">
           {#each songs as song, i (song.number)}
@@ -180,7 +164,7 @@
       {/if}
     </div>
   </main>
-{/if}
+</OrientationGate>
 
 <style>
 

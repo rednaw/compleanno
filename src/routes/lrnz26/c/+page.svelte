@@ -1,30 +1,18 @@
 <script>
 	import { base } from '$app/paths';
-	import { onMount } from 'svelte';
-	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import PhasedPuzzle from '$lib/components/PhasedPuzzle.svelte';
+	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { lrnz26Keys } from '../storage-keys.js';
 	import { lrnz26HubImage } from '../coordinates.js';
 	import MusicClips from './MusicClips.svelte';
 	import FinalPuzzle from './FinalPuzzle.svelte';
-	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import '$lib/quiz-form.css';
 
 	let clipsDone = $state(false);
 	let finalDone = $state(false);
-	let previouslyDone = $state(false);
 
-	const allCompleted = $derived(previouslyDone || (clipsDone && finalDone));
-
-	$effect(() => {
-		if (allCompleted) savePuzzleState(lrnz26Keys.gameCDone, '1');
-	});
-
-	onMount(() => {
-		if (loadPuzzleState(lrnz26Keys.gameCDone)) {
-			previouslyDone = true;
-		}
-	});
+	const phasesComplete = $derived(clipsDone && finalDone);
 </script>
 
 <svelte:head>
@@ -33,18 +21,22 @@
 
 <BackButton href="/lrnz26" />
 
-{#if allCompleted}
-	<ResultOverlay src="{base}/lrnz26/code/{lrnz26HubImage.c}" />
-{:else}
-	<main>
-		<div class="content-wrap">
-			<MusicClips bind:done={clipsDone} />
-			{#if clipsDone}
-				<FinalPuzzle bind:done={finalDone} />
-			{/if}
-		</div>
-	</main>
-{/if}
+<PhasedPuzzle doneKey={lrnz26Keys.gameCDone} complete={phasesComplete}>
+	{#snippet children({ allCompleted })}
+		{#if allCompleted}
+			<ResultOverlay src="{base}/lrnz26/code/{lrnz26HubImage.c}" />
+		{:else}
+			<main>
+				<div class="content-wrap">
+					<MusicClips bind:done={clipsDone} />
+					{#if clipsDone}
+						<FinalPuzzle bind:done={finalDone} />
+					{/if}
+				</div>
+			</main>
+		{/if}
+	{/snippet}
+</PhasedPuzzle>
 
 <style>
 	main {

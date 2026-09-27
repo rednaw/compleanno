@@ -1,11 +1,10 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import { savePuzzleState, loadPuzzleState } from '../utils.js';
   import BackButton from '$lib/components/BackButton.svelte';
-  import RotateMessage from '$lib/components/RotateMessage.svelte';
-
-  let showRotateMessage = false;
+import OrientationGate from '$lib/components/OrientationGate.svelte';
+  
   let guess = '';
   let submitted = false;
   let isCorrect = false;
@@ -34,27 +33,12 @@
       submitted = true;
       isCorrect = true;
     }
-    
-    // Check orientation on mount
-    const updateOrientation = () => {
-      const isLandscapeMode = checkOrientation(false); // Encourage landscape for picture puzzle
-      showRotateMessage = !isLandscapeMode;
-    };
-    
-    updateOrientation();
-    
-    // Listen for orientation changes
-    const cleanup = setupOrientationListeners(updateOrientation);
-    
-    return cleanup;
   });
 </script>
 
 <BackButton />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={false} />
-
-{#if !showRotateMessage}
+<OrientationGate encouragePortrait={false}>
   <main class="container">
     <div class="image-section">
       <img src="{base}/lrnz25/wiskunde.png" alt="Wiskunde Puzzle" class="puzzle-image" />
@@ -80,7 +64,7 @@
       </form>
     </div>
   </main>
-{/if}
+</OrientationGate>
 
 <style>
 

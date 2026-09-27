@@ -1,10 +1,10 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import { checkOrientation, setupOrientationListeners, savePuzzleState, loadPuzzleState } from '../utils.js';
+  import { savePuzzleState, loadPuzzleState } from '../utils.js';
   import BackButton from '$lib/components/BackButton.svelte';
-  import RotateMessage from '$lib/components/RotateMessage.svelte';
-
+import OrientationGate from '$lib/components/OrientationGate.svelte';
+  
   const correctAnswer = 'extinction rebellion';
   const helpImages = [
     { src: `${base}/lrnz25/pumpjack.webp`, alt: 'Pumpjack' },
@@ -15,7 +15,6 @@
   let submitted = false;
   let isCorrect = false;
   let helpClicks = 0;
-  let showRotateMessage = false;
 
   function submitGuess() {
     if (!guess.trim()) return;
@@ -97,27 +96,12 @@
           }
         }, 100);
       }
-    
-    // Check orientation on mount
-    const updateOrientation = () => {
-      const isPortraitMode = checkOrientation(true); // Encourage portrait for guess puzzle
-      showRotateMessage = !isPortraitMode;
-    };
-    
-    updateOrientation();
-    
-    // Listen for orientation changes
-    const cleanup = setupOrientationListeners(updateOrientation);
-    
-    return cleanup;
   });
 </script>
 
 <BackButton />
 
-<RotateMessage show={showRotateMessage} encouragePortrait={true} />
-
-{#if !showRotateMessage}
+<OrientationGate encouragePortrait={true}>
   <main class="container">
   <div class="images-section">
     <div class="images-container">
@@ -167,7 +151,7 @@
     </div>
   </div>
 </main>
-{/if}
+</OrientationGate>
 
 <style>
 
