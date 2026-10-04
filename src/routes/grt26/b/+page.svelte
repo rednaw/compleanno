@@ -6,18 +6,20 @@
 	import { grt26Prizes } from '../prizes.js';
 
 	const GROUPS = [
-		{ name: 'bisnonni', color: '#f7d070', words: ['omirp', 'airad', 'erotama', 'ailuig'] },
+		{ name: 'Bisnonni', color: '#f7d070', words: ['omirp', 'airad', 'erotama', 'ailuig'] },
 		{
-			name: 'amici a quattro zampe',
+			name: 'Amici a quattro zampe',
 			color: '#50b0e3',
 			words: ['sushi', 'pixel', 'spijker', 'tappo']
 		},
 		{
-			name: 'quello che studi',
+			name: 'Lo studio di GMJ',
 			color: '#a78bfa',
 			words: ['global', 'art', 'culture', 'politics']
 		},
-		{ name: 'UvA campus', color: '#94d3a2', words: ['OMHP', 'SP', 'REC', 'UB'] }
+		{ name: 'Luoghi storici di Champoluc', color: '#94d3a2', words: [
+      'Crest', 'Golo', 'Churen', 'Conigli'
+    ] }
 	];
 
 	let won = $state(false);
