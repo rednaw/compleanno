@@ -2,6 +2,7 @@ import { allowed as defaultDictionary } from '$lib/words-it.js';
 
 /**
  * Five-letter Wordle engine. Answer and dictionary are injected by the trail.
+ * Guesses are unlimited — the board only ends on a win.
  */
 export class Game {
 	/**
@@ -15,17 +16,14 @@ export class Game {
 		if (serialized) {
 			const [savedAnswer, guessesPart, answersPart] = serialized.split('-');
 			this.answer = savedAnswer;
+			this.answers = answersPart ? answersPart.split(' ').filter(Boolean) : [];
 			const restored = guessesPart ? guessesPart.split(' ') : [];
-			// Always keep 6 slots so the board never indexes past the array
-			this.guesses = ['', '', '', '', '', ''];
-			for (let i = 0; i < Math.min(6, restored.length); i++) {
-				this.guesses[i] = restored[i];
-			}
-			this.answers = answersPart ? answersPart.split(' ').filter(Boolean).slice(0, 6) : [];
+			// Drop trailing empty pads from older 6-slot saves
+			this.guesses = restored.slice(0, this.answers.length);
 		} else {
 			if (!answer) throw new Error('Game requires answer when not restoring from serialized');
 			this.answer = answer;
-			this.guesses = ['', '', '', '', '', ''];
+			this.guesses = [];
 			this.answers = [];
 		}
 	}
@@ -43,12 +41,11 @@ export class Game {
 	 * @returns {boolean} true if the guess was valid
 	 */
 	enter(letters) {
-		if (this.answers.length >= 6) return false;
 		const word = letters.join('');
 		const normalizedWord = this.normalizeWord(word);
 		const valid = this.dictionary.has(word) || this.dictionary.has(normalizedWord);
 		if (!valid) return false;
-		this.guesses[this.answers.length] = word;
+		this.guesses.push(word);
 		const available = Array.from(this.answer);
 		const answer = Array(5).fill('_');
 		for (let i = 0; i < 5; i += 1) {

@@ -31,7 +31,7 @@
 		onWon
 	} = $props();
 
-	const ROWS = [0, 1, 2, 3, 4, 5];
+	const MIN_ROWS = 6;
 	const COLS = [0, 1, 2, 3, 4];
 	const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 
@@ -42,7 +42,10 @@
 	let won = $state(false);
 	let badGuess = $state(false);
 
-	const gameOver = $derived(won || answers.length >= 6);
+	/** Only a win ends the game — guesses are unlimited. */
+	const gameOver = $derived(won);
+	const rowCount = $derived(Math.max(MIN_ROWS, answers.length + (won ? 0 : 1)));
+	const rows = $derived(Array.from({ length: rowCount }, (_, i) => i));
 
 	/** @type {(e: KeyboardEvent) => void} */
 	let onKeyDown;
@@ -65,7 +68,7 @@
 
 	/** @param {string} key */
 	function handleKey(key) {
-		if (won || answers.length >= 6) return;
+		if (won) return;
 		if (key === 'backspace') {
 			currentGuess = currentGuess.slice(0, -1);
 			badGuess = false;
@@ -120,7 +123,7 @@
 		{@render children()}
 	{/if}
 	<div class="game">
-		{#each ROWS as row (row)}
+		{#each rows as row (row)}
 			<div
 				class="row"
 				class:current={row === answers.length && !gameOver}
@@ -149,15 +152,8 @@
 	{#if gameOver}
 		{#if result}
 			{@render result({ won, restart })}
-		{:else if won}
-			{#if restartable}
-				<div class="result">
-					<button type="button" onclick={restart}>Riprova</button>
-				</div>
-			{/if}
-		{:else}
+		{:else if restartable}
 			<div class="result">
-				<p class="lose-msg">Era <strong>{answer}</strong></p>
 				<button type="button" onclick={restart}>Riprova</button>
 			</div>
 		{/if}
@@ -314,12 +310,6 @@
 	.result {
 		margin-top: 1em;
 		text-align: center;
-	}
-
-	.lose-msg {
-		margin: 0 0 0.75rem;
-		font-size: 1.1rem;
-		color: var(--color-text);
 	}
 
 	@media (max-width: 500px) {
