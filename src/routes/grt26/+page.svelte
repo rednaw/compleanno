@@ -1,10 +1,10 @@
 <script>
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import { GRT26_STORAGE_PREFIX, grt26Keys } from './storage-keys.js';
-	import { grt26Prizes } from './prizes.js';
+	import { grt26PrizeImages } from './prizes.js';
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
@@ -49,16 +49,32 @@
 	<div class="content">
 		<div class="games-grid">
 			<a href={resolve('/grt26/a')} class="game-button" class:game-button-solved={gameADone}>
-				{gameADone ? grt26Prizes.a : '?'}
+				{#if gameADone}<img
+						src="{base}/grt26/code/{grt26PrizeImages.a}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/grt26/b')} class="game-button" class:game-button-solved={gameBDone}>
-				{gameBDone ? grt26Prizes.b : '?'}
+				{#if gameBDone}<img
+						src="{base}/grt26/code/{grt26PrizeImages.b}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/grt26/c')} class="game-button" class:game-button-solved={gameCDone}>
-				{gameCDone ? grt26Prizes.c : '?'}
+				{#if gameCDone}<img
+						src="{base}/grt26/code/{grt26PrizeImages.c}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 			<a href={resolve('/grt26/d')} class="game-button" class:game-button-solved={gameDDone}>
-				{gameDDone ? grt26Prizes.d : '?'}
+				{#if gameDDone}<img
+						src="{base}/grt26/code/{grt26PrizeImages.d}"
+						alt=""
+						class="hub-img"
+					/>{:else}?{/if}
 			</a>
 		</div>
 		<div class="arrow">↓</div>
@@ -128,8 +144,14 @@
 	}
 
 	.game-button-solved {
-		font-size: 1.05rem;
-		font-weight: 700;
+		padding: 0;
+	}
+
+	.hub-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
 	}
 
 	.code-button {
@@ -169,10 +191,6 @@
 
 		.game-button {
 			font-size: 1.75rem;
-		}
-
-		.game-button-solved {
-			font-size: 0.9rem;
 		}
 
 		.code-button {

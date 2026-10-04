@@ -5,7 +5,7 @@
 	import AudioMixGuess from '$lib/components/AudioMixGuess.svelte';
 	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { grt26DSolvedKey, grt26Keys } from '../storage-keys.js';
-	import { grt26Prizes } from '../prizes.js';
+	import { grt26PrizeImages } from '../prizes.js';
 
 	/** @type {{ id: string; title: string }[]} */
 	const tracks = manifest.tracks.map((t) => ({
@@ -25,7 +25,7 @@
 
 <main>
 	{#if allCompleted}
-		<ResultOverlay text={grt26Prizes.d} />
+		<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.d}" />
 	{:else}
 		<div class="mix">
 			<AudioMixGuess

@@ -1,9 +1,10 @@
 <script>
+	import { base } from '$app/paths';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import ConnectionsBoard from '$lib/components/ConnectionsBoard.svelte';
 	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { grt26Keys } from '../storage-keys.js';
-	import { grt26Prizes } from '../prizes.js';
+	import { grt26PrizeImages } from '../prizes.js';
 
 	const GROUPS = [
 		{ name: 'Bisnonni', color: '#f7d070', words: ['omirp', 'airad', 'erotama', 'ailuig'] },
@@ -44,7 +45,7 @@
 </main>
 
 {#if won}
-	<ResultOverlay text={grt26Prizes.b} />
+	<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.b}" />
 {/if}
 
 <style>

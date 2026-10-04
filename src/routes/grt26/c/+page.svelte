@@ -8,7 +8,7 @@
 	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { answerMatches } from '$lib/normalize.js';
 	import { grt26CItemKey, grt26Keys } from '../storage-keys.js';
-	import { grt26Prizes } from '../prizes.js';
+	import { grt26PrizeImages } from '../prizes.js';
 
 	const ITEMS = [
 		{ id: 'one', file: 'one.jpg', answers: ['gogh', 'van gogh'] },
@@ -100,7 +100,7 @@
 </main>
 
 {#if allCompleted}
-	<ResultOverlay text={grt26Prizes.c} />
+	<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.c}" />
 {/if}
 
 <style>

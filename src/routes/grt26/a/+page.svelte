@@ -1,9 +1,10 @@
 <script>
+	import { base } from '$app/paths';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import WordleBoard from '$lib/components/WordleBoard.svelte';
 	import ResultOverlay from '$lib/components/ResultOverlay.svelte';
 	import { grt26Keys } from '../storage-keys.js';
-	import { grt26Prizes } from '../prizes.js';
+	import { grt26PrizeImages } from '../prizes.js';
 
 	const ANSWER = 'sofia';
 	let won = $state(false);
@@ -27,5 +28,5 @@
 </WordleBoard>
 
 {#if won}
-	<ResultOverlay text={grt26Prizes.a} />
+	<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.a}" />
 {/if}
