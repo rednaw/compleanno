@@ -193,8 +193,8 @@
 		background: rgba(255, 255, 255, 0.9);
 		border-radius: 1em;
 		box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
-		padding: 2em 2em 1em 2em;
-		max-width: 420px;
+		padding: 2em 1.25em 1.25em;
+		max-width: min(36rem, 96vw);
 		width: 100%;
 		margin: 5em auto 2em auto;
 		box-sizing: border-box;
@@ -275,17 +275,22 @@
 	.keyboard {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25em;
-		align-items: center;
+		gap: 0.35em;
+		align-items: stretch;
+		width: 100%;
 	}
 
 	.kb-row {
 		display: flex;
-		gap: 0.25em;
+		gap: 0.3em;
+		width: 100%;
+		justify-content: center;
 	}
 
 	button {
-		padding: 0.5em 1em;
+		flex: 1 1 0;
+		min-width: 0;
+		padding: 0.55em 0.2em;
 		font-size: 1em;
 		border: 2px solid var(--color-border);
 		background: var(--color-white);
@@ -320,7 +325,7 @@
 	@media (max-width: 500px) {
 		.main-container {
 			max-width: 98vw;
-			padding: 1em 0.2em 0.5em 0.2em;
+			padding: 1em 0.4em 0.75em;
 		}
 
 		.game {
@@ -338,20 +343,9 @@
 			font-size: 1.1em;
 		}
 
-		.keyboard {
-			width: 100%;
-			max-width: 100vw;
-		}
-
-		.kb-row {
-			width: 100%;
-			justify-content: center;
-		}
-
 		button {
-			padding: 0.3em 0.5em;
-			font-size: 0.95em;
-			min-width: 2.2em;
+			padding: 0.45em 0.1em;
+			font-size: 0.9em;
 		}
 	}
 </style>
