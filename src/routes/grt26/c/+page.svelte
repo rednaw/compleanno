@@ -92,6 +92,9 @@
 <BackButton href="/grt26" />
 
 <main>
+	<h1>Chi l'ha dipinto?</h1>
+	<p class="howto">Scrivi il nome del pittore di ogni quadro.</p>
+
 	<PhotoGuessGrid items={gridItems} {solved} {flashId} shake={gridShake} />
 
 	{#if !allCompleted}
@@ -113,5 +116,24 @@
 		padding: 5rem 1rem 2rem;
 		box-sizing: border-box;
 		gap: 1.25rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.5rem;
+		text-align: center;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+	}
+
+	.howto {
+		margin: -0.5rem 0 0;
+		max-width: 22rem;
+		text-align: center;
+		font-size: 0.95rem;
+		line-height: 1.35;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+		opacity: 0.95;
 	}
 </style>

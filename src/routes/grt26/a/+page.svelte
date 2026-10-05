@@ -25,8 +25,29 @@
 	}}
 >
 	<h1>Indovina la parola</h1>
+	<p class="howto">
+		Parola di 5 lettere. Verde = posto giusto · giallo = nella parola · grigio = no.
+	</p>
 </WordleBoard>
 
 {#if won}
 	<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.a}" />
 {/if}
+
+<style>
+	.howto {
+		margin: 0 0 1rem;
+		max-width: 22rem;
+		text-align: center;
+		font-size: 0.95rem;
+		line-height: 1.35;
+		color: var(--color-text);
+		opacity: 0.85;
+	}
+
+	:global(.main-container h1) {
+		margin: 0 0 0.5rem;
+		font-size: 1.5rem;
+		text-align: center;
+	}
+</style>

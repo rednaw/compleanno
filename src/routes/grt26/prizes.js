@@ -1,16 +1,19 @@
 /**
- * Digit each game hands out. The hub shows them on solved tiles and the code page lists all four —
- * read in the order the recipient knows, they spell `3795`.
- * Puzzle win overlays use the matching photo under `static/grt26/code/`.
+ * Each game’s prize is a person (photo + name) with a random digit.
+ * Code = digits oldest → youngest: Lorenzo 3, Giacomo 7, Nicolò 9, Sofia 5 → `3795`.
+ * Player knows the age order; digits are not ages.
  */
 
 /** @readonly */
 export const grt26Prizes = Object.freeze({
-	a: 'Sofia = 5',
-	b: 'Nicolò = 9',
-	c: 'Lorenzo = 3',
-	d: 'Giacomo = 7'
+	a: { name: 'Sofia', digit: '5' },
+	b: { name: 'Nicolò', digit: '9' },
+	c: { name: 'Lorenzo', digit: '3' },
+	d: { name: 'Giacomo', digit: '7' }
 });
+
+/** Code digits oldest → youngest (Lorenzo, Giacomo, Nicolò, Sofia). */
+export const GRT26_CODE = '3795';
 
 /** Filename under `/grt26/code/` for each game’s fullscreen win image. */
 /** @readonly */

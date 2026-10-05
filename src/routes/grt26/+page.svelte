@@ -1,10 +1,19 @@
 <script>
 	import { base, resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { loadPuzzleState, clearPuzzleKeyPrefix } from '$lib/puzzle-utils.js';
+	import {
+		loadPuzzleState,
+		savePuzzleState,
+		clearPuzzleState,
+		clearPuzzleKeyPrefix
+	} from '$lib/puzzle-utils.js';
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
+	import HubDevBar from '$lib/components/HubDevBar.svelte';
 	import { GRT26_STORAGE_PREFIX, grt26Keys } from './storage-keys.js';
 	import { grt26PrizeImages } from './prizes.js';
+
+	/** Set true while authoring; leave false for release. */
+	const DEV_MODE = true;
 
 	let gameADone = $state(false);
 	let gameBDone = $state(false);
@@ -13,6 +22,42 @@
 	let codeDone = $state(false);
 
 	const allPuzzlesDone = $derived(gameADone && gameBDone && gameCDone && gameDDone);
+
+	/** @param {string} key @param {(v: boolean) => void} set */
+	function toggleDone(key, set, current) {
+		const next = !current;
+		if (next) savePuzzleState(key, '1');
+		else clearPuzzleState(key);
+		set(next);
+	}
+
+	const devKeys = $derived([
+		{
+			label: 'A',
+			done: gameADone,
+			onToggle: () => toggleDone(grt26Keys.gameADone, (v) => (gameADone = v), gameADone)
+		},
+		{
+			label: 'B',
+			done: gameBDone,
+			onToggle: () => toggleDone(grt26Keys.gameBDone, (v) => (gameBDone = v), gameBDone)
+		},
+		{
+			label: 'C',
+			done: gameCDone,
+			onToggle: () => toggleDone(grt26Keys.gameCDone, (v) => (gameCDone = v), gameCDone)
+		},
+		{
+			label: 'D',
+			done: gameDDone,
+			onToggle: () => toggleDone(grt26Keys.gameDDone, (v) => (gameDDone = v), gameDDone)
+		},
+		{
+			label: '🔑',
+			done: codeDone,
+			onToggle: () => toggleDone(grt26Keys.codeDone, (v) => (codeDone = v), codeDone)
+		}
+	]);
 
 	onMount(() => {
 		try {
@@ -46,6 +91,7 @@
 
 <main>
 	<ClearProgressButton onClear={clearGlobalState} />
+	<HubDevBar enabled={DEV_MODE} keys={devKeys} />
 	<div class="content">
 		<div class="games-grid">
 			<a href={resolve('/grt26/a')} class="game-button" class:game-button-solved={gameADone}>

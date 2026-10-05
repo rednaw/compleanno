@@ -27,6 +27,8 @@
 	{#if allCompleted}
 		<ResultOverlay src="{base}/grt26/code/{grt26PrizeImages.d}" />
 	{:else}
+		<h1>Che canzone è?</h1>
+		<p class="howto">Ascolta il mix e indovina le canzoni, una alla volta.</p>
 		<div class="mix">
 			<AudioMixGuess
 				{tracks}
@@ -51,6 +53,26 @@
 		padding: 1rem 0.5rem;
 		box-sizing: border-box;
 		margin-top: 4rem;
+		gap: 0.5rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.5rem;
+		text-align: center;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+	}
+
+	.howto {
+		margin: 0 0 0.75rem;
+		max-width: 22rem;
+		text-align: center;
+		font-size: 0.95rem;
+		line-height: 1.35;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+		opacity: 0.95;
 	}
 
 	.mix :global(.progress-hint),

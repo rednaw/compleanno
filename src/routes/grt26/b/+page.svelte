@@ -33,6 +33,8 @@
 <BackButton href="/grt26" />
 
 <main class="container">
+	<h1>Collega le parole</h1>
+	<p class="howto">Forma 4 gruppi di 4 parole che hanno qualcosa in comune.</p>
 	<ConnectionsBoard
 		groups={GROUPS}
 		seed={0x51b26026}
@@ -58,6 +60,25 @@
 		padding: 11rem 1rem 2rem;
 		box-sizing: border-box;
 		gap: 0.75rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.5rem;
+		text-align: center;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+	}
+
+	.howto {
+		margin: 0 0 0.5rem;
+		max-width: 22rem;
+		text-align: center;
+		font-size: 0.95rem;
+		line-height: 1.35;
+		color: var(--color-white);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+		opacity: 0.95;
 	}
 
 	@media (max-width: 500px) {
