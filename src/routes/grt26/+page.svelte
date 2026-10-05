@@ -10,7 +10,7 @@
 	import ClearProgressButton from '$lib/components/ClearProgressButton.svelte';
 	import HubDevBar from '$lib/components/HubDevBar.svelte';
 	import { GRT26_STORAGE_PREFIX, grt26Keys } from './storage-keys.js';
-	import { grt26PrizeImages } from './prizes.js';
+	import { grt26PrizeImages, GRT26_FINAL_IMAGE } from './prizes.js';
 
 	/** Set true while authoring; leave false for release. */
 	const DEV_MODE = true;
@@ -126,7 +126,9 @@
 		<div class="arrow">↓</div>
 		<div class="code-section">
 			{#if codeDone}
-				<a href={resolve('/grt26/code')} class="code-button code-button-solved">✓</a>
+				<a href={resolve('/grt26/code')} class="code-button code-button-solved">
+					<img src="{base}/grt26/code/{GRT26_FINAL_IMAGE}" alt="" class="hub-img" />
+				</a>
 			{:else if allPuzzlesDone}
 				<a href={resolve('/grt26/code')} class="code-button">?</a>
 			{:else}
@@ -189,7 +191,8 @@
 		text-wrap: balance;
 	}
 
-	.game-button-solved {
+	.game-button-solved,
+	.code-button-solved {
 		padding: 0;
 	}
 

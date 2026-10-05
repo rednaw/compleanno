@@ -23,3 +23,6 @@ export const grt26PrizeImages = Object.freeze({
 	c: 'lorenzo.png',
 	d: 'giacomo.png'
 });
+
+/** Fullscreen / hub image after the code is solved. */
+export const GRT26_FINAL_IMAGE = 'final.jpg';
