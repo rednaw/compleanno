@@ -1,6 +1,7 @@
 <script>
 	import { base } from '$app/paths';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { confetti } from '@neoconfetti/svelte';
 	import { savePuzzleState, loadPuzzleState } from '$lib/puzzle-utils.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import CodeKeypad from '$lib/components/CodeKeypad.svelte';
@@ -20,14 +21,88 @@
 		image: grt26PrizeImages[id]
 	}));
 
+	const CONFETTI_COLORS = ['#FFC700', '#ff3d33', '#0e61cb', '#ffffff', '#ddd5f4', '#388e3c'];
+
 	let success = $state(false);
+	/** @type {(() => void) | undefined} */
+	let stopRain;
+
+	function startConfettiRain() {
+		stopRain?.();
+
+		const layer = document.createElement('div');
+		layer.setAttribute('aria-hidden', 'true');
+		layer.style.cssText =
+			'position:fixed;inset:0;z-index:150;pointer-events:none;overflow:visible';
+		document.body.append(layer);
+
+		/** @type {Array<{ destroy: () => void }>} */
+		const instances = [];
+		/** @type {number[]} */
+		const timers = [];
+
+		const duration = 5200;
+		const xs = ['8%', '26%', '44%', '62%', '80%', '94%'];
+
+		/** @param {string} left @param {number} particleCount */
+		function dropFrom(left, particleCount) {
+			const el = document.createElement('div');
+			el.style.cssText = `position:absolute;top:0;left:${left}`;
+			layer.append(el);
+			instances.push(
+				confetti(el, {
+					particleCount,
+					force: 0.38,
+					duration,
+					particleSize: 11,
+					stageHeight: window.innerHeight,
+					stageWidth: window.innerWidth,
+					colors: CONFETTI_COLORS
+				})
+			);
+		}
+
+		for (const left of xs) dropFrom(left, 55);
+		timers.push(
+			window.setTimeout(() => {
+				for (const left of xs) dropFrom(left, 40);
+			}, 900)
+		);
+		timers.push(
+			window.setTimeout(() => {
+				for (const left of ['18%', '50%', '82%']) dropFrom(left, 45);
+			}, 1800)
+		);
+
+		timers.push(
+			window.setTimeout(() => {
+				stopRain?.();
+			}, duration + 2200)
+		);
+
+		stopRain = () => {
+			for (const t of timers) clearTimeout(t);
+			for (const inst of instances) inst.destroy();
+			layer.remove();
+			stopRain = undefined;
+		};
+	}
+
+	function showFinale() {
+		success = true;
+		startConfettiRain();
+	}
 
 	onMount(() => {
 		try {
-			if (loadPuzzleState(grt26Keys.codeDone)) success = true;
+			if (loadPuzzleState(grt26Keys.codeDone)) showFinale();
 		} catch {
 			/* localStorage may be unavailable */
 		}
+	});
+
+	onDestroy(() => {
+		stopRain?.();
 	});
 </script>
 
@@ -43,8 +118,8 @@
 	<CodeKeypad
 		correctCode={GRT26_CODE}
 		onCorrect={() => {
-			success = true;
 			savePuzzleState(grt26Keys.codeDone, '1');
+			showFinale();
 		}}
 	>
 		<p class="howto">Sai già l’ordine. Digita.</p>
