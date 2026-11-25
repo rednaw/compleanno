@@ -30,4 +30,4 @@ __pycache__/
 *.py[cod]
 
 # Host skills bind-mounted in the Dev Container
-.cursor/skills/
+.cursor

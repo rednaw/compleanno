@@ -9,8 +9,10 @@
 	"workspaceFolder": "/workspaces/compleanno",
 	"mounts": [
 		"source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/projects/rednaw/store/compleanno,target=/workspaces/compleanno/.cursor,type=bind,consistency=cached",
 		"source=${localEnv:HOME}/.cursor/skills,target=/home/node/.cursor/skills,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.cursor/skills,target=/workspaces/compleanno/.cursor/skills,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.cursor/skills,target=/workspaces/compleanno/.cursor/skills,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/projects/rednaw/store/rednaw/history.md,target=/workspaces/compleanno/.cursor/history.md,type=bind,consistency=cached"
 	],
 	"containerEnv": {
 		"DEVCONTAINER": "1",
